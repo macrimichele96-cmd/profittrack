@@ -27,22 +27,26 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg); color: var(--text); margin: 0;
   padding-bottom: calc(110px + env(safe-area-inset-bottom));
-  padding-top: env(safe-area-inset-top);
+  padding-top: calc(65px + env(safe-area-inset-top));
   -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
 
-/* NAV iOS GLASS - Adattata Safe Area */
+/* FIX DYNAMIC ISLAND */
+.timeline-nav-wrapper {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 5000;
+  background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding-top: env(safe-area-inset-top);
+}
 .timeline-nav {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 15px; position: sticky; top: env(safe-area-inset-top); z-index: 100;
-  background: rgba(18, 18, 18, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border); margin-top: calc(-1 * env(safe-area-inset-top));
+  padding: 10px 15px; max-width: 500px; margin: auto;
 }
 .nav-btn { background: none; border: none; color: var(--blue); font-size: 22px; cursor: pointer; padding: 10px; }
 .current-date { font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
 .current-date small { display: block; font-size: 10px; color: var(--sub); font-weight: 400; margin-top: 2px; }
 
-/* CONTAINER - Margini fissi per Pro Max */
+/* CONTAINER */
 .container { max-width: 500px; margin: auto; padding: 15px 20px; box-sizing: border-box; }
 
 /* SEZIONI NAVIGAZIONE */
@@ -80,6 +84,12 @@ input:focus { border-color: var(--blue); }
 .lab { font-size: 9px; color: var(--sub); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
 .val { font-size: 16px; font-weight: 800; color: #fff; }
 
+/* BUDGET BAR */
+.budget-container { margin-bottom: 15px; }
+.budget-header { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; color: var(--sub); font-weight: 600; margin-bottom: 8px; }
+.budget-track { background: rgba(255,255,255,0.1); border-radius: 6px; height: 10px; width: 100%; overflow: hidden; }
+.budget-fill { height: 100%; width: 0%; transition: width 0.4s ease; border-radius: 6px; }
+
 /* LIST ITEMS */
 .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease;}
 .item-row:last-child { border-bottom: none; }
@@ -96,7 +106,7 @@ input:focus { border-color: var(--blue); }
 
 @keyframes fadeIn { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
 
-/* TAB BAR iOS - Adattata Safe Area */
+/* TAB BAR iOS */
 .tab-bar {
   position: fixed; bottom: 0; left: 0; width: 100%;
   background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -111,16 +121,18 @@ input:focus { border-color: var(--blue); }
 
 <body>
 
-<div id="page-home" class="page active">
+<div class="timeline-nav-wrapper">
   <div class="timeline-nav">
     <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
     <div class="current-date" id="dateHeader"></div>
     <button class="nav-btn" onclick="changeMonth(1)">❯</button>
   </div>
-  
+</div>
+
+<div id="page-home" class="page active">
   <div class="container">
     <div class="summary-grid">
-      <div class="summary-boxhighlight highlight" id="boxPaga">
+      <div class="summary-box highlight" id="boxPaga">
         <span class="lab">Tua Ora</span>
         <div id="valoreOra" class="val">€0.00</div>
       </div>
@@ -139,6 +151,16 @@ input:focus { border-color: var(--blue); }
       <div class="summary-box">
         <span class="lab">Ore Lavoro</span>
         <div id="monthHoursVal" class="val" style="color:var(--orange)">0h</div>
+      </div>
+    </div>
+
+    <div class="card budget-container">
+      <div class="budget-header">
+        <span>Capacità di Spesa Assorbita</span>
+        <span id="budgetPerc">0%</span>
+      </div>
+      <div class="budget-track">
+        <div id="budgetBar" class="budget-fill"></div>
       </div>
     </div>
 
@@ -186,7 +208,7 @@ input:focus { border-color: var(--blue); }
 </div>
 
 <div id="page-list" class="page">
-  <div class="container" style="padding-top: 30px;">
+  <div class="container">
     <div class="card">
       <h3>Entrate <span id="listDateLabelEnt" style="color:var(--green)"></span></h3>
       <div id="incomeList"></div>
@@ -195,12 +217,13 @@ input:focus { border-color: var(--blue); }
       <h3>Uscite <span id="listDateLabelUsc" style="color:var(--red)"></span></h3>
       <div id="expenseList"></div>
       <div id="topSpesaContainer"></div>
+      <div id="resFisso" style="margin-top: 15px; font-size: 12px; color: var(--sub); text-align: center; font-weight: 600;"></div>
     </div>
   </div>
 </div>
 
 <div id="page-tool" class="page">
-  <div class="container" style="padding-top: 30px;">
+  <div class="container">
     <div class="card">
       <h3>🛒 Deterrente Acquisto</h3>
       <input id="det_prezzo" type="number" placeholder="Prezzo tentazione (€)">
@@ -218,12 +241,12 @@ input:focus { border-color: var(--blue); }
 </div>
 
 <div id="page-set" class="page">
-  <div class="container" style="padding-top: 30px;">
+  <div class="container">
     <div class="card">
       <h3>⚙️ Strumenti e Backup</h3>
       <button class="btn btn-outline" onclick="exportCSV()">💾 Esporta in Excel (CSV)</button>
-      <button class="btn btn-outline" onclick="exportBackup()">☁️ Esporta Backup JSON</button>
-      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="resetData()">⚠️ Cancella Tutti i Dati</button>
+      <button class="btn btn-outline" style="margin-top: 10px;" onclick="exportBackup()">☁️ Esporta Backup JSON</button>
+      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red); margin-top: 25px;" onclick="resetData()">⚠️ Cancella Tutti i Dati</button>
     </div>
     <div style="text-align:center; color:var(--sub); font-size:11px; margin-top:20px;">ProfitTrack Pro V10</div>
   </div>
@@ -254,9 +277,7 @@ const oggetti = [
 ];
 const monthNames = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
 
-// Nuovo DB V10 strutturato per mese
 let db = JSON.parse(localStorage.getItem('pt_v10_db')) || {};
-// Fallback globale se utente non imposta mese specifico
 let globalSettings = JSON.parse(localStorage.getItem('pt_v10_settings')) || { stip: 0, ore: 1, pagaH: 0 }; 
 let currentView = new Date();
 
@@ -279,7 +300,7 @@ function changeMonth(dir) {
 function estraiIcona(stringa) { return stringa.substring(0, 2); }
 function vibrate() { if(navigator.vibrate) navigator.vibrate(15); }
 
-// ANIMAZIONE NUMERI (Dalla V9)
+// ANIMAZIONE NUMERI
 function animaNumero(el, finale) {
   let start = parseFloat(el.getAttribute('data-val')) || 0;
   if (start === finale) { el.innerText = "€" + finale.toFixed(0); return; }
@@ -294,7 +315,7 @@ function animaNumero(el, finale) {
   requestAnimationFrame(anim);
 }
 
-// LOGICA CORE MESE (Tua richiesta: Stipendio mensile)
+// LOGICA CORE MESE
 function getMonthlyDataKey() { return `${currentView.getFullYear()}-${currentView.getMonth()}`; }
 
 function initMonthData() {
@@ -311,7 +332,6 @@ function saveMonthlySalary() {
   initMonthData();
   db[getMonthlyDataKey()].monthlySettings = { stip: stipVal, ore: oreVal, pagaH: stipVal/oreVal };
   
-  // Salva anche come fallback globale se è la prima volta o se è zero
   if(globalSettings.stip === 0) {
       globalSettings = { stip: stipVal, ore: oreVal, pagaH: stipVal/oreVal };
       localStorage.setItem('pt_v10_settings', JSON.stringify(globalSettings));
@@ -322,7 +342,6 @@ function saveMonthlySalary() {
   render();
 }
 
-// Riceve la pagaH corretta per il mese visibile (specifica o globale)
 function getCurrentPagaH() {
   const key = getMonthlyDataKey();
   if(db[key] && db[key].monthlySettings) return db[key].monthlySettings.pagaH;
@@ -373,7 +392,7 @@ function deleteItem(id, type) {
   render();
 }
 
-// STRUMENTI (Dalla V9)
+// STRUMENTI
 function validaAcquisto() {
   const pagaH = getCurrentPagaH();
   if (pagaH === 0) return alert("Imposta stipendio/ore per calcolare.");
@@ -420,15 +439,8 @@ function exportCSV() {
         const month = db[key];
         const pagaHMese = month.monthlySettings ? month.monthlySettings.pagaH : pagaHGlobale;
         
-        // Aggiungi Entrate
-        month.income.forEach(i => {
-            csv += `${key},Entrata,"${i.nome.replace(/"/g, '""')}","${i.cat}",${i.imp},0\n`;
-        });
-        
-        // Aggiungi Uscite
-        month.expenses.forEach(e => {
-            csv += `${key},Uscita,"${e.nome.replace(/"/g, '""')}","${e.cat}",${e.imp},${(e.imp/pagaHMese).toFixed(1)}\n`;
-        });
+        month.income.forEach(i => { csv += `${key},Entrata,"${i.nome.replace(/"/g, '""')}","${i.cat}",${i.imp},0\n`; });
+        month.expenses.forEach(e => { csv += `${key},Uscita,"${e.nome.replace(/"/g, '""')}","${e.cat}",${e.imp},${(e.imp/pagaHMese).toFixed(1)}\n`; });
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -447,7 +459,6 @@ function render() {
   const data = db[key];
   const currentPagaH = getCurrentPagaH();
   
-  // LABELS DATE
   const dateStr = `${monthNames[currentView.getMonth()]} ${currentView.getFullYear()}`;
   document.getElementById("dateHeader").innerHTML = `${dateStr}<small>Paga Base: ${data.monthlySettings ? '✅ Impostata' : '⚠️ Non impostata'}</small>`;
   if(document.getElementById("page-home").classList.contains('active')) document.getElementById("setupDateLabel").innerText = dateStr;
@@ -456,7 +467,6 @@ function render() {
       document.getElementById("listDateLabelUsc").innerText = dateStr;
   }
 
-  // UPDATE SETUP INPUTS (Dashboard)
   if(data.monthlySettings) {
       document.getElementById("set_stip_mese").value = data.monthlySettings.stip;
       document.getElementById("set_ore_mese").value = data.monthlySettings.ore;
@@ -465,7 +475,6 @@ function render() {
       document.getElementById("set_ore_mese").value = '';
   }
 
-  // CALCOLO TOTALI
   const totEntrateBase = data.monthlySettings ? data.monthlySettings.stip : 0;
   const totEntrateExtra = data.income.reduce((a, b) => a + b.imp, 0);
   const totEntrateEffettive = totEntrateBase + totEntrateExtra;
@@ -473,23 +482,27 @@ function render() {
   const totUscite = data.expenses.reduce((a, b) => a + b.imp, 0);
   const flussoNetto = totEntrateEffettive - totUscite;
   const oreLavoroUscite = currentPagaH > 0 ? totUscite / currentPagaH : 0;
-  const oreLavoroBase = data.monthlySettings ? data.monthlySettings.ore : 0;
 
-  // AGGIORNA DASHBOARD NUMERI
   if(currentPagaH > 0) {
     document.getElementById("boxPaga").style.display = "block";
     document.getElementById("valoreOra").innerText = `€${currentPagaH.toFixed(2)}`;
   } else { document.getElementById("boxPaga").style.display = "none"; }
   
   document.getElementById("monthInVal").innerText = `€${totEntrateEffettive.toFixed(0)}`;
-  animaNumero(document.getElementById("monthOutVal"), totUscite); // Tua miglioria
+  animaNumero(document.getElementById("monthOutVal"), totUscite); 
   document.getElementById("monthHoursVal").innerText = `${oreLavoroUscite.toFixed(1)}h`;
   
   const netEl = document.getElementById("monthNetVal");
   netEl.innerText = `€${flussoNetto.toFixed(0)}`;
   netEl.style.color = flussoNetto >= 0 ? 'var(--green)' : 'var(--red)';
 
-  // RENDER LISTE (Tab Liste)
+  // GESTIONE BUDGET BAR
+  let percSpesa = totEntrateEffettive > 0 ? (totUscite / totEntrateEffettive) * 100 : 0;
+  if(percSpesa > 100) percSpesa = 100;
+  document.getElementById("budgetPerc").innerText = `${percSpesa.toFixed(1)}%`;
+  document.getElementById("budgetBar").style.width = `${percSpesa}%`;
+  document.getElementById("budgetBar").style.background = percSpesa > 80 ? 'var(--red)' : (percSpesa > 50 ? 'var(--orange)' : 'var(--green)');
+
   if(document.getElementById("page-list").classList.contains('active')) {
       const renderRow = (i, type, ph) => `
         <div class="item-row fade-in">
@@ -509,7 +522,6 @@ function render() {
       document.getElementById("incomeList").innerHTML = data.income.length ? data.income.map(i=>renderRow(i,'inc',0)).join('') : "<small style='color:var(--sub)'>Nessuna entrata extra.</small>";
       document.getElementById("expenseList").innerHTML = data.expenses.length ? data.expenses.map(i=>renderRow(i,'usc',currentPagaH)).join('') : "<small style='color:var(--sub)'>Nessuna uscita.</small>";
 
-      // LOGICA TESCHIO E RES CONTO
       if(data.expenses.length > 0) {
         let top = data.expenses.reduce((a, b) => a.imp > b.imp ? a : b);
         let alertText = "";
@@ -518,7 +530,7 @@ function render() {
             alertText = `<br><span style="color:var(--text); font-size:11px;">💀 Pesa oltre il 20% dello stipendio base!</span>`;
         }
         document.getElementById("topSpesaContainer").innerHTML = `<div class="top-spesa">🔥 Salasso: ${top.nome} (€${top.imp.toFixed(0)})${alertText}</div>`;
-        document.getElementById("resFisso").innerText = stipRiferimento > 1 ? `Uscite assorbono il ${((totUscite / stipRiferimento) * 100).toFixed(1)}% dello stipendio base.` : "";
+        document.getElementById("resFisso").innerText = stipRiferimento > 1 ? `Le uscite assorbono il ${((totUscite / stipRiferimento) * 100).toFixed(1)}% dello stipendio base.` : "";
       } else {
         document.getElementById("topSpesaContainer").innerHTML = "";
         document.getElementById("resFisso").innerText = "";
