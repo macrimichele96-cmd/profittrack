@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ProfitTrack</title>
+
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ProfitTrack%22%2C%22short_name%22%3A%22ProfitTrack%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2220%22%20fill%3D%22%230A84FF%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2268%22%20font-size%3D%2255%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22bold%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%3E%E2%82%AC%3C%2Ftext%3E%3C%2Fsvg%3E">
+
+<style>
+:root {
+  --bg: #000000;
+  --card: rgba(28, 28, 30, 0.6);
+  --text: #ffffff;
+  --sub: #8e8e93;
+  --blue: #0A84FF;
+  --red: #FF453A;
+  --green: #32D74B;
+  --orange: #FF9F0A;
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding-bottom: 100px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* NAV iOS GLASS */
+.timeline-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 20px; position: sticky; top: 0; z-index: 100;
+  background: rgba(18, 18, 18, 0.75);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-btn { background: none; border: none; color: var(--blue); font-size: 22px; cursor: pointer; padding: 5px 15px; }
+.current-date { font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.container { max-width: 500px; margin: auto; padding: 15px; }
+
+/* SEZIONI NAVIGAZIONE */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+
+/* CARD iOS */
+.card {
+  background: var(--card); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+  border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);
+}
+h3 { font-size: 12px; text-transform: uppercase; color: var(--sub); letter-spacing: 1px; margin: 0 0 15px 0; font-weight: 600; }
+
+input, select {
+  width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px;
+  background: rgba(44, 44, 46, 0.8); color: #fff; font-size: 16px; box-sizing: border-box; outline: none; -webkit-appearance: none;
+}
+input:focus, select:focus { border-color: var(--blue); }
+
+.btn { width: 100%; border: none; border-radius: 14px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; margin-top: 5px; -webkit-tap-highlight-color: transparent;}
+.btn:active { transform: scale(0.97); opacity: 0.8; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-outline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.summary-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; text-align: center; }
+.summary-box.highlight { background: rgba(10, 132, 255, 0.1); border-color: var(--blue); grid-column: span 2;}
+
+.item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease;}
+.item-row:last-child { border-bottom: none; }
+.item-icon { font-size: 24px; margin-right: 12px; background: rgba(255,255,255,0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+.item-info { display: flex; flex-direction: column; flex-grow: 1; }
+.item-name { font-weight: 600; font-size: 16px; }
+.item-meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.item-price { font-weight: 700; font-size: 16px; color: var(--red); }
+.del-btn { background: rgba(255, 69, 58, 0.1); color: var(--red); border: none; border-radius: 8px; width: 30px; height: 30px; margin-left: 10px; font-size: 16px; font-weight: bold; }
+
+.deterrente-res { margin-top: 15px; padding: 15px; border-radius: 14px; background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.3); display: none; text-align: center; color: var(--orange); }
+.top-spesa { margin-top: 15px; padding: 12px; background: rgba(255,69,58,0.1); border-radius: 10px; font-size: 13px; color: var(--red); text-align: center; font-weight: 600; line-height: 1.4;}
+
+@keyframes fadeIn { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
+
+/* TAB BAR */
+.tab-bar {
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom)) 0; z-index: 1000;
+}
+.tab-item { color: var(--sub); text-align: center; font-size: 24px; cursor: pointer; flex: 1; -webkit-tap-highlight-color: transparent; }
+.tab-item.active { color: var(--blue); }
+.tab-label { font-size: 10px; display: block; margin-top: 4px; font-weight: 600; }
+</style>
+</head>
+
+<body>
+
+<div id="page-home" class="page active">
+  <div class="timeline-nav">
+    <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+    <div class="current-date" id="dateHeader"></div>
+    <button class="nav-btn" onclick="changeMonth(1)">❯</button>
+  </div>
+  
+  <div class="container">
+    <div class="summary-grid">
+      <div class="summary-box highlight" id="boxPaga" style="display:none;">
+        <span style="font-size:11px; color:var(--blue); font-weight:bold;">VALORE DELLA TUA ORA</span>
+        <div id="valoreOra" style="font-size:24px; font-weight:800; color:#fff; margin-top:4px;"></div>
+      </div>
+      <div class="summary-box">
+        <span style="font-size:11px; color:var(--sub)">USCITE MESE</span>
+        <div id="monthTotalVal" data-val="0" style="font-size:20px; font-weight:800; color:var(--red); margin-top:4px;">€0</div>
+      </div>
+      <div class="summary-box">
+        <span style="font-size:11px; color:var(--sub)">TEMPO BRUCIATO</span>
+        <div id="monthHoursVal" style="font-size:20px; font-weight:800; color:var(--orange); margin-top:4px;">0h</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Aggiungi Spesa</h3>
+      <input id="in_nome" placeholder="Cosa hai pagato?">
+      <input id="in_importo" type="number" placeholder="Importo €">
+      <select id="in_cat">
+        <option value="🏠 Casa e Bollette">🏠 Casa e Bollette</option>
+        <option value="🛒 Cibo e Spesa">🛒 Cibo e Spesa</option>
+        <option value="🚗 Trasporti">🚗 Trasporti</option>
+        <option value="🍝 Ristoranti">🍝 Ristoranti</option>
+        <option value="🍿 Svago">🍿 Svago</option>
+        <option value="🛍️ Shopping">🛍️ Shopping</option>
+        <option value="💊 Salute">💊 Salute</option>
+      </select>
+      <button class="btn btn-blue" onclick="addItem()">Registra Spesa</button>
+      
+      <div id="itemList" style="margin-top:20px;"></div>
+      <div id="topSpesaContainer"></div>
+      <div id="resFisso" style="margin-top:15px; font-size:13px; color:var(--sub); text-align:center;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-det" class="page">
+  <div class="container" style="padding-top: 30px;">
+    <div class="card">
+      <h3>🛒 Deterrente Acquisto</h3>
+      <input id="det_prezzo" type="number" placeholder="Prezzo tentazione (€)">
+      <button class="btn btn-orange" onclick="validaAcquisto()">Ne vale la pena?</button>
+      <div id="detOut" class="deterrente-res"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-obj" class="page">
+  <div class="container" style="padding-top: 30px;">
+    <div class="card">
+      <h3>🎯 Sostenibilità Obiettivo</h3>
+      <input id="obj_target" type="number" placeholder="Cifra da raggiungere €">
+      <input id="obj_anni" type="number" placeholder="In quanti anni?">
+      <button class="btn btn-green" onclick="calcolaSostenibilita()">Calcola Sforzo</button>
+      <div id="objOut" style="margin-top:15px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-set" class="page">
+  <div class="container" style="padding-top: 30px;">
+    <div class="card">
+      <h3>⚙️ Base Reddito</h3>
+      <input id="set_stip" type="number" placeholder="Stipendio Netto €">
+      <input id="set_ore" type="number" placeholder="Ore mensili lavorate">
+      <button class="btn btn-outline" onclick="saveSettings()">Aggiorna Dati</button>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab-item active" onclick="showPage('page-home', this)">
+    🏠<span class="tab-label">Dashboard</span>
+  </div>
+  <div class="tab-item" onclick="showPage('page-det', this)">
+    🛒<span class="tab-label">Acquisti</span>
+  </div>
+  <div class="tab-item" onclick="showPage('page-obj', this)">
+    🎯<span class="tab-label">Obiettivi</span>
+  </div>
+  <div class="tab-item" onclick="showPage('page-set', this)">
+    ⚙️<span class="tab-label">Impostazioni</span>
+  </div>
+</div>
+
+<script>
+const R = 0.07;
+const oggetti = [
+  { val: 1200, icon: "📱", name: "iPhone Pro" },
+  { val: 5000, icon: "🚲", name: "E-Bike Pro" },
+  { val: 18000, icon: "🚗", name: "Auto Usata" },
+  { val: 40000, icon: "⚡️", name: "Tesla Model 3" }
+];
+
+let db = JSON.parse(localStorage.getItem('pt_v9_db')) || {};
+let settings = JSON.parse(localStorage.getItem('pt_v9_settings')) || { stip: 0, ore: 1, pagaH: 0 };
+let currentView = new Date();
+
+function showPage(pageId, element) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  element.classList.add('active');
+}
+
+function estraiIcona(stringa) { return stringa.substring(0, 2); }
+
+/* ANIMAZIONE NUMERI (Tua miglioria) */
+function animaNumero(el, finale) {
+  let start = parseFloat(el.getAttribute('data-val')) || 0;
+  if (start === finale) {
+    el.innerText = "€" + finale.toFixed(0);
+    return;
+  }
+  let startTime = null;
+  function anim(t) {
+    if (!startTime) startTime = t;
+    let p = Math.min((t - startTime) / 400, 1); // 400ms di animazione
+    let val = start + (finale - start) * p;
+    el.innerText = "€" + val.toFixed(0);
+    if (p < 1) {
+      requestAnimationFrame(anim);
+    } else {
+      el.setAttribute('data-val', finale);
+    }
+  }
+  requestAnimationFrame(anim);
+}
+
+function saveSettings() {
+  settings.stip = parseFloat(document.getElementById("set_stip").value) || 0;
+  settings.ore = parseFloat(document.getElementById("set_ore").value) || 1;
+  settings.pagaH = settings.stip > 0 ? (settings.stip / settings.ore) : 0;
+  localStorage.setItem('pt_v9_settings', JSON.stringify(settings));
+  render();
+}
+
+function changeMonth(dir) {
+  currentView.setDate(1);
+  currentView.setMonth(currentView.getMonth() + dir);
+  render();
+}
+
+function addItem() {
+  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
+  
+  /* HAPTIC FEEDBACK (Tua miglioria) */
+  if(navigator.vibrate) navigator.vibrate(15);
+
+  const nome = document.getElementById("in_nome").value;
+  const imp = parseFloat(document.getElementById("in_importo").value);
+  const cat = document.getElementById("in_cat").value;
+  
+  if(!nome || !imp) return;
+
+  const key = `${currentView.getFullYear()}-${currentView.getMonth()}`;
+  if(!db[key]) db[key] = [];
+  db[key].push({ id: Date.now(), nome, imp, cat });
+  localStorage.setItem('pt_v9_db', JSON.stringify(db));
+  
+  document.getElementById("in_nome").value = "";
+  document.getElementById("in_importo").value = "";
+  render();
+}
+
+function deleteItem(id, key) {
+  db[key] = db[key].filter(i => i.id !== id);
+  localStorage.setItem('pt_v9_db', JSON.stringify(db));
+  render();
+}
+
+function validaAcquisto() {
+  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
+  const prezzo = parseFloat(document.getElementById("det_prezzo").value) || 0;
+  const ore = prezzo / settings.pagaH;
+  const futuro = prezzo * Math.pow(1.07, 10);
+  const obj = oggetti.slice().reverse().find(o => futuro >= o.val);
+
+  const out = document.getElementById("detOut");
+  out.style.display = "block";
+  out.innerHTML = `
+    Stai per bruciare <strong style="color:var(--text)">${ore.toFixed(1)} ore</strong> di vita.<br><br>
+    Investiti, tra 10 anni sarebbero <strong>€${futuro.toFixed(0)}</strong><br>
+    ${obj ? `<span style="font-size:20px; display:block; margin-top:10px">${obj.icon} Un/una ${obj.name}</span>` : ''}
+  `;
+}
+
+function calcolaSostenibilita() {
+  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
+  const target = parseFloat(document.getElementById("obj_target").value) || 0;
+  const anni = parseFloat(document.getElementById("obj_anni").value) || 0;
+  if(target <= 0 || anni <= 0) return;
+  
+  const quotaM = (target * R) / (12 * (Math.pow(1 + R, anni) - 1));
+  const percS = (quotaM / settings.stip) * 100;
+  const color = percS > 25 ? 'var(--red)' : 'var(--green)';
+
+  document.getElementById("objOut").innerHTML = `
+    <div class="summary-box" style="border-color:${color}; border-width:2px;">
+      <span style="font-size:11px; color:var(--sub); display:block;">DA RISPARMIARE OGNI MESE</span>
+      <span style="font-size:26px; font-weight:900; color:${color};">€${quotaM.toFixed(2)}</span>
+      <span style="font-size:13px; color:var(--text); display:block; margin-top:5px;">Assorbe il <strong>${percS.toFixed(1)}%</strong> dello stipendio.</span>
+    </div>`;
+}
+
+function render() {
+  const key = `${currentView.getFullYear()}-${currentView.getMonth()}`;
+  document.getElementById("dateHeader").innerText = currentView.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
+
+  if(settings.stip > 0) {
+    document.getElementById("boxPaga").style.display = "block";
+    document.getElementById("valoreOra").innerText = `€${settings.pagaH.toFixed(2)}/h`;
+    document.getElementById("set_stip").value = settings.stip;
+    document.getElementById("set_ore").value = settings.ore;
+  }
+
+  const items = db[key] || [];
+  const tot = items.reduce((a, b) => a + b.imp, 0);
+  const ore = settings.pagaH > 0 ? tot / settings.pagaH : 0;
+
+  /* Richiamo animazione numeri invece del testo statico */
+  animaNumero(document.getElementById("monthTotalVal"), tot);
+  document.getElementById("monthHoursVal").innerText = ore.toFixed(1) + "h";
+
+  const listDiv = document.getElementById("itemList");
+  listDiv.innerHTML = items.length ? items.map(i => `
+    <div class="item-row">
+      <div style="display:flex; align-items:center; flex-grow:1;">
+        <div class="item-icon">${estraiIcona(i.cat)}</div>
+        <div class="item-info">
+          <span class="item-name">${i.nome}</span>
+          <span class="item-meta">${(i.imp / settings.pagaH).toFixed(1)} ore di fatica</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center;">
+        <span class="item-price">€${i.imp}</span>
+        <button class="del-btn" onclick="deleteItem(${i.id}, '${key}')">✕</button>
+      </div>
+    </div>`).join('') : "<div style='text-align:center; color:var(--sub); font-size:14px; margin-top:10px;'>Nessuna spesa registrata.</div>";
+
+  if(items.length > 0) {
+    let top = items.reduce((a, b) => a.imp > b.imp ? a : b);
+    
+    /* LOGICA TESCHIO 20% (Tua miglioria integrata) */
+    let alertText = "";
+    if (settings.stip > 0 && (top.imp / settings.stip) > 0.2) {
+        alertText = `<br><span style="font-size:15px">💀 Pesa oltre il 20% del tuo stipendio!</span>`;
+    }
+
+    document.getElementById("topSpesaContainer").innerHTML = `<div class="top-spesa">🔥 Il salasso del mese: ${top.nome} (€${top.imp})${alertText}</div>`;
+    document.getElementById("resFisso").innerText = `Questo mese hai speso il ${((tot / settings.stip) * 100).toFixed(1)}% dello stipendio.`;
+  } else {
+    document.getElementById("topSpesaContainer").innerHTML = "";
+    document.getElementById("resFisso").innerText = "";
+  }
+}
+
+render();
+</script>
+</body>
+</html>
