@@ -13,7 +13,7 @@
 <style>
 :root {
   --bg: #000000;
-  --card: rgba(28, 28, 30, 0.6);
+  --card: rgba(28, 28, 30, 0.7);
   --text: #ffffff;
   --sub: #8e8e93;
   --blue: #0A84FF;
@@ -24,26 +24,26 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding-bottom: 100px;
-  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text); margin: 0;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+  padding-top: env(safe-area-inset-top);
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
 
-/* NAV iOS GLASS */
+/* NAV iOS GLASS - Adattata Safe Area */
 .timeline-nav {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 15px 20px; position: sticky; top: 0; z-index: 100;
-  background: rgba(18, 18, 18, 0.75);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  padding: 10px 15px; position: sticky; top: env(safe-area-inset-top); z-index: 100;
+  background: rgba(18, 18, 18, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); margin-top: calc(-1 * env(safe-area-inset-top));
 }
-.nav-btn { background: none; border: none; color: var(--blue); font-size: 22px; cursor: pointer; padding: 5px 15px; }
-.current-date { font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.5px; }
+.nav-btn { background: none; border: none; color: var(--blue); font-size: 22px; cursor: pointer; padding: 10px; }
+.current-date { font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+.current-date small { display: block; font-size: 10px; color: var(--sub); font-weight: 400; margin-top: 2px; }
 
-.container { max-width: 500px; margin: auto; padding: 15px; }
+/* CONTAINER - Margini fissi per Pro Max */
+.container { max-width: 500px; margin: auto; padding: 15px 20px; box-sizing: border-box; }
 
 /* SEZIONI NAVIGAZIONE */
 .page { display: none; animation: fadeIn 0.3s ease; }
@@ -52,51 +52,60 @@ body {
 /* CARD iOS */
 .card {
   background: var(--card); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-  border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);
+  border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid var(--border);
 }
-h3 { font-size: 12px; text-transform: uppercase; color: var(--sub); letter-spacing: 1px; margin: 0 0 15px 0; font-weight: 600; }
+h3 { font-size: 12px; text-transform: uppercase; color: var(--sub); letter-spacing: 0.8px; margin: 0 0 15px 0; font-weight: 600; }
 
 input, select {
   width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px;
   background: rgba(44, 44, 46, 0.8); color: #fff; font-size: 16px; box-sizing: border-box; outline: none; -webkit-appearance: none;
 }
-input:focus, select:focus { border-color: var(--blue); }
+input:focus { border-color: var(--blue); }
 
-.btn { width: 100%; border: none; border-radius: 14px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; margin-top: 5px; -webkit-tap-highlight-color: transparent;}
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row input, .row select { margin-bottom: 0; flex: 1; }
+
+.btn { width: 100%; border: none; border-radius: 14px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent;}
 .btn:active { transform: scale(0.97); opacity: 0.8; }
 .btn-blue { background: var(--blue); color: #fff; }
 .btn-orange { background: var(--orange); color: #fff; }
 .btn-green { background: var(--green); color: #fff; }
 .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+.btn-danger { background: rgba(255, 69, 58, 0.1); color: var(--red); border: 1px solid rgba(255, 69, 58, 0.3); margin-top: 15px; font-size: 13px; padding: 12px; }
 
-.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.summary-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; text-align: center; }
-.summary-box.highlight { background: rgba(10, 132, 255, 0.1); border-color: var(--blue); grid-column: span 2;}
+/* SUMMARY DASHBOARD */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+.summary-box { background: var(--card); border: 1px solid var(--border); padding: 12px 5px; border-radius: 16px; text-align: center; }
+.summary-box.highlight { background: rgba(10, 132, 255, 0.08); border-color: rgba(10, 132, 255, 0.3); }
+.lab { font-size: 9px; color: var(--sub); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+.val { font-size: 16px; font-weight: 800; color: #fff; }
 
+/* LIST ITEMS */
 .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease;}
 .item-row:last-child { border-bottom: none; }
-.item-icon { font-size: 24px; margin-right: 12px; background: rgba(255,255,255,0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+.item-icon { font-size: 20px; margin-right: 12px; background: rgba(255,255,255,0.06); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
 .item-info { display: flex; flex-direction: column; flex-grow: 1; }
-.item-name { font-weight: 600; font-size: 16px; }
-.item-meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
-.item-price { font-weight: 700; font-size: 16px; color: var(--red); }
-.del-btn { background: rgba(255, 69, 58, 0.1); color: var(--red); border: none; border-radius: 8px; width: 30px; height: 30px; margin-left: 10px; font-size: 16px; font-weight: bold; }
+.item-name { font-weight: 600; font-size: 15px; }
+.item-meta { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.item-price { font-weight: 700; font-size: 15px; text-align: right;}
+.del-btn { background: rgba(255, 69, 58, 0.08); color: var(--red); border: none; border-radius: 8px; width: 28px; height: 28px; margin-left: 10px; font-size: 14px; font-weight: bold; }
 
-.deterrente-res { margin-top: 15px; padding: 15px; border-radius: 14px; background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.3); display: none; text-align: center; color: var(--orange); }
-.top-spesa { margin-top: 15px; padding: 12px; background: rgba(255,69,58,0.1); border-radius: 10px; font-size: 13px; color: var(--red); text-align: center; font-weight: 600; line-height: 1.4;}
+/* ALERTS & DET */
+.deterrente-res { margin-top: 15px; padding: 15px; border-radius: 14px; background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.3); display: none; text-align: center; color: var(--orange); line-height: 1.4; font-size: 14px; }
+.top-spesa { margin-top: 15px; padding: 12px; background: rgba(255,69,58,0.1); border: 1px solid rgba(255,69,58,0.2); border-radius: 10px; font-size: 12px; color: var(--red); text-align: center; font-weight: 600; line-height: 1.4;}
 
 @keyframes fadeIn { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
 
-/* TAB BAR */
+/* TAB BAR iOS - Adattata Safe Area */
 .tab-bar {
   position: fixed; bottom: 0; left: 0; width: 100%;
   background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border); display: flex; justify-content: space-around;
   padding: 10px 0 calc(10px + env(safe-area-inset-bottom)) 0; z-index: 1000;
 }
-.tab-item { color: var(--sub); text-align: center; font-size: 24px; cursor: pointer; flex: 1; -webkit-tap-highlight-color: transparent; }
+.tab-item { color: var(--sub); text-align: center; font-size: 22px; cursor: pointer; flex: 1; -webkit-tap-highlight-color: transparent; }
 .tab-item.active { color: var(--blue); }
-.tab-label { font-size: 10px; display: block; margin-top: 4px; font-weight: 600; }
+.tab-label { font-size: 10px; display: block; margin-top: 5px; font-weight: 600; }
 </style>
 </head>
 
@@ -111,43 +120,86 @@ input:focus, select:focus { border-color: var(--blue); }
   
   <div class="container">
     <div class="summary-grid">
-      <div class="summary-box highlight" id="boxPaga" style="display:none;">
-        <span style="font-size:11px; color:var(--blue); font-weight:bold;">VALORE DELLA TUA ORA</span>
-        <div id="valoreOra" style="font-size:24px; font-weight:800; color:#fff; margin-top:4px;"></div>
+      <div class="summary-boxhighlight highlight" id="boxPaga">
+        <span class="lab">Tua Ora</span>
+        <div id="valoreOra" class="val">€0.00</div>
       </div>
       <div class="summary-box">
-        <span style="font-size:11px; color:var(--sub)">USCITE MESE</span>
-        <div id="monthTotalVal" data-val="0" style="font-size:20px; font-weight:800; color:var(--red); margin-top:4px;">€0</div>
+        <span class="lab">Entrate</span>
+        <div id="monthInVal" class="val" style="color:var(--green)">€0</div>
       </div>
       <div class="summary-box">
-        <span style="font-size:11px; color:var(--sub)">TEMPO BRUCIATO</span>
-        <div id="monthHoursVal" style="font-size:20px; font-weight:800; color:var(--orange); margin-top:4px;">0h</div>
+        <span class="lab">Uscite</span>
+        <div id="monthOutVal" data-val="0" class="val" style="color:var(--red)">€0</div>
+      </div>
+      <div class="summary-box highlight" style="grid-column: span 2; border-color: var(--border); background: var(--card)">
+        <span class="lab">Flusso Cassa Netto</span>
+        <div id="monthNetVal" class="val">€0</div>
+      </div>
+      <div class="summary-box">
+        <span class="lab">Ore Lavoro</span>
+        <div id="monthHoursVal" class="val" style="color:var(--orange)">0h</div>
       </div>
     </div>
 
+    <div class="card" style="background: rgba(255,255,255,0.03);">
+      <h3>Impostazioni Mese <span id="setupDateLabel" style="text-transform: none; color:var(--blue)"></span></h3>
+      <div class="row">
+        <input id="set_stip_mese" type="number" placeholder="Busta Paga €">
+        <input id="set_ore_mese" type="number" placeholder="Ore Lavorate">
+      </div>
+      <button class="btn btn-outline" style="padding: 12px; font-size: 14px;" onclick="saveMonthlySalary()">Salva Parametri Mese</button>
+    </div>
+
     <div class="card">
-      <h3>Aggiungi Spesa</h3>
-      <input id="in_nome" placeholder="Cosa hai pagato?">
-      <input id="in_importo" type="number" placeholder="Importo €">
-      <select id="in_cat">
-        <option value="🏠 Casa e Bollette">🏠 Casa e Bollette</option>
-        <option value="🛒 Cibo e Spesa">🛒 Cibo e Spesa</option>
-        <option value="🚗 Trasporti">🚗 Trasporti</option>
-        <option value="🍝 Ristoranti">🍝 Ristoranti</option>
-        <option value="🍿 Svago">🍿 Svago</option>
-        <option value="🛍️ Shopping">🛍️ Shopping</option>
-        <option value="💊 Salute">💊 Salute</option>
-      </select>
-      <button class="btn btn-blue" onclick="addItem()">Registra Spesa</button>
-      
-      <div id="itemList" style="margin-top:20px;"></div>
-      <div id="topSpesaContainer"></div>
-      <div id="resFisso" style="margin-top:15px; font-size:13px; color:var(--sub); text-align:center;"></div>
+      <h3>Aggiungi Entrata</h3>
+      <div class="row">
+        <input id="in_nome_ent" placeholder="Nome (es. Bonus)">
+        <select id="in_cat_ent">
+          <option value="💰 Extra">💰 Extra</option>
+          <option value="📈 Investimenti">📈 Investimenti</option>
+          <option value="🎁 Regalo">🎁 Regalo</option>
+          <option value="💼 Altro Lavoro">💼 Altro</option>
+        </select>
+      </div>
+      <input id="in_importo_ent" type="number" placeholder="Importo €">
+      <button class="btn btn-green" onclick="addIncome()">Registra Entrata</button>
+    </div>
+
+    <div class="card">
+      <h3>Aggiungi Uscita</h3>
+      <div class="row">
+        <input id="in_nome_usc" placeholder="Nome (es. Spesa)">
+        <select id="in_cat_usc">
+          <option value="🛒 Cibo">🛒 Cibo</option>
+          <option value="🏠 Casa">🏠 Casa</option>
+          <option value="🚗 Trasporti">🚗 Trasporti</option>
+          <option value="🍝 Ristoranti">🍝 Ristoranti</option>
+          <option value="🍿 Svago">🍿 Svago</option>
+          <option value="🛍️ Shopping">🛍️ Shopping</option>
+        </select>
+      </div>
+      <input id="in_importo_usc" type="number" placeholder="Importo €">
+      <button class="btn btn-blue" onclick="addExpense()">Registra Uscita</button>
     </div>
   </div>
 </div>
 
-<div id="page-det" class="page">
+<div id="page-list" class="page">
+  <div class="container" style="padding-top: 30px;">
+    <div class="card">
+      <h3>Entrate <span id="listDateLabelEnt" style="color:var(--green)"></span></h3>
+      <div id="incomeList"></div>
+    </div>
+    <div class="card">
+      <h3>Uscite <span id="listDateLabelUsc" style="color:var(--red)"></span></h3>
+      <div id="expenseList"></div>
+      <div id="topSpesaContainer"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-tool" class="page">
   <div class="container" style="padding-top: 30px;">
     <div class="card">
       <h3>🛒 Deterrente Acquisto</h3>
@@ -155,15 +207,10 @@ input:focus, select:focus { border-color: var(--blue); }
       <button class="btn btn-orange" onclick="validaAcquisto()">Ne vale la pena?</button>
       <div id="detOut" class="deterrente-res"></div>
     </div>
-  </div>
-</div>
-
-<div id="page-obj" class="page">
-  <div class="container" style="padding-top: 30px;">
     <div class="card">
       <h3>🎯 Sostenibilità Obiettivo</h3>
       <input id="obj_target" type="number" placeholder="Cifra da raggiungere €">
-      <input id="obj_anni" type="number" placeholder="In quanti anni?">
+      <input id="obj_anni" type="number" placeholder="Anni per arrivarci">
       <button class="btn btn-green" onclick="calcolaSostenibilita()">Calcola Sforzo</button>
       <div id="objOut" style="margin-top:15px;"></div>
     </div>
@@ -173,11 +220,12 @@ input:focus, select:focus { border-color: var(--blue); }
 <div id="page-set" class="page">
   <div class="container" style="padding-top: 30px;">
     <div class="card">
-      <h3>⚙️ Base Reddito</h3>
-      <input id="set_stip" type="number" placeholder="Stipendio Netto €">
-      <input id="set_ore" type="number" placeholder="Ore mensili lavorate">
-      <button class="btn btn-outline" onclick="saveSettings()">Aggiorna Dati</button>
+      <h3>⚙️ Strumenti e Backup</h3>
+      <button class="btn btn-outline" onclick="exportCSV()">💾 Esporta in Excel (CSV)</button>
+      <button class="btn btn-outline" onclick="exportBackup()">☁️ Esporta Backup JSON</button>
+      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="resetData()">⚠️ Cancella Tutti i Dati</button>
     </div>
+    <div style="text-align:center; color:var(--sub); font-size:11px; margin-top:20px;">ProfitTrack Pro V10</div>
   </div>
 </div>
 
@@ -185,11 +233,11 @@ input:focus, select:focus { border-color: var(--blue); }
   <div class="tab-item active" onclick="showPage('page-home', this)">
     🏠<span class="tab-label">Dashboard</span>
   </div>
-  <div class="tab-item" onclick="showPage('page-det', this)">
-    🛒<span class="tab-label">Acquisti</span>
+  <div class="tab-item" onclick="showPage('page-list', this)">
+    📖<span class="tab-label">Liste</span>
   </div>
-  <div class="tab-item" onclick="showPage('page-obj', this)">
-    🎯<span class="tab-label">Obiettivi</span>
+  <div class="tab-item" onclick="showPage('page-tool', this)">
+    🛠️<span class="tab-label">Strumenti</span>
   </div>
   <div class="tab-item" onclick="showPage('page-set', this)">
     ⚙️<span class="tab-label">Impostazioni</span>
@@ -204,171 +252,279 @@ const oggetti = [
   { val: 18000, icon: "🚗", name: "Auto Usata" },
   { val: 40000, icon: "⚡️", name: "Tesla Model 3" }
 ];
+const monthNames = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
 
-let db = JSON.parse(localStorage.getItem('pt_v9_db')) || {};
-let settings = JSON.parse(localStorage.getItem('pt_v9_settings')) || { stip: 0, ore: 1, pagaH: 0 };
+// Nuovo DB V10 strutturato per mese
+let db = JSON.parse(localStorage.getItem('pt_v10_db')) || {};
+// Fallback globale se utente non imposta mese specifico
+let globalSettings = JSON.parse(localStorage.getItem('pt_v10_settings')) || { stip: 0, ore: 1, pagaH: 0 }; 
 let currentView = new Date();
 
+window.onload = function() { render(); };
+
+// NAVIGAZIONE
 function showPage(pageId, element) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
   element.classList.add('active');
+  render();
+}
+function changeMonth(dir) {
+  currentView.setDate(1); currentView.setMonth(currentView.getMonth() + dir);
+  render();
 }
 
+// UTILITY
 function estraiIcona(stringa) { return stringa.substring(0, 2); }
+function vibrate() { if(navigator.vibrate) navigator.vibrate(15); }
 
-/* ANIMAZIONE NUMERI (Tua miglioria) */
+// ANIMAZIONE NUMERI (Dalla V9)
 function animaNumero(el, finale) {
   let start = parseFloat(el.getAttribute('data-val')) || 0;
-  if (start === finale) {
-    el.innerText = "€" + finale.toFixed(0);
-    return;
-  }
+  if (start === finale) { el.innerText = "€" + finale.toFixed(0); return; }
   let startTime = null;
   function anim(t) {
     if (!startTime) startTime = t;
-    let p = Math.min((t - startTime) / 400, 1); // 400ms di animazione
+    let p = Math.min((t - startTime) / 350, 1);
     let val = start + (finale - start) * p;
     el.innerText = "€" + val.toFixed(0);
-    if (p < 1) {
-      requestAnimationFrame(anim);
-    } else {
-      el.setAttribute('data-val', finale);
-    }
+    if (p < 1) { requestAnimationFrame(anim); } else { el.setAttribute('data-val', finale); }
   }
   requestAnimationFrame(anim);
 }
 
-function saveSettings() {
-  settings.stip = parseFloat(document.getElementById("set_stip").value) || 0;
-  settings.ore = parseFloat(document.getElementById("set_ore").value) || 1;
-  settings.pagaH = settings.stip > 0 ? (settings.stip / settings.ore) : 0;
-  localStorage.setItem('pt_v9_settings', JSON.stringify(settings));
+// LOGICA CORE MESE (Tua richiesta: Stipendio mensile)
+function getMonthlyDataKey() { return `${currentView.getFullYear()}-${currentView.getMonth()}`; }
+
+function initMonthData() {
+  const key = getMonthlyDataKey();
+  if(!db[key]) db[key] = { monthlySettings: null, expenses: [], income: [] };
+}
+
+function saveMonthlySalary() {
+  const stipVal = parseFloat(document.getElementById("set_stip_mese").value) || 0;
+  const oreVal = parseFloat(document.getElementById("set_ore_mese").value) || 0;
+  
+  if(stipVal <= 0 || oreVal <= 0) return alert("Inserisci stipendio e ore validi per questo mese.");
+  
+  initMonthData();
+  db[getMonthlyDataKey()].monthlySettings = { stip: stipVal, ore: oreVal, pagaH: stipVal/oreVal };
+  
+  // Salva anche come fallback globale se è la prima volta o se è zero
+  if(globalSettings.stip === 0) {
+      globalSettings = { stip: stipVal, ore: oreVal, pagaH: stipVal/oreVal };
+      localStorage.setItem('pt_v10_settings', JSON.stringify(globalSettings));
+  }
+
+  localStorage.setItem('pt_v10_db', JSON.stringify(db));
+  vibrate();
   render();
 }
 
-function changeMonth(dir) {
-  currentView.setDate(1);
-  currentView.setMonth(currentView.getMonth() + dir);
-  render();
+// Riceve la pagaH corretta per il mese visibile (specifica o globale)
+function getCurrentPagaH() {
+  const key = getMonthlyDataKey();
+  if(db[key] && db[key].monthlySettings) return db[key].monthlySettings.pagaH;
+  return globalSettings.pagaH;
 }
 
-function addItem() {
-  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
-  
-  /* HAPTIC FEEDBACK (Tua miglioria) */
-  if(navigator.vibrate) navigator.vibrate(15);
-
-  const nome = document.getElementById("in_nome").value;
-  const imp = parseFloat(document.getElementById("in_importo").value);
-  const cat = document.getElementById("in_cat").value;
-  
+// AZIONI AGGIUNTA
+function addIncome() {
+  vibrate();
+  const nome = document.getElementById("in_nome_ent").value;
+  const imp = parseFloat(document.getElementById("in_importo_ent").value);
+  const cat = document.getElementById("in_cat_ent").value;
   if(!nome || !imp) return;
 
-  const key = `${currentView.getFullYear()}-${currentView.getMonth()}`;
-  if(!db[key]) db[key] = [];
-  db[key].push({ id: Date.now(), nome, imp, cat });
-  localStorage.setItem('pt_v9_db', JSON.stringify(db));
+  initMonthData();
+  db[getMonthlyDataKey()].income.push({ id: Date.now(), nome, imp, cat });
+  localStorage.setItem('pt_v10_db', JSON.stringify(db));
   
-  document.getElementById("in_nome").value = "";
-  document.getElementById("in_importo").value = "";
+  document.getElementById("in_nome_ent").value = "";
+  document.getElementById("in_importo_ent").value = "";
   render();
 }
 
-function deleteItem(id, key) {
-  db[key] = db[key].filter(i => i.id !== id);
-  localStorage.setItem('pt_v9_db', JSON.stringify(db));
+function addExpense() {
+  const pagaH = getCurrentPagaH();
+  if (pagaH === 0) return alert("Imposta i parametri del mese (Stipendio/Ore) prima di aggiungere spese.");
+  vibrate();
+  const nome = document.getElementById("in_nome_usc").value;
+  const imp = parseFloat(document.getElementById("in_importo_usc").value);
+  const cat = document.getElementById("in_cat_usc").value;
+  if(!nome || !imp) return;
+
+  initMonthData();
+  db[getMonthlyDataKey()].expenses.push({ id: Date.now(), nome, imp, cat });
+  localStorage.setItem('pt_v10_db', JSON.stringify(db));
+  
+  document.getElementById("in_nome_usc").value = "";
+  document.getElementById("in_importo_usc").value = "";
   render();
 }
 
+function deleteItem(id, type) {
+  vibrate();
+  const key = getMonthlyDataKey();
+  if(type === 'inc') db[key].income = db[key].income.filter(i => i.id !== id);
+  else db[key].expenses = db[key].expenses.filter(i => i.id !== id);
+  localStorage.setItem('pt_v10_db', JSON.stringify(db));
+  render();
+}
+
+// STRUMENTI (Dalla V9)
 function validaAcquisto() {
-  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
+  const pagaH = getCurrentPagaH();
+  if (pagaH === 0) return alert("Imposta stipendio/ore per calcolare.");
   const prezzo = parseFloat(document.getElementById("det_prezzo").value) || 0;
-  const ore = prezzo / settings.pagaH;
+  const ore = prezzo / pagaH;
   const futuro = prezzo * Math.pow(1.07, 10);
   const obj = oggetti.slice().reverse().find(o => futuro >= o.val);
-
   const out = document.getElementById("detOut");
   out.style.display = "block";
-  out.innerHTML = `
-    Stai per bruciare <strong style="color:var(--text)">${ore.toFixed(1)} ore</strong> di vita.<br><br>
-    Investiti, tra 10 anni sarebbero <strong>€${futuro.toFixed(0)}</strong><br>
-    ${obj ? `<span style="font-size:20px; display:block; margin-top:10px">${obj.icon} Un/una ${obj.name}</span>` : ''}
-  `;
+  out.innerHTML = `Bruci <strong>${ore.toFixed(1)} ore</strong> di vita.<br><br>Tra 10 anni: <strong>€${futuro.toFixed(0)}</strong>${obj ? `<br><span style="font-size:22px; margin-top:10px; display:block">${obj.icon} ${obj.name}</span>` : ''}`;
 }
 
 function calcolaSostenibilita() {
-  if (settings.pagaH === 0) return alert("Inserisci lo stipendio nelle Impostazioni.");
   const target = parseFloat(document.getElementById("obj_target").value) || 0;
   const anni = parseFloat(document.getElementById("obj_anni").value) || 0;
   if(target <= 0 || anni <= 0) return;
-  
+  const key = getMonthlyDataKey();
+  const stipMese = db[key] && db[key].monthlySettings ? db[key].monthlySettings.stip : globalSettings.stip;
+  if(stipMese === 0) return alert("Imposta stipendio mese per calcolare incidenza.");
   const quotaM = (target * R) / (12 * (Math.pow(1 + R, anni) - 1));
-  const percS = (quotaM / settings.stip) * 100;
+  const percS = (quotaM / stipMese) * 100;
   const color = percS > 25 ? 'var(--red)' : 'var(--green)';
-
-  document.getElementById("objOut").innerHTML = `
-    <div class="summary-box" style="border-color:${color}; border-width:2px;">
-      <span style="font-size:11px; color:var(--sub); display:block;">DA RISPARMIARE OGNI MESE</span>
-      <span style="font-size:26px; font-weight:900; color:${color};">€${quotaM.toFixed(2)}</span>
-      <span style="font-size:13px; color:var(--text); display:block; margin-top:5px;">Assorbe il <strong>${percS.toFixed(1)}%</strong> dello stipendio.</span>
-    </div>`;
+  document.getElementById("objOut").innerHTML = `<div class="summary-box fade-in highlight" style="border-color:${color}; grid-column: span 3;"><span class="lab" style="color:${color}">Quota Mensile</span><div class="val" style="color:${color}">€${quotaM.toFixed(2)}</div><span class="lab" style="color:var(--text); text-transform:none; font-size:11px; margin-top:5px;">Assorbe il <strong>${percS.toFixed(1)}%</strong> delle entrate base.</span></div>`;
 }
 
-function render() {
-  const key = `${currentView.getFullYear()}-${currentView.getMonth()}`;
-  document.getElementById("dateHeader").innerText = currentView.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
+// IMPOSTAZIONI AVANZATE
+function resetData() { if(confirm("Cancellare tutto lo storico permanentemente?")) { localStorage.clear(); location.reload(); } }
 
-  if(settings.stip > 0) {
-    document.getElementById("boxPaga").style.display = "block";
-    document.getElementById("valoreOra").innerText = `€${settings.pagaH.toFixed(2)}/h`;
-    document.getElementById("set_stip").value = settings.stip;
-    document.getElementById("set_ore").value = settings.ore;
-  }
+function exportBackup() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('pt_v10_db'));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("download", `ProfitTrack_Backup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(dlAnchorElem);
+    dlAnchorElem.click();
+    dlAnchorElem.remove();
+}
 
-  const items = db[key] || [];
-  const tot = items.reduce((a, b) => a + b.imp, 0);
-  const ore = settings.pagaH > 0 ? tot / settings.pagaH : 0;
-
-  /* Richiamo animazione numeri invece del testo statico */
-  animaNumero(document.getElementById("monthTotalVal"), tot);
-  document.getElementById("monthHoursVal").innerText = ore.toFixed(1) + "h";
-
-  const listDiv = document.getElementById("itemList");
-  listDiv.innerHTML = items.length ? items.map(i => `
-    <div class="item-row">
-      <div style="display:flex; align-items:center; flex-grow:1;">
-        <div class="item-icon">${estraiIcona(i.cat)}</div>
-        <div class="item-info">
-          <span class="item-name">${i.nome}</span>
-          <span class="item-meta">${(i.imp / settings.pagaH).toFixed(1)} ore di fatica</span>
-        </div>
-      </div>
-      <div style="display:flex; align-items:center;">
-        <span class="item-price">€${i.imp}</span>
-        <button class="del-btn" onclick="deleteItem(${i.id}, '${key}')">✕</button>
-      </div>
-    </div>`).join('') : "<div style='text-align:center; color:var(--sub); font-size:14px; margin-top:10px;'>Nessuna spesa registrata.</div>";
-
-  if(items.length > 0) {
-    let top = items.reduce((a, b) => a.imp > b.imp ? a : b);
+function exportCSV() {
+    let csv = "Anno-Mese,Tipo,Nome,Categoria,Importo,Ore Lavoro\n";
+    const pagaHGlobale = globalSettings.pagaH || 1;
     
-    /* LOGICA TESCHIO 20% (Tua miglioria integrata) */
-    let alertText = "";
-    if (settings.stip > 0 && (top.imp / settings.stip) > 0.2) {
-        alertText = `<br><span style="font-size:15px">💀 Pesa oltre il 20% del tuo stipendio!</span>`;
-    }
+    Object.keys(db).forEach(key => {
+        const month = db[key];
+        const pagaHMese = month.monthlySettings ? month.monthlySettings.pagaH : pagaHGlobale;
+        
+        // Aggiungi Entrate
+        month.income.forEach(i => {
+            csv += `${key},Entrata,"${i.nome.replace(/"/g, '""')}","${i.cat}",${i.imp},0\n`;
+        });
+        
+        // Aggiungi Uscite
+        month.expenses.forEach(e => {
+            csv += `${key},Uscita,"${e.nome.replace(/"/g, '""')}","${e.cat}",${e.imp},${(e.imp/pagaHMese).toFixed(1)}\n`;
+        });
+    });
 
-    document.getElementById("topSpesaContainer").innerHTML = `<div class="top-spesa">🔥 Il salasso del mese: ${top.nome} (€${top.imp})${alertText}</div>`;
-    document.getElementById("resFisso").innerText = `Questo mese hai speso il ${((tot / settings.stip) * 100).toFixed(1)}% dello stipendio.`;
-  } else {
-    document.getElementById("topSpesaContainer").innerHTML = "";
-    document.getElementById("resFisso").innerText = "";
-  }
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `ProfitTrack_Report_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
-render();
+// RENDER GENERALE
+function render() {
+  const key = getMonthlyDataKey();
+  initMonthData();
+  const data = db[key];
+  const currentPagaH = getCurrentPagaH();
+  
+  // LABELS DATE
+  const dateStr = `${monthNames[currentView.getMonth()]} ${currentView.getFullYear()}`;
+  document.getElementById("dateHeader").innerHTML = `${dateStr}<small>Paga Base: ${data.monthlySettings ? '✅ Impostata' : '⚠️ Non impostata'}</small>`;
+  if(document.getElementById("page-home").classList.contains('active')) document.getElementById("setupDateLabel").innerText = dateStr;
+  if(document.getElementById("page-list").classList.contains('active')) {
+      document.getElementById("listDateLabelEnt").innerText = dateStr;
+      document.getElementById("listDateLabelUsc").innerText = dateStr;
+  }
+
+  // UPDATE SETUP INPUTS (Dashboard)
+  if(data.monthlySettings) {
+      document.getElementById("set_stip_mese").value = data.monthlySettings.stip;
+      document.getElementById("set_ore_mese").value = data.monthlySettings.ore;
+  } else {
+      document.getElementById("set_stip_mese").value = '';
+      document.getElementById("set_ore_mese").value = '';
+  }
+
+  // CALCOLO TOTALI
+  const totEntrateBase = data.monthlySettings ? data.monthlySettings.stip : 0;
+  const totEntrateExtra = data.income.reduce((a, b) => a + b.imp, 0);
+  const totEntrateEffettive = totEntrateBase + totEntrateExtra;
+  
+  const totUscite = data.expenses.reduce((a, b) => a + b.imp, 0);
+  const flussoNetto = totEntrateEffettive - totUscite;
+  const oreLavoroUscite = currentPagaH > 0 ? totUscite / currentPagaH : 0;
+  const oreLavoroBase = data.monthlySettings ? data.monthlySettings.ore : 0;
+
+  // AGGIORNA DASHBOARD NUMERI
+  if(currentPagaH > 0) {
+    document.getElementById("boxPaga").style.display = "block";
+    document.getElementById("valoreOra").innerText = `€${currentPagaH.toFixed(2)}`;
+  } else { document.getElementById("boxPaga").style.display = "none"; }
+  
+  document.getElementById("monthInVal").innerText = `€${totEntrateEffettive.toFixed(0)}`;
+  animaNumero(document.getElementById("monthOutVal"), totUscite); // Tua miglioria
+  document.getElementById("monthHoursVal").innerText = `${oreLavoroUscite.toFixed(1)}h`;
+  
+  const netEl = document.getElementById("monthNetVal");
+  netEl.innerText = `€${flussoNetto.toFixed(0)}`;
+  netEl.style.color = flussoNetto >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // RENDER LISTE (Tab Liste)
+  if(document.getElementById("page-list").classList.contains('active')) {
+      const renderRow = (i, type, ph) => `
+        <div class="item-row fade-in">
+          <div style="display:flex; align-items:center; flex-grow:1;">
+            <div class="item-icon">${estraiIcona(i.cat)}</div>
+            <div class="item-info">
+              <span class="item-name">${i.nome}</span>
+              <span class="item-meta">${type==='usc'?`${(i.imp/ph).toFixed(1)}h fatica` : i.cat}</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="item-price" style="color:var(--${type==='usc'?'red':'green'})">€${i.imp.toFixed(0)}</span>
+            <button class="del-btn" onclick="deleteItem(${i.id}, '${type==='usc'?'exp':'inc'}')">✕</button>
+          </div>
+        </div>`;
+
+      document.getElementById("incomeList").innerHTML = data.income.length ? data.income.map(i=>renderRow(i,'inc',0)).join('') : "<small style='color:var(--sub)'>Nessuna entrata extra.</small>";
+      document.getElementById("expenseList").innerHTML = data.expenses.length ? data.expenses.map(i=>renderRow(i,'usc',currentPagaH)).join('') : "<small style='color:var(--sub)'>Nessuna uscita.</small>";
+
+      // LOGICA TESCHIO E RES CONTO
+      if(data.expenses.length > 0) {
+        let top = data.expenses.reduce((a, b) => a.imp > b.imp ? a : b);
+        let alertText = "";
+        const stipRiferimento = data.monthlySettings ? data.monthlySettings.stip : 1;
+        if (stipRiferimento > 1 && (top.imp / stipRiferimento) > 0.2) {
+            alertText = `<br><span style="color:var(--text); font-size:11px;">💀 Pesa oltre il 20% dello stipendio base!</span>`;
+        }
+        document.getElementById("topSpesaContainer").innerHTML = `<div class="top-spesa">🔥 Salasso: ${top.nome} (€${top.imp.toFixed(0)})${alertText}</div>`;
+        document.getElementById("resFisso").innerText = stipRiferimento > 1 ? `Uscite assorbono il ${((totUscite / stipRiferimento) * 100).toFixed(1)}% dello stipendio base.` : "";
+      } else {
+        document.getElementById("topSpesaContainer").innerHTML = "";
+        document.getElementById("resFisso").innerText = "";
+      }
+  }
+}
 </script>
 </body>
 </html>
