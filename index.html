@@ -8,58 +8,58 @@
 <title>ProfitTrack</title>
 <link rel="apple-touch-icon" href="icon.png">
 <style>
-:root {
-  --blue: #0A84FF; --red: #FF453A; --green: #32D74B; --orange: #FF9F0A; --purple: #BF5AF2;
-  --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --sub: #8E8E93; --border: #38383A;
-  --nav-bg: rgba(28,28,30,0.85); --input-bg: #2C2C2E;
+:root{
+  --blue:#0A84FF; --red:#FF453A; --green:#32D74B; --orange:#FF9F0A; --purple:#BF5AF2;
+  --bg:#000000; --card:#1C1C1E; --text:#FFFFFF; --sub:#8E8E93; --border:#38383A; --nav-bg:rgba(28,28,30,0.85);
+  --input-bg:#2C2C2E;
 }
-@media (prefers-color-scheme: light) {
-  :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --sub:#8E8E93; --border:#C6C6C8;
-          --nav-bg: rgba(255,255,255,0.85); --input-bg: #E5E5EA; --blue:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500; --purple:#AF52DE; }
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#F2F2F7; --card:#FFFFFF; --text:#000000; --sub:#8E8E93; --border:#C6C6C8; --nav-bg:rgba(255,255,255,0.85); --input-bg:#E5E5EA;
+    --blue:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500; --purple:#AF52DE;
+  }
 }
-html, body { background: var(--bg); color: var(--text); margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; overscroll-behavior-y: none; }
-body { padding-bottom: calc(90px + env(safe-area-inset-bottom)); padding-top: calc(65px + env(safe-area-inset-top)); box-sizing: border-box; }
-.top-nav { position: fixed; top: 0; width: 100%; z-index: 50; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); }
-.nav-content { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; max-width: 500px; margin: auto; }
-.nav-btn { background: none; border: none; color: var(--blue); font-size: 20px; font-weight: bold; cursor: pointer; padding: 10px; }
-.date-display { text-align: center; cursor: pointer; }
-.date-title { font-size: 17px; font-weight: 600; text-transform: uppercase; }
-.date-sub { font-size: 11px; color: var(--sub); margin-top: 2px; }
-.container { max-width: 500px; margin: auto; padding: 15px; }
-.page { display: none; animation: fade 0.2s ease; }
-.page.active { display: block; }
-.card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-h3 { font-size: 13px; text-transform: uppercase; color: var(--sub); margin: 0 0 12px 0; font-weight: 600; letter-spacing: -0.2px; }
-input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; margin-bottom: 10px; background: var(--input-bg); color: var(--text); font-size: 16px; box-sizing: border-box; outline: none; -webkit-appearance: none; }
-.row { display: flex; gap: 10px; margin-bottom: 10px; }
-.row input, .row select { margin-bottom: 0; }
-.btn { width: 100%; border: none; border-radius: 10px; padding: 14px; font-weight: 600; font-size: 16px; cursor: pointer; color: #fff; }
-.btn-blue { background: var(--blue); } .btn-green { background: var(--green); } .btn-red { background: var(--red); } .btn-purple { background: var(--purple); }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-.stat-box { background: var(--input-bg); padding: 12px 8px; border-radius: 12px; text-align: center; }
-.stat-lbl { font-size: 10px; color: var(--sub); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 4px; }
-.stat-val { font-size: 16px; font-weight: 700; }
-.budget-bar { height: 8px; background: var(--input-bg); border-radius: 4px; overflow: hidden; margin-top: 5px; }
-.budget-fill { height: 100%; transition: width 0.3s ease; }
-.list-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
-.list-item:last-child { border-bottom: none; }
-.item-icon { width: 36px; height: 36px; background: var(--blue); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
-.item-icon svg { width: 20px; height: 20px; fill: currentColor; }
-.item-icon.uscita { background: var(--red); }
-.item-icon.trasferimento { background: var(--purple); }
-.item-details { flex-grow: 1; }
-.item-title { font-weight: 600; font-size: 15px; }
-.item-cat { font-size: 12px; color: var(--sub); }
-.item-amount { font-weight: 600; font-size: 15px; text-align: right; }
-.del-btn { background: none; border: none; color: var(--red); font-size: 18px; padding: 5px 0 5px 15px; cursor: pointer; }
-.tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--nav-bg); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
-.tab { flex: 1; text-align: center; padding: 10px 0; color: var(--sub); font-size: 10px; font-weight: 500; cursor: pointer; }
-.tab.active { color: var(--blue); }
-.tab svg { width: 24px; height: 24px; display: block; margin: 0 auto 4px auto; fill: currentColor; }
-.checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-.checkbox-label { background: var(--input-bg); padding: 8px 12px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 6px; }
-.checkbox-label input { width: auto; margin: 0; }
-@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+html,body{background:var(--bg);color:var(--text);margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;}
+body{padding-bottom:calc(90px + env(safe-area-inset-bottom));padding-top:calc(65px + env(safe-area-inset-top));box-sizing:border-box;}
+.top-nav{position:fixed;top:0;left:0;width:100%;z-index:50;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top);}
+.nav-content{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;max-width:500px;margin:auto;}
+.nav-btn{background:none;border:none;color:var(--blue);font-size:20px;font-weight:bold;cursor:pointer;padding:10px;}
+.date-display{text-align:center;cursor:pointer;}
+.date-title{font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:-0.2px;}
+.date-sub{font-size:11px;color:var(--sub);margin-top:2px;}
+.container{max-width:500px;margin:auto;padding:15px;}
+.page{display:none;animation:fade 0.2s ease;}
+.page.active{display:block;}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;}
+h3{font-size:13px;text-transform:uppercase;color:var(--sub);margin:0 0 12px 0;font-weight:600;letter-spacing:-0.2px;}
+input,select{width:100%;border:none;border-radius:10px;padding:14px;margin-bottom:10px;background:var(--input-bg);color:var(--text);font-size:16px;box-sizing:border-box;outline:none;-webkit-appearance:none;}
+.row{display:flex;gap:10px;margin-bottom:10px;}
+.row input,.row select{margin-bottom:0;}
+.btn{width:100%;border:none;border-radius:10px;padding:14px;font-weight:600;font-size:16px;cursor:pointer;color:#fff;}
+.btn-blue{background:var(--blue);} .btn-green{background:var(--green);} .btn-red{background:var(--red);} .btn-purple{background:var(--purple);}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--input-bg);padding:12px 8px;border-radius:12px;text-align:center;}
+.stat-lbl{font-size:10px;color:var(--sub);text-transform:uppercase;font-weight:600;display:block;margin-bottom:4px;}
+.stat-val{font-size:16px;font-weight:700;}
+.budget-bar{height:8px;background:var(--input-bg);border-radius:4px;overflow:hidden;margin-top:5px;}
+.budget-fill{height:100%;transition:width .25s ease;}
+.list-item{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.list-item:last-child{border-bottom:none;}
+.item-icon{width:36px;height:36px;background:var(--blue);color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0;}
+.item-icon svg{width:20px;height:20px;fill:currentColor;}
+.item-details{flex-grow:1;}
+.item-title{font-weight:600;font-size:15px;}
+.item-cat{font-size:12px;color:var(--sub);}
+.item-amount{font-weight:600;font-size:15px;text-align:right;}
+.del-btn{background:none;border:none;color:var(--red);font-size:18px;padding:5px 0 5px 15px;cursor:pointer;}
+.tab-bar{position:fixed;bottom:0;left:0;width:100%;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50;}
+.tab{flex:1;text-align:center;padding:10px 0;color:var(--sub);font-size:10px;font-weight:500;cursor:pointer;}
+.tab.active{color:var(--blue);}
+.tab svg{width:24px;height:24px;display:block;margin:0 auto 4px auto;fill:currentColor;}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;}
+.checkbox-label{background:var(--input-bg);padding:8px 12px;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:6px;}
+.checkbox-label input{width:auto;margin:0;}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
 </style>
 </head>
 <body>
@@ -67,7 +67,7 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
   <div class="nav-content">
     <button class="nav-btn" onclick="navDate(-1)">❮</button>
     <div class="date-display" onclick="toggleView()">
-      <div class="date-title" id="dateTitle">GIORNO</div>
+      <div class="date-title" id="dateTitle">MESE</div>
       <div class="date-sub" id="dateSub">Cambia Vista</div>
     </div>
     <button class="nav-btn" onclick="navDate(1)">❯</button>
@@ -79,7 +79,7 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
       <div class="stat-box"><span class="stat-lbl">Tua Ora</span><div class="stat-val" id="valOra">€0.00</div></div>
       <div class="stat-box"><span class="stat-lbl">Entrate</span><div class="stat-val" id="valEnt" style="color:var(--green)">€0</div></div>
       <div class="stat-box"><span class="stat-lbl">Uscite</span><div class="stat-val" id="valUsc" style="color:var(--red)">€0</div></div>
-      <div class="stat-box" style="grid-column: span 2"><span class="stat-lbl">Flusso Netto</span><div class="stat-val" id="valNet">€0</div></div>
+      <div class="stat-box" style="grid-column: span 2;"><span class="stat-lbl">Flusso Netto</span><div class="stat-val" id="valNet">€0</div></div>
       <div class="stat-box"><span class="stat-lbl">Ore Lavoro</span><div class="stat-val" id="valOreUsc">0h</div></div>
     </div>
     <div class="card">
@@ -96,21 +96,15 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
     <div class="card">
       <h3>Nuova Transazione</h3>
       <div class="row">
-        <select id="trxTipo" onchange="aggiornaFormTrx()">
+        <select id="trxTipo" onchange="onTipoChange()">
           <option value="uscita">Uscita</option>
           <option value="entrata">Entrata (Extra)</option>
-          <option value="transfer">Trasferimento</option>
         </select>
         <input type="number" id="trxImporto" placeholder="Importo €">
       </div>
       <input type="text" id="trxNome" placeholder="Descrizione (es. Spesa Coop)">
-      <div id="areaCategoria" class="row">
-        <select id="trxContoFrom"></select>
+      <div class="row" style="margin-top:6px;">
         <select id="trxCategoria"></select>
-      </div>
-      <div id="areaTransfer" class="row" style="display:none;">
-        <select id="trxContoDa"></select>
-        <select id="trxContoA"></select>
       </div>
       <button class="btn btn-green" id="btnSalvaTrx" onclick="salvaTransazione()">Registra</button>
     </div>
@@ -143,14 +137,6 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
 </div>
 <div id="page-settings" class="page">
   <div class="container">
-    <div class="card">
-      <h3>Gestione Conti</h3>
-      <div class="row">
-        <input type="text" id="nuovoConto" placeholder="Nome conto">
-        <button class="btn btn-blue" style="width:80px" onclick="aggiungiConto()">Add</button>
-      </div>
-      <div id="listaConti" style="margin-top:10px; font-size:14px;"></div>
-    </div>
     <div class="card">
       <h3>Parametri Lavorativi</h3>
       <input type="number" id="oreSettimanali" placeholder="Ore settimanali totali (es. 40)">
@@ -188,292 +174,378 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
   </div>
 </div>
 <script>
-const DB_KEY = 'pt_v11_db';
-const SET_KEY = 'pt_v11_set';
+const DB_KEY = 'pt_v13_db';
+const SET_KEY = 'pt_v13_set';
 let db = JSON.parse(localStorage.getItem(DB_KEY)) || { trx: [], stipendi: {} };
-let settings = JSON.parse(localStorage.getItem(SET_KEY)) || { oreWeek: 40, riposi: [0,6], conti: ['Principale'] };
+let settings = JSON.parse(localStorage.getItem(SET_KEY)) || { oreWeek: 40, riposi: [0,6] };
 let currentDate = new Date();
-let viewMode = 'month'; // 'day', 'month', 'year'
+let viewMode = 'month'; // 'month' o 'year'
 // =======================
 // CATEGORIE (come richiesto)
 // =======================
-const INCOME_CATEGORIES = ["Extra", "Investimenti", "Regalo"];
+const INCOME_CATEGORIES = ["Extra","Investimenti","Regalo"];
 const EXPENSE_CATEGORIES = [
-  "Carburante",
-  "Tabacchino",
-  "Spesa",
-  "Ristorazione & Bar",
-  "Acquisti & Regali",
-  "Auto e Manutenzione",
-  "Abitazione",
-  "Connettivita",
-  "Utenze",
-  "Software e Giochi",
-  "Tempo libero e Viaggi",
-  "Cura & Servizi",
+  "Carburante","Tabacchino","Spesa","Ristorazione & Bar","Acquisti & Regali","Auto e Manutenzione",
+  "Abitazione","Connettivita","Utenze","Software e Giochi","Tempo libero e Viaggi","Cura & Servizi",
   "Viabilita & Soste"
 ];
-// Icône semplici e pulite (tutte valide SVG)
-const icnGeneric = '<circle cx="12" cy="12" r="9" />';
+// Icone semplici e veloci (SVG piccoli; non “pesanti”).
+const icnGeneric = '<circle cx="12" cy="12" r="9"/>';
 const icnEntrate = {
-  "Extra": '<path d="M12 2l2.2 6.8H21l-5.4 3.9L17.8 20 12 15.9 6.2 20l2.2-7.4L3 8.8h6.8L12 2z" />',
-  "Investimenti": '<path d="M4 19h16v2H4v-2zm2-2l4-6 3 4 4-7 1 0.6-6 10.8-7-5-3 3.6-1-0.99z" />',
-  "Regalo": '<path d="M20 7h-3.2C16.6 5.3 15 4 13 4c-1.7 0-3.2 1-4 2.5C8.2 5 7.2 4 6 4c-2 0-3.6 1.3-3.8 3H0v5h20V7z"/><path d="M0 22h20V12H0v10z" />'
+  "Extra": '<path d="M12 2l2.2 6.8H21l-5.4 3.9L17.8 20 12 15.9 6.2 20l2.2-7.4L3 8.8h6.8L12 2z"/>',
+  "Investimenti": '<path d="M4 19h16v2H4v-2z"/><path d="M6 17l4-6 3 4 4-7 1 0.6-6 10.8-7-5-3 3.6-1-0.99z"/>',
+  "Regalo": '<path d="M20 7h-3.2C16.6 5.3 15 4 13 4c-1.7 0-3.2 1-4 2.5C8.2 5 7.2 4 6 4c-2 0-3.6 1.3-3.8 3H0v5h20V7z"/><path d="M0 22h20V12H0v10z"/>'
 };
 const icnUscite = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c, icnGeneric]));
-const icnTransfer = '<path d="M7 7h10v10H7V7zm5-4l5 4-5 4-5-4 5-4z" />';
 // =======================
-// PERSISTENZA
+// RENDER THROTTLE (velocità UI)
 // =======================
-function save() {
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
-  localStorage.setItem(SET_KEY, JSON.stringify(settings));
-  render();
+let rafId = null;
+function scheduleRender() {
+  if (rafId !== null) return;
+  rafId = requestAnimationFrame(() => {
+    rafId = null;
+    render();
+  });
 }
 // =======================
-// NAV / VISTE
+// HELPERS
 // =======================
 function switchTab(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  render();
+  scheduleRender();
 }
 function toggleView() {
-  if(viewMode === 'day') viewMode = 'month';
-  else if(viewMode === 'month') viewMode = 'year';
-  else viewMode = 'day';
-  render();
+  viewMode = (viewMode === 'month') ? 'year' : 'month';
+  scheduleRender();
 }
 function navDate(dir) {
-  if(viewMode === 'day') currentDate.setDate(currentDate.getDate() + dir);
-  else if(viewMode === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
-  else currentDate.setFullYear(currentDate.getFullYear() + dir);
-  render();
+  if (viewMode === 'month') {
+    currentDate.setMonth(currentDate.getMonth() + dir);
+  } else {
+    currentDate.setFullYear(currentDate.getFullYear() + dir);
+  }
+  scheduleRender();
 }
-// =======================
-// DATE & WORK
-// =======================
 function getMeseKey(date) {
-  return `${date.getFullYear()}-${date.getMonth()}`; // mese 0..11
+  return `${date.getFullYear()}-${date.getMonth()}`; // month 0..11
+}
+function daysInMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
 }
 function isRestDay(date) {
   return (settings.riposi || []).includes(date.getDay()); // 0..6 Dom..Sab
 }
-function calcGiorniLavoro(date, isFullMonth) {
-  let d = new Date(date.getFullYear(), date.getMonth(), isFullMonth ? 1 : date.getDate());
-  let max = isFullMonth ? new Date(date.getFullYear(), date.getMonth()+1, 0).getDate() : date.getDate();
-  let count = 0;
-  while(d.getDate() <= max) {
-    if(!isRestDay(d)) count++;
-    d.setDate(d.getDate() + 1);
-  }
-  return count;
-}
-// Dati wage del mese: base (stipendio base) + ore previste e wage/ora
-function getWageMonthData(date) {
-  const key = getMeseKey(date);
-  const base = (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : 0;
+function calcWorkHoursForMonth(monthDate) {
+  // ore = (oreWeek / workdaysPerWeek) * workdaysInMonth
   const riposiCount = (settings.riposi || []).length;
-  const workdaysPerWeek = (7 - riposiCount);
-  const ggMese = calcGiorniLavoro(date, true);
-  const hrDay = (workdaysPerWeek > 0 && (settings.oreWeek || 0) > 0)
-    ? (settings.oreWeek / workdaysPerWeek)
-    : 0;
-  const hrMese = ggMese * hrDay;
-  const hourlyWage = (hrMese > 0) ? (base / hrMese) : 0;
-  return { key, base, ggMese, hrDay, hrMese, hourlyWage };
+  const workdaysPerWeek = 7 - riposiCount;
+  if (!(settings.oreWeek > 0) || workdaysPerWeek <= 0) return { workdaysInMonth: 0, workHoursInMonth: 0 };
+  const hrPerWorkday = settings.oreWeek / workdaysPerWeek;
+  const dim = daysInMonth(monthDate);
+  let workdaysInMonth = 0;
+  for (let d = 1; d <= dim; d++) {
+    const dt = new Date(monthDate.getFullYear(), monthDate.getMonth(), d);
+    if (!isRestDay(dt)) workdaysInMonth++;
+  }
+  return { workdaysInMonth, workHoursInMonth: workdaysInMonth * hrPerWorkday };
 }
-// Base stipendio giornaliera stimata (per view day)
-function getDayBase(date) {
-  const m = getWageMonthData(date);
-  if(!m.ggMese || m.ggMese <= 0) return 0;
-  if(isRestDay(date)) return 0;
-  return m.base / m.ggMese;
+function monthData(monthDate) {
+  const key = getMeseKey(monthDate);
+  const baseSalary = (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : 0;
+  const w = calcWorkHoursForMonth(monthDate);
+  const hourlyWage = (w.workHoursInMonth > 0 && baseSalary > 0) ? (baseSalary / w.workHoursInMonth) : 0;
+  return { key, baseSalary, hourlyWage, workHoursInMonth: w.workHoursInMonth };
 }
-// Totali anno: stipendio base e ore lavoro "schedulate" in base alle impostazioni
-function getYearBaseTotal(year) {
+function yearBaseTotal(year) {
   let sum = 0;
-  for(let m=0; m<12; m++) {
+  for (let m=0;m<12;m++) {
     const key = `${year}-${m}`;
     sum += (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : 0;
   }
   return sum;
 }
-function getYearWorkHoursTotal(year) {
-  let totalHours = 0;
-  for(let m=0; m<12; m++) {
-    const monthDate = new Date(year, m, 1);
-    const data = getWageMonthData(monthDate);
-    totalHours += data.hrMese; // hrMese usa oreWeek + riposi e calendario
+function yearWorkHoursTotal(year) {
+  let total = 0;
+  for (let m=0;m<12;m++) {
+    const md = monthData(new Date(year, m, 1));
+    total += md.workHoursInMonth;
   }
-  return totalHours;
+  return total;
 }
-function getYearHourlyWage(year) {
-  const totalBase = getYearBaseTotal(year);
-  const totalHours = getYearWorkHoursTotal(year);
-  return totalHours > 0 ? (totalBase / totalHours) : 0;
+function yearHourlyWage(year) {
+  const base = yearBaseTotal(year);
+  const hours = yearWorkHoursTotal(year);
+  return (hours > 0 && base > 0) ? (base / hours) : 0;
 }
-// =======================
-// TRANSAZIONI / PERIODO
-// =======================
 function getPeriodTrx(date, mode) {
-  return (db.trx || []).filter(t => {
-    let d = new Date(t.timestamp);
-    if(mode === 'day') return d.toDateString() === date.toDateString();
-    if(mode === 'month') return d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear();
-    return d.getFullYear() === date.getFullYear();
-  });
+  const arr = db.trx || [];
+  if (mode === 'month') {
+    const mm = date.getMonth();
+    const yy = date.getFullYear();
+    return arr.filter(t => {
+      const d = new Date(t.timestamp);
+      return d.getMonth() === mm && d.getFullYear() === yy;
+    });
+  }
+  // year
+  const year = date.getFullYear();
+  return arr.filter(t => (new Date(t.timestamp)).getFullYear() === year);
+}
+function computeTotals() {
+  const periodTrx = getPeriodTrx(currentDate, viewMode);
+  const extraIncome = periodTrx.filter(t => t.type === 'entrata').reduce((s,t)=>s+t.amount,0);
+  const expenses = periodTrx.filter(t => t.type === 'uscita').reduce((s,t)=>s+t.amount,0);
+  if (viewMode === 'month') {
+    const md = monthData(currentDate);
+    const baseSalary = md.baseSalary;
+    const hourlyWage = md.hourlyWage;
+    const totEntrate = baseSalary + extraIncome;
+    const net = totEntrate - expenses;
+    const oreCosto = (hourlyWage > 0) ? (expenses / hourlyWage) : 0;
+    const assorbimento = (totEntrate > 0) ? (expenses / totEntrate) * 100 : 0;
+    return { baseSalary, hourlyWage, totEntrate, expenses, net, oreCosto, assorbimento };
+  }
+  // year
+  const year = currentDate.getFullYear();
+  const baseSalary = yearBaseTotal(year);
+  const hourlyWage = yearHourlyWage(year); // wage media
+  const totEntrate = baseSalary + extraIncome;
+  const net = totEntrate - expenses;
+  // ore costo: facciamo comunque mese-per-mese per essere coerenti (più stabile se base/ore cambiano mese)
+  // ma qui c'è poca roba -> non lento.
+  let oreCosto = 0;
+  if (hourlyWage > 0) {
+    for (let m=0;m<12;m++) {
+      const md = monthData(new Date(year,m,1));
+      if (md.hourlyWage <= 0) continue;
+      const start = new Date(year,m,1).getTime();
+      const end = new Date(year,m+1,0).getTime();
+      const expM = (db.trx || []).filter(tx => tx.type==='uscita' && tx.timestamp>=start && tx.timestamp<=end).reduce((s,tx)=>s+tx.amount,0);
+      oreCosto += expM / md.hourlyWage;
+    }
+  }
+  const assorbimento = (totEntrate > 0) ? (expenses / totEntrate) * 100 : 0;
+  return { baseSalary, hourlyWage, totEntrate, expenses, net, oreCosto, assorbimento };
 }
 // =======================
-// SALVATAGGI
+// CRUD STIPENDIO / TX
 // =======================
+function save() {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  localStorage.setItem(SET_KEY, JSON.stringify(settings));
+  scheduleRender();
+}
 function salvaStipendio() {
-  let v = parseFloat(document.getElementById('inpStipendio').value);
-  if(isNaN(v)) return;
-  if(!db.stipendi) db.stipendi = {};
-  db.stipendi[getMeseKey(currentDate)] = v;
+  const v = parseFloat(document.getElementById('inpStipendio').value);
+  if (isNaN(v) || v < 0) return;
+  const key = getMeseKey(currentDate);
+  if (!db.stipendi) db.stipendi = {};
+  db.stipendi[key] = v;
   save();
 }
-function aggiungiConto() {
-  let n = document.getElementById('nuovoConto').value.trim();
-  if(n && !(settings.conti || []).includes(n)) {
-    settings.conti.push(n);
-    document.getElementById('nuovoConto').value = '';
-    save();
-  }
+function aggiungiIcona(tx) {
+  if (tx.type === 'entrata') return icnEntrate[tx.cat] || icnGeneric;
+  return icnUscite[tx.cat] || icnGeneric;
 }
-function salvaImpostazioni() {
-  let o = parseFloat(document.getElementById('oreSettimanali').value);
-  if(o > 0) settings.oreWeek = o;
-  let riposi = Array.from(document.querySelectorAll('.chk-riposo:checked'))
-    .map(c => parseInt(c.value));
-  settings.riposi = riposi;
+function eliminaTrx(id) {
+  db.trx = (db.trx || []).filter(t => t.id !== id);
   save();
 }
-// =======================
-// FORM TRX
-// =======================
-function aggiornaFormTrx() {
-  let t = document.getElementById('trxTipo').value;
-  let areaCat = document.getElementById('areaCategoria');
-  let areaTra = document.getElementById('areaTransfer');
-  let selCat = document.getElementById('trxCategoria');
-  let btn = document.getElementById('btnSalvaTrx');
-  areaCat.style.display = t === 'transfer' ? 'none' : 'flex';
-  areaTra.style.display = t === 'transfer' ? 'flex' : 'none';
-  selCat.innerHTML = '';
-  if(t === 'uscita') {
-    EXPENSE_CATEGORIES.forEach(k => selCat.add(new Option(k, k)));
-    btn.className = 'btn btn-red';
-  } else if(t === 'entrata') {
-    INCOME_CATEGORIES.forEach(k => selCat.add(new Option(k, k)));
-    btn.className = 'btn btn-green';
+function aggiornaCategoriaSelect() {
+  const tipo = document.getElementById('trxTipo').value;
+  const sel = document.getElementById('trxCategoria');
+  sel.innerHTML = '';
+  if (tipo === 'entrata') {
+    INCOME_CATEGORIES.forEach(c => sel.add(new Option(c,c)));
   } else {
-    btn.className = 'btn btn-purple';
+    EXPENSE_CATEGORIES.forEach(c => sel.add(new Option(c,c)));
   }
+  // aggiorna colore bottone
+  const btn = document.getElementById('btnSalvaTrx');
+  btn.className = (tipo === 'entrata') ? 'btn btn-green' : 'btn btn-blue';
+}
+function onTipoChange() {
+  aggiornaCategoriaSelect();
 }
 function salvaTransazione() {
-  let t = document.getElementById('trxTipo').value;
-  let imp = parseFloat(document.getElementById('trxImporto').value);
-  let nome = document.getElementById('trxNome').value || t;
-  if(isNaN(imp) || imp <= 0) return;
-  let baseTrx = {
+  const tipo = document.getElementById('trxTipo').value;
+  const imp = parseFloat(document.getElementById('trxImporto').value);
+  const nome = document.getElementById('trxNome').value || tipo;
+  const cat = document.getElementById('trxCategoria').value;
+  if (isNaN(imp) || imp <= 0) return;
+  const tx = {
     id: Date.now(),
     timestamp: currentDate.getTime(),
-    type: t,
+    type: tipo,
     amount: imp,
-    name: nome
+    name: nome,
+    cat: cat
   };
-  if(t === 'transfer') {
-    baseTrx.fromAcc = document.getElementById('trxContoDa').value;
-    baseTrx.toAcc = document.getElementById('trxContoA').value;
-    if(baseTrx.fromAcc === baseTrx.toAcc) return alert("Conti uguali");
-  } else {
-    baseTrx.cat = document.getElementById('trxCategoria').value;
-    baseTrx.acc = document.getElementById('trxContoFrom').value;
-  }
-  db.trx.push(baseTrx);
+  if (!db.trx) db.trx = [];
+  db.trx.push(tx);
   document.getElementById('trxImporto').value = '';
   document.getElementById('trxNome').value = '';
   save();
 }
-function eliminaTrx(id) {
-  db.trx = (db.trx || []).filter(x => x.id !== id);
+// =======================
+// IMPOSTAZIONI / EXPORT
+// =======================
+function salvaImpostazioni() {
+  const ore = parseFloat(document.getElementById('oreSettimanali').value);
+  if (isNaN(ore) || ore <= 0) return;
+  const riposi = Array.from(document.querySelectorAll('.chk-riposo:checked'))
+    .map(c => parseInt(c.value));
+  settings.oreWeek = ore;
+  settings.riposi = riposi;
   save();
 }
-// =======================
-// ORE COSTO (Anno: mese-per-mese)
-// =======================
-function getYearHoursCost(year) {
-  let sumHours = 0;
-  for(let m=0; m<12; m++) {
-    const monthDate = new Date(year, m, 1);
-    const monthWage = getWageMonthData(monthDate).hourlyWage; // paga oraria del mese (base mese / ore mese)
-    if(monthWage <= 0) continue;
-    const start = new Date(year, m, 1).getTime();
-    const end = new Date(year, m + 1, 0).getTime();
-    const expensesMonth = (db.trx || [])
-      .filter(tx => tx.type === 'uscita' && tx.timestamp >= start && tx.timestamp <= end)
-      .reduce((s, tx) => s + tx.amount, 0);
-    sumHours += (expensesMonth / monthWage);
-  }
-  return sumHours;
+function exportData() {
+  const payload = JSON.stringify(db, null, 2);
+  const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ProfitTrack_Backup.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function resetData() {
+  if (!confirm("Attenzione: questa azione eliminerà tutti i dati. Procedere?")) return;
+  localStorage.removeItem(DB_KEY);
+  localStorage.removeItem(SET_KEY);
+  location.reload();
 }
 // =======================
-// ANALISI (Piano)
- // =======================
+// UI UPDATE
+// =======================
+function render() {
+  // header
+  const title = (viewMode === 'month')
+    ? currentDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }).toUpperCase()
+    : String(currentDate.getFullYear());
+  document.getElementById('dateTitle').innerText = title;
+  document.getElementById('dateSub').innerText = `VISTA: ${viewMode.toUpperCase()}`;
+  // stipendio base solo in month
+  const card = document.getElementById('cardStipendio');
+  if (card) card.style.display = (viewMode === 'month') ? 'block' : 'none';
+  // set input stipendio month current
+  if (viewMode === 'month') {
+    const key = getMeseKey(currentDate);
+    document.getElementById('inpStipendio').value = (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : '';
+  }
+  // settings UI
+  if (document.getElementById('page-settings').classList.contains('active')) {
+    document.getElementById('oreSettimanali').value = settings.oreWeek || 0;
+    document.querySelectorAll('.chk-riposo').forEach(c => {
+      c.checked = (settings.riposi || []).includes(parseInt(c.value));
+    });
+  }
+  // compute totals
+  const t = computeTotals();
+  // metriche
+  document.getElementById('valOra').innerText = `€${(t.hourlyWage || 0).toFixed(2)}`;
+  document.getElementById('valEnt').innerText = `€${t.totEntrate.toFixed(0)}`;
+  document.getElementById('valUsc').innerText = `€${t.expenses.toFixed(0)}`;
+  const valNet = document.getElementById('valNet');
+  valNet.innerText = `€${t.net.toFixed(0)}`;
+  valNet.style.color = (t.net < 0) ? 'var(--red)' : 'var(--text)';
+  document.getElementById('valOreUsc').innerText = `${(t.oreCosto || 0).toFixed(1)}h`;
+  const ass = Math.max(0, Math.min(100, t.assorbimento || 0));
+  document.getElementById('budgetPerc').innerText = `${ass.toFixed(1)}%`;
+  const budgetFill = document.getElementById('budgetFill');
+  budgetFill.style.width = `${ass}%`;
+  budgetFill.style.background = ass > 80 ? 'var(--red)' : (ass > 50 ? 'var(--orange)' : 'var(--green)');
+  // lista movimenti
+  if (document.getElementById('page-list').classList.contains('active')) {
+    const periodTrx = getPeriodTrx(currentDate, viewMode).slice().sort((a,b)=>b.timestamp-a.timestamp);
+    let html = '';
+    for (const tx of periodTrx) {
+      const sign = (tx.type === 'uscita') ? '-' : '+';
+      const color = (tx.type === 'uscita') ? 'var(--red)' : 'var(--green)';
+      const iconSvg = aggiungiIcona(tx);
+      const catText = tx.cat || '';
+      html += `
+        <div class="list-item">
+          <div class="item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>
+          </div>
+          <div class="item-details">
+            <div class="item-title">${tx.name}</div>
+            <div class="item-cat">${catText}</div>
+          </div>
+          <div class="item-amount" style="color:${color}">${sign}€${tx.amount.toFixed(2)}</div>
+          <button class="del-btn" onclick="eliminaTrx(${tx.id})">✕</button>
+        </div>
+      `;
+    }
+    document.getElementById('listaMovimenti').innerHTML =
+      html || '<div style="color:var(--sub); text-align:center; padding:20px;">Nessun movimento.</div>';
+  }
+}
+// =======================
+// ANALISI
+// =======================
 function calcolaImpatto() {
-  let c = parseFloat(document.getElementById('anaCosto').value);
-  if(isNaN(c) || c <= 0) {
-    document.getElementById('resImpatto').innerText = "Inserisci un costo valido.";
+  const c = parseFloat(document.getElementById('anaCosto').value);
+  const res = document.getElementById('resImpatto');
+  if (isNaN(c) || c <= 0) {
+    res.innerText = "Inserisci un costo valido.";
     return;
   }
-  let baseDenom = 0; // SOLO stipendio base
-  let hourly = 0;    // paga oraria
-  if(viewMode === 'year') {
-    const year = currentDate.getFullYear();
-    baseDenom = getYearBaseTotal(year);
-    hourly = getYearHourlyWage(year);
+  let baseDenom = 0;
+  let hourly = 0;
+  if (viewMode === 'month') {
+    const md = monthData(currentDate);
+    baseDenom = md.baseSalary;
+    hourly = md.hourlyWage;
   } else {
-    const m = getWageMonthData(currentDate);
-    baseDenom = m.base;
-    hourly = m.hourlyWage;
+    const year = currentDate.getFullYear();
+    baseDenom = yearBaseTotal(year);
+    hourly = yearHourlyWage(year);
   }
-  if(baseDenom <= 0 || hourly <= 0) {
-    document.getElementById('resImpatto').innerText = "Imposta lo stipendio base e le ore/riposi nelle Impostazioni.";
+  if (baseDenom <= 0 || hourly <= 0) {
+    res.innerText = "Imposta lo stipendio base (e ore/riposi) nelle impostazioni.";
     return;
   }
-  let perc = (c / baseDenom) * 100;
-  let ore = c / hourly;
-  document.getElementById('resImpatto').innerHTML =
+  const perc = (c / baseDenom) * 100;
+  const ore = c / hourly;
+  res.innerHTML =
     `Assorbe il <span style="color:var(--red)">${perc.toFixed(1)}%</span> dello stipendio base.<br>` +
     `Equivale a <span style="color:var(--red)">${ore.toFixed(1)} ore</span> di lavoro.`;
 }
 function calcolaSostenibilita() {
-  let obj = parseFloat(document.getElementById('anaObiettivo').value);
-  let anni = parseFloat(document.getElementById('anaAnni').value);
-  if(isNaN(obj) || obj <= 0 || isNaN(anni) || anni <= 0) {
-    document.getElementById('resSostenibilita').innerText = "Inserisci obiettivo (€) e anni validi.";
+  const target = parseFloat(document.getElementById('anaObiettivo').value);
+  const anni = parseFloat(document.getElementById('anaAnni').value);
+  const res = document.getElementById('resSostenibilita');
+  if (isNaN(target) || target <= 0 || isNaN(anni) || anni <= 0) {
+    res.innerText = "Inserisci obiettivo (€) e anni validi.";
     return;
   }
-  const requiredMonthlySaving = obj / (anni * 12);
-  // costruiamo mesi con stipendio base
+  const requiredMonthlySaving = target / (anni * 12);
   const stipendKeys = Object.keys(db.stipendi || {});
+  if (stipendKeys.length === 0) {
+    res.innerText = "Storico stipendi assente.";
+    return;
+  }
+  // costruisci mesi disponibili (base + extra - uscite)
   const months = stipendKeys.map(k => {
     const [yStr, mStr] = k.split('-');
-    const year = parseInt(yStr);
-    const month = parseInt(mStr);
-    const monthStart = new Date(year, month, 1).getTime();
-    const monthEnd = new Date(year, month + 1, 0).getTime();
+    const year = parseInt(yStr), month = parseInt(mStr);
+    const start = new Date(year, month, 1).getTime();
+    const end = new Date(year, month+1, 0).getTime();
     const baseSalary = db.stipendi[k] || 0;
     const extraIncome = (db.trx || [])
-      .filter(tx => tx.type === 'entrata' && tx.timestamp >= monthStart && tx.timestamp <= monthEnd)
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter(tx => tx.type === 'entrata' && tx.timestamp >= start && tx.timestamp <= end)
+      .reduce((s,tx)=>s+tx.amount,0);
     const expenses = (db.trx || [])
-      .filter(tx => tx.type === 'uscita' && tx.timestamp >= monthStart && tx.timestamp <= monthEnd)
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter(tx => tx.type === 'uscita' && tx.timestamp >= start && tx.timestamp <= end)
+      .reduce((s,tx)=>s+tx.amount,0);
     return {
       monthKey: k,
       baseSalary,
@@ -482,180 +554,37 @@ function calcolaSostenibilita() {
       availableToSave: baseSalary + extraIncome - expenses
     };
   });
-  if(months.length === 0) {
-    document.getElementById('resSostenibilita').innerText = "Storico stipendi assente.";
-    return;
-  }
-  // Stima iniziale: mese selezionato (finché abbiamo <2 mesi)
-  // Poi media su tutti i mesi disponibili (come da piano)
+  // stima iniziale = mese corrente selezionato; poi media su tutti i mesi quando ci sono piu dati
   const initialMonthKey = getMeseKey(currentDate);
   const initial = months.find(m => m.monthKey === initialMonthKey) || months[0];
-  const avgAvailable = months.reduce((s, m) => s + m.availableToSave, 0) / months.length;
-  const avgBase = months.reduce((s, m) => s + m.baseSalary, 0) / months.length;
+  const avgAvailable = months.reduce((s,m)=>s+m.availableToSave,0) / Math.max(1, months.length);
+  const avgBase = months.reduce((s,m)=>s+m.baseSalary,0) / Math.max(1, months.length);
   const useAvg = months.length >= 2;
   const basisAvail = useAvg ? avgAvailable : initial.availableToSave;
   const basisBase = useAvg ? avgBase : initial.baseSalary;
   const isSustainable = requiredMonthlySaving <= basisAvail;
   const deficit = Math.max(0, requiredMonthlySaving - basisAvail);
-  const percent = basisBase > 0 ? (requiredMonthlySaving / basisBase) * 100 : 0;
-  document.getElementById('resSostenibilita').innerHTML =
+  const percent = (basisBase > 0) ? (requiredMonthlySaving / basisBase) * 100 : 0;
+  res.innerHTML =
     `Devi mettere da parte <span style="color:var(--purple)">€${requiredMonthlySaving.toFixed(0)}</span> al mese.<br>` +
     `Pari a <span style="color:var(--purple)">${percent.toFixed(1)}%</span> del tuo stipendio base${useAvg ? " medio" : ""}.` +
-    `<br><span style="font-weight:700; color:${isSustainable ? "var(--green)" : "var(--red)"};">` +
-    `${isSustainable ? "Sostenibile" : "Non sostenibile"}</span>` +
+    `<br><span style="font-weight:700; color:${isSustainable ? "var(--green)" : "var(--red)"};">${isSustainable ? "Sostenibile" : "Non sostenibile"}</span>` +
     (!isSustainable ? `<br>Deficit stimato: circa <span style="font-weight:700; color:var(--red);">€${deficit.toFixed(0)}</span>/mese` : "");
 }
 // =======================
-// EXPORT / RESET
-// =======================
-function exportData() {
-  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-  let dlAnchorElem = document.createElement('a');
-  dlAnchorElem.setAttribute("href", dataStr);
-  dlAnchorElem.setAttribute("download", "ProfitTrack_Backup.json");
-  document.body.appendChild(dlAnchorElem);
-  dlAnchorElem.click();
-  dlAnchorElem.remove();
-}
-function resetData() {
-  if(confirm("Attenzione: questa azione eliminerà tutti i dati. Procedere?")) {
-    localStorage.removeItem(DB_KEY);
-    localStorage.removeItem(SET_KEY);
-    location.reload();
-  }
-}
-// =======================
-// RENDER
-// =======================
-function render() {
-  // header
-  let opts = { month: 'long', year: 'numeric' };
-  if(viewMode === 'day') opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  if(viewMode === 'year') opts = { year: 'numeric' };
-  const title = currentDate.toLocaleDateString('it-IT', opts).toUpperCase();
-  document.getElementById('dateTitle').innerText = title;
-  document.getElementById('dateSub').innerText = `VISTA: ${viewMode.toUpperCase()}`;
-  // visibilità stipendio base solo in month
-  document.getElementById('cardStipendio').style.display = viewMode === 'month' ? 'block' : 'none';
-  // wage base/oraria coerente
-  let baseForPeriod = 0;
-  let hourlyForCost = 0;
-  if(viewMode === 'month') {
-    const m = getWageMonthData(currentDate);
-    baseForPeriod = m.base;
-    hourlyForCost = m.hourlyWage;
-  } else if(viewMode === 'day') {
-    // base giornaliera stimata ma hourly: usa sempre wage oraria del mese
-    const m = getWageMonthData(currentDate);
-    baseForPeriod = getDayBase(currentDate);
-    hourlyForCost = m.hourlyWage;
-  } else { // year
-    const year = currentDate.getFullYear();
-    baseForPeriod = getYearBaseTotal(year);
-    hourlyForCost = getYearHourlyWage(year);
-  }
-  // period trx: extras e uscite includono solo entrate/uscite (trasferimenti esclusi)
-  const periodTrx = getPeriodTrx(currentDate, viewMode);
-  const extraEntrate = periodTrx
-    .filter(t => t.type === 'entrata')
-    .reduce((s, t) => s + t.amount, 0);
-  const totUscite = periodTrx
-    .filter(t => t.type === 'uscita')
-    .reduce((s, t) => s + t.amount, 0);
-  const totEntrate = baseForPeriod + extraEntrate;
-  const net = totEntrate - totUscite;
-  // ORE COSTO: in year mese-per-mese
-  let oreCosto = 0;
-  if(viewMode === 'year') {
-    oreCosto = getYearHoursCost(currentDate.getFullYear());
-  } else {
-    oreCosto = (hourlyForCost > 0) ? (totUscite / hourlyForCost) : 0;
-  }
-  // Assorbimento stipendio: uscite / (stipendio base + extra)
-  let assorbimento = (totEntrate > 0) ? (totUscite / totEntrate) * 100 : 0;
-  assorbimento = Math.max(0, Math.min(100, assorbimento));
-  // visori principali
-  document.getElementById('valOra').innerText = `€${(hourlyForCost > 0 ? hourlyForCost : 0).toFixed(2)}`;
-  document.getElementById('valEnt').innerText = `€${totEntrate.toFixed(0)}`;
-  document.getElementById('valUsc').innerText = `€${totUscite.toFixed(0)}`;
-  document.getElementById('valNet').innerText = `€${net.toFixed(0)}`;
-  let elNet = document.getElementById('valNet');
-  elNet.style.color = net < 0 ? 'var(--red)' : 'var(--text)';
-  document.getElementById('valOreUsc').innerText = `${(oreCosto || 0).toFixed(1)}h`;
-  document.getElementById('budgetPerc').innerText = `${assorbimento.toFixed(1)}%`;
-  let bFill = document.getElementById('budgetFill');
-  bFill.style.width = `${assorbimento}%`;
-  bFill.style.background = assorbimento > 80 ? 'var(--red)' : (assorbimento > 50 ? 'var(--orange)' : 'var(--green)');
-  // setup selects conti
-  let selDa = document.getElementById('trxContoDa');
-  let selA = document.getElementById('trxContoA');
-  let selFrom = document.getElementById('trxContoFrom');
-  selDa.innerHTML = '';
-  selA.innerHTML = '';
-  selFrom.innerHTML = '';
-  (settings.conti || []).forEach(c => {
-    selDa.add(new Option(c, c));
-    selA.add(new Option(c, c));
-    selFrom.add(new Option(c, c));
-  });
-  // aggiorna input stipendio per mese corrente
-  if(viewMode === 'month') {
-    let mKey = getMeseKey(currentDate);
-    document.getElementById('inpStipendio').value = (db.stipendi && db.stipendi[mKey]) ? db.stipendi[mKey] : '';
-  }
-  // form transazioni categorie coerenti
-  aggiornaFormTrx();
-  // Lista movimenti (include anche trasferimenti)
-  if(document.getElementById('page-list').classList.contains('active')) {
-    let listHTML = '';
-    let sorted = [...periodTrx].sort((a,b)=>b.timestamp-a.timestamp);
-    sorted.forEach(t => {
-      let iconSvg = icnGeneric;
-      if(t.type === 'entrata') iconSvg = icnEntrate[t.cat] || icnGeneric;
-      else if(t.type === 'uscita') iconSvg = icnUscite[t.cat] || icnGeneric;
-      else iconSvg = icnTransfer;
-      let catText = (t.type === 'transfer') ? `${t.fromAcc} ➔ ${t.toAcc}` : (t.cat || '');
-      let sign = t.type === 'uscita' ? '-' : (t.type === 'entrata' ? '+' : '');
-      let color = (t.type === 'uscita') ? 'var(--red)' : (t.type === 'entrata') ? 'var(--green)' : 'var(--purple)';
-      let colorClass = (t.type === 'uscita') ? 'uscita' : (t.type === 'transfer') ? 'trasferimento' : '';
-      listHTML += `
-      <div class="list-item">
-        <div class="item-icon ${colorClass}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            ${iconSvg}
-          </svg>
-        </div>
-        <div class="item-details">
-          <div class="item-title">${t.name}</div>
-          <div class="item-cat">${catText}</div>
-        </div>
-        <div class="item-amount" style="color:${color}">
-          ${sign}€${t.amount.toFixed(2)}
-        </div>
-        <button class="del-btn" onclick="eliminaTrx(${t.id})">✕</button>
-      </div>`;
-    });
-    document.getElementById('listaMovimenti').innerHTML =
-      listHTML || '<div style="color:var(--sub); text-align:center; padding:20px;">Nessun movimento.</div>';
-  }
-  // Settings UI
-  if(document.getElementById('page-settings').classList.contains('active')) {
-    document.getElementById('oreSettimanali').value = settings.oreWeek || 0;
-    document.querySelectorAll('.chk-riposo').forEach(c => {
-      c.checked = (settings.riposi || []).includes(parseInt(c.value));
-    });
-    document.getElementById('listaConti').innerHTML = (settings.conti || []).map((c,i) =>
-      `<div style="padding:10px; border-bottom:1px solid var(--border)">${c}
-        <button onclick="settings.conti.splice(${i},1); save()" style="float:right; background:none; border:none; color:var(--red)">Elimina</button>
-      </div>`
-    ).join('');
-  }
-}
 // INIT
-document.addEventListener('DOMContentLoaded', () => {
-  aggiornaFormTrx();
-  render();
-});
+// =======================
+function init() {
+  aggiornaCategoriaSelect();
+  // applica impostazioni iniziali UI
+  document.getElementById('oreSettimanali').value = settings.oreWeek || 0;
+  document.querySelectorAll('.chk-riposo').forEach(c => {
+    c.checked = (settings.riposi || []).includes(parseInt(c.value));
+  });
+  // render primo
+  scheduleRender();
+}
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
