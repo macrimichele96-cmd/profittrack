@@ -8,8 +8,15 @@
 <title>ProfitTrack</title>
 <link rel="apple-touch-icon" href="icon.png">
 <style>
-:root { --blue: #0A84FF; --red: #FF453A; --green: #32D74B; --orange: #FF9F0A; --purple: #BF5AF2; --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --sub: #8E8E93; --border: #38383A; --nav-bg: rgba(28,28,30,0.85); --input-bg: #2C2C2E; }
-@media (prefers-color-scheme: light) { :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --sub: #8E8E93; --border: #C6C6C8; --nav-bg: rgba(255,255,255,0.85); --input-bg: #E5E5EA; --blue: #007AFF; --red: #FF3B30; --green: #34C759; --orange: #FF9500; --purple: #AF52DE; } }
+:root {
+  --blue: #0A84FF; --red: #FF453A; --green: #32D74B; --orange: #FF9F0A; --purple: #BF5AF2;
+  --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --sub: #8E8E93; --border: #38383A;
+  --nav-bg: rgba(28,28,30,0.85); --input-bg: #2C2C2E;
+}
+@media (prefers-color-scheme: light) {
+  :root { --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --sub:#8E8E93; --border:#C6C6C8;
+          --nav-bg: rgba(255,255,255,0.85); --input-bg: #E5E5EA; --blue:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500; --purple:#AF52DE; }
+}
 html, body { background: var(--bg); color: var(--text); margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; overscroll-behavior-y: none; }
 body { padding-bottom: calc(90px + env(safe-area-inset-bottom)); padding-top: calc(65px + env(safe-area-inset-top)); box-sizing: border-box; }
 .top-nav { position: fixed; top: 0; width: 100%; z-index: 50; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); }
@@ -38,7 +45,8 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
 .list-item:last-child { border-bottom: none; }
 .item-icon { width: 36px; height: 36px; background: var(--blue); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
 .item-icon svg { width: 20px; height: 20px; fill: currentColor; }
-.item-icon.uscita { background: var(--red); } .item-icon.trasferimento { background: var(--purple); }
+.item-icon.uscita { background: var(--red); }
+.item-icon.trasferimento { background: var(--purple); }
 .item-details { flex-grow: 1; }
 .item-title { font-weight: 600; font-size: 15px; }
 .item-cat { font-size: 12px; color: var(--sub); }
@@ -55,7 +63,6 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
 </style>
 </head>
 <body>
-
 <div class="top-nav">
   <div class="nav-content">
     <button class="nav-btn" onclick="navDate(-1)">❮</button>
@@ -66,7 +73,6 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
     <button class="nav-btn" onclick="navDate(1)">❯</button>
   </div>
 </div>
-
 <div id="page-home" class="page active">
   <div class="container">
     <div class="grid-3">
@@ -76,20 +82,17 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
       <div class="stat-box" style="grid-column: span 2"><span class="stat-lbl">Flusso Netto</span><div class="stat-val" id="valNet">€0</div></div>
       <div class="stat-box"><span class="stat-lbl">Ore Lavoro</span><div class="stat-val" id="valOreUsc">0h</div></div>
     </div>
-
     <div class="card">
       <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:5px;">
         <span>Assorbimento Stipendio</span><span id="budgetPerc">0%</span>
       </div>
       <div class="budget-bar"><div id="budgetFill" class="budget-fill" style="width:0%; background:var(--green)"></div></div>
     </div>
-
     <div class="card" id="cardStipendio">
       <h3>Dati Mensili Base</h3>
       <input type="number" id="inpStipendio" placeholder="Stipendio Netto Base (€)">
       <button class="btn btn-blue" onclick="salvaStipendio()">Salva Stipendio Mese</button>
     </div>
-
     <div class="card">
       <h3>Nuova Transazione</h3>
       <div class="row">
@@ -101,22 +104,18 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
         <input type="number" id="trxImporto" placeholder="Importo €">
       </div>
       <input type="text" id="trxNome" placeholder="Descrizione (es. Spesa Coop)">
-      
       <div id="areaCategoria" class="row">
         <select id="trxContoFrom"></select>
         <select id="trxCategoria"></select>
       </div>
-
       <div id="areaTransfer" class="row" style="display:none;">
         <select id="trxContoDa"></select>
         <select id="trxContoA"></select>
       </div>
-
       <button class="btn btn-green" id="btnSalvaTrx" onclick="salvaTransazione()">Registra</button>
     </div>
   </div>
 </div>
-
 <div id="page-list" class="page">
   <div class="container">
     <div class="card">
@@ -125,7 +124,6 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
     </div>
   </div>
 </div>
-
 <div id="page-analysis" class="page">
   <div class="container">
     <div class="card">
@@ -143,12 +141,14 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
     </div>
   </div>
 </div>
-
 <div id="page-settings" class="page">
   <div class="container">
     <div class="card">
       <h3>Gestione Conti</h3>
-      <div class="row"><input type="text" id="nuovoConto" placeholder="Nome conto"><button class="btn btn-blue" style="width:80px" onclick="aggiungiConto()">Add</button></div>
+      <div class="row">
+        <input type="text" id="nuovoConto" placeholder="Nome conto">
+        <button class="btn btn-blue" style="width:80px" onclick="aggiungiConto()">Add</button>
+      </div>
       <div id="listaConti" style="margin-top:10px; font-size:14px;"></div>
     </div>
     <div class="card">
@@ -173,54 +173,66 @@ input, select { width: 100%; border: none; border-radius: 10px; padding: 14px; m
     </div>
   </div>
 </div>
-
 <div class="tab-bar">
-  <div class="tab active" onclick="switchTab('page-home', this)"><svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2z"/></svg>Riepilogo</div>
-  <div class="tab" onclick="switchTab('page-list', this)"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>Movimenti</div>
-  <div class="tab" onclick="switchTab('page-analysis', this)"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Analisi</div>
-  <div class="tab" onclick="switchTab('page-settings', this)"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Opzioni</div>
+  <div class="tab active" onclick="switchTab('page-home', this)">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2z"/></svg>Riepilogo
+  </div>
+  <div class="tab" onclick="switchTab('page-list', this)">
+    <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>Movimenti
+  </div>
+  <div class="tab" onclick="switchTab('page-analysis', this)">
+    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Analisi
+  </div>
+  <div class="tab" onclick="switchTab('page-settings', this)">
+    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Opzioni
+  </div>
 </div>
-
 <script>
 const DB_KEY = 'pt_v11_db';
 const SET_KEY = 'pt_v11_set';
-
 let db = JSON.parse(localStorage.getItem(DB_KEY)) || { trx: [], stipendi: {} };
 let settings = JSON.parse(localStorage.getItem(SET_KEY)) || { oreWeek: 40, riposi: [0,6], conti: ['Principale'] };
-
 let currentDate = new Date();
 let viewMode = 'month'; // 'day', 'month', 'year'
-
+// =======================
+// CATEGORIE (come richiesto)
+// =======================
+const INCOME_CATEGORIES = ["Extra", "Investimenti", "Regalo"];
+const EXPENSE_CATEGORIES = [
+  "Carburante",
+  "Tabacchino",
+  "Spesa",
+  "Ristorazione & Bar",
+  "Acquisti & Regali",
+  "Auto e Manutenzione",
+  "Abitazione",
+  "Connettivita",
+  "Utenze",
+  "Software e Giochi",
+  "Tempo libero e Viaggi",
+  "Cura & Servizi",
+  "Viabilita & Soste"
+];
+// Icône semplici e pulite (tutte valide SVG)
+const icnGeneric = '<circle cx="12" cy="12" r="9" />';
 const icnEntrate = {
-  "Extra": '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
-  "Investimenti": '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
-  "Regalo": '<rect x="3" y="8" width="18" height="14" rx="2" ry="2"/><path d="M12 5a3 3 0 1 0-3 3v0h6a3 3 0 1 0-3-3z"/><line x1="12" y1="8" x2="12" y2="22"/>'
+  "Extra": '<path d="M12 2l2.2 6.8H21l-5.4 3.9L17.8 20 12 15.9 6.2 20l2.2-7.4L3 8.8h6.8L12 2z" />',
+  "Investimenti": '<path d="M4 19h16v2H4v-2zm2-2l4-6 3 4 4-7 1 0.6-6 10.8-7-5-3 3.6-1-0.99z" />',
+  "Regalo": '<path d="M20 7h-3.2C16.6 5.3 15 4 13 4c-1.7 0-3.2 1-4 2.5C8.2 5 7.2 4 6 4c-2 0-3.6 1.3-3.8 3H0v5h20V7z"/><path d="M0 22h20V12H0v10z" />'
 };
-
-const icnUscite = {
-  "Carburante": '<path d="M3 22v-8p..."/>', // Simplified for generic usage
-  "Tabacchino": '<path d="M4 12h16M4 16h16M4 8h16"/>',
-  "Spesa": '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
-  "Ristorazione & Bar": '<path d="M11 2v20M7 2v20M3 2v20M15 2v20M19 2v20M23 2v20"/>',
-  "Acquisti & Regali": '<rect x="3" y="8" width="18" height="14" rx="2" ry="2"/><path d="M12 5a3 3 0 1 0-3 3v0h6a3 3 0 1 0-3-3z"/>',
-  "Auto e Manutenzione": '<rect x="2" y="7" width="20" height="10" rx="2" ry="2"/><circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/>',
-  "Abitazione": '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
-  "Connettivita": '<path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/>',
-  "Utenze": '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  "Software e Giochi": '<rect x="2" y="6" width="20" height="12" rx="2" ry="2"/><path d="M6 12h4M8 10v4M15 12h.01M18 12h.01"/>',
-  "Tempo libero e Viaggi": '<path d="M22 12A10 10 0 1 1 12 2a10 10 0 0 1 10 10zM12 2v20M2 12h20"/>',
-  "Cura & Servizi": '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
-  "Viabilita & Soste": '<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 16V8h4a2 2 0 0 1 0 4H9"/>'
-};
-
-const icnGeneric = '<circle cx="12" cy="12" r="10"/>';
-
+const icnUscite = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c, icnGeneric]));
+const icnTransfer = '<path d="M7 7h10v10H7V7zm5-4l5 4-5 4-5-4 5-4z" />';
+// =======================
+// PERSISTENZA
+// =======================
 function save() {
   localStorage.setItem(DB_KEY, JSON.stringify(db));
   localStorage.setItem(SET_KEY, JSON.stringify(settings));
   render();
 }
-
+// =======================
+// NAV / VISTE
+// =======================
 function switchTab(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -228,84 +240,152 @@ function switchTab(id, el) {
   el.classList.add('active');
   render();
 }
-
 function toggleView() {
   if(viewMode === 'day') viewMode = 'month';
   else if(viewMode === 'month') viewMode = 'year';
   else viewMode = 'day';
   render();
 }
-
 function navDate(dir) {
   if(viewMode === 'day') currentDate.setDate(currentDate.getDate() + dir);
   else if(viewMode === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
   else currentDate.setFullYear(currentDate.getFullYear() + dir);
   render();
 }
-
-function getMeseKey(date) { return `${date.getFullYear()}-${date.getMonth()}`; }
-
+// =======================
+// DATE & WORK
+// =======================
+function getMeseKey(date) {
+  return `${date.getFullYear()}-${date.getMonth()}`; // mese 0..11
+}
+function isRestDay(date) {
+  return (settings.riposi || []).includes(date.getDay()); // 0..6 Dom..Sab
+}
 function calcGiorniLavoro(date, isFullMonth) {
-  let count = 0;
   let d = new Date(date.getFullYear(), date.getMonth(), isFullMonth ? 1 : date.getDate());
   let max = isFullMonth ? new Date(date.getFullYear(), date.getMonth()+1, 0).getDate() : date.getDate();
-  let currentDay = d.getDate();
-  
-  while(currentDay <= max) {
-    if(!settings.riposi.includes(d.getDay())) count++;
+  let count = 0;
+  while(d.getDate() <= max) {
+    if(!isRestDay(d)) count++;
     d.setDate(d.getDate() + 1);
-    currentDay++;
   }
   return count;
 }
-
-function getWageData(date) {
-  let key = getMeseKey(date);
-  let base = db.stipendi[key] || 0;
-  let ggMese = calcGiorniLavoro(date, true);
-  let hrDay = (7 - settings.riposi.length) > 0 ? settings.oreWeek / (7 - settings.riposi.length) : 0;
-  let hrMese = ggMese * hrDay;
-  let wage = hrMese > 0 ? base / hrMese : 0;
-  return { base, ggMese, hrDay, hrMese, wage };
+// Dati wage del mese: base (stipendio base) + ore previste e wage/ora
+function getWageMonthData(date) {
+  const key = getMeseKey(date);
+  const base = (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : 0;
+  const riposiCount = (settings.riposi || []).length;
+  const workdaysPerWeek = (7 - riposiCount);
+  const ggMese = calcGiorniLavoro(date, true);
+  const hrDay = (workdaysPerWeek > 0 && (settings.oreWeek || 0) > 0)
+    ? (settings.oreWeek / workdaysPerWeek)
+    : 0;
+  const hrMese = ggMese * hrDay;
+  const hourlyWage = (hrMese > 0) ? (base / hrMese) : 0;
+  return { key, base, ggMese, hrDay, hrMese, hourlyWage };
 }
-
+// Base stipendio giornaliera stimata (per view day)
+function getDayBase(date) {
+  const m = getWageMonthData(date);
+  if(!m.ggMese || m.ggMese <= 0) return 0;
+  if(isRestDay(date)) return 0;
+  return m.base / m.ggMese;
+}
+// Totali anno: stipendio base e ore lavoro "schedulate" in base alle impostazioni
+function getYearBaseTotal(year) {
+  let sum = 0;
+  for(let m=0; m<12; m++) {
+    const key = `${year}-${m}`;
+    sum += (db.stipendi && db.stipendi[key]) ? db.stipendi[key] : 0;
+  }
+  return sum;
+}
+function getYearWorkHoursTotal(year) {
+  let totalHours = 0;
+  for(let m=0; m<12; m++) {
+    const monthDate = new Date(year, m, 1);
+    const data = getWageMonthData(monthDate);
+    totalHours += data.hrMese; // hrMese usa oreWeek + riposi e calendario
+  }
+  return totalHours;
+}
+function getYearHourlyWage(year) {
+  const totalBase = getYearBaseTotal(year);
+  const totalHours = getYearWorkHoursTotal(year);
+  return totalHours > 0 ? (totalBase / totalHours) : 0;
+}
+// =======================
+// TRANSAZIONI / PERIODO
+// =======================
+function getPeriodTrx(date, mode) {
+  return (db.trx || []).filter(t => {
+    let d = new Date(t.timestamp);
+    if(mode === 'day') return d.toDateString() === date.toDateString();
+    if(mode === 'month') return d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear();
+    return d.getFullYear() === date.getFullYear();
+  });
+}
+// =======================
+// SALVATAGGI
+// =======================
 function salvaStipendio() {
   let v = parseFloat(document.getElementById('inpStipendio').value);
   if(isNaN(v)) return;
+  if(!db.stipendi) db.stipendi = {};
   db.stipendi[getMeseKey(currentDate)] = v;
   save();
 }
-
+function aggiungiConto() {
+  let n = document.getElementById('nuovoConto').value.trim();
+  if(n && !(settings.conti || []).includes(n)) {
+    settings.conti.push(n);
+    document.getElementById('nuovoConto').value = '';
+    save();
+  }
+}
+function salvaImpostazioni() {
+  let o = parseFloat(document.getElementById('oreSettimanali').value);
+  if(o > 0) settings.oreWeek = o;
+  let riposi = Array.from(document.querySelectorAll('.chk-riposo:checked'))
+    .map(c => parseInt(c.value));
+  settings.riposi = riposi;
+  save();
+}
+// =======================
+// FORM TRX
+// =======================
 function aggiornaFormTrx() {
   let t = document.getElementById('trxTipo').value;
   let areaCat = document.getElementById('areaCategoria');
   let areaTra = document.getElementById('areaTransfer');
   let selCat = document.getElementById('trxCategoria');
   let btn = document.getElementById('btnSalvaTrx');
-  
   areaCat.style.display = t === 'transfer' ? 'none' : 'flex';
   areaTra.style.display = t === 'transfer' ? 'flex' : 'none';
   selCat.innerHTML = '';
-  
   if(t === 'uscita') {
-    Object.keys(icnUscite).forEach(k => selCat.add(new Option(k, k)));
+    EXPENSE_CATEGORIES.forEach(k => selCat.add(new Option(k, k)));
     btn.className = 'btn btn-red';
   } else if(t === 'entrata') {
-    Object.keys(icnEntrate).forEach(k => selCat.add(new Option(k, k)));
+    INCOME_CATEGORIES.forEach(k => selCat.add(new Option(k, k)));
     btn.className = 'btn btn-green';
   } else {
     btn.className = 'btn btn-purple';
   }
 }
-
 function salvaTransazione() {
   let t = document.getElementById('trxTipo').value;
   let imp = parseFloat(document.getElementById('trxImporto').value);
   let nome = document.getElementById('trxNome').value || t;
   if(isNaN(imp) || imp <= 0) return;
-
-  let baseTrx = { id: Date.now(), timestamp: currentDate.getTime(), type: t, amount: imp, name: nome };
-
+  let baseTrx = {
+    id: Date.now(),
+    timestamp: currentDate.getTime(),
+    type: t,
+    amount: imp,
+    name: nome
+  };
   if(t === 'transfer') {
     baseTrx.fromAcc = document.getElementById('trxContoDa').value;
     baseTrx.toAcc = document.getElementById('trxContoA').value;
@@ -314,151 +394,120 @@ function salvaTransazione() {
     baseTrx.cat = document.getElementById('trxCategoria').value;
     baseTrx.acc = document.getElementById('trxContoFrom').value;
   }
-
   db.trx.push(baseTrx);
   document.getElementById('trxImporto').value = '';
   document.getElementById('trxNome').value = '';
   save();
 }
-
 function eliminaTrx(id) {
-  db.trx = db.trx.filter(x => x.id !== id);
+  db.trx = (db.trx || []).filter(x => x.id !== id);
   save();
 }
-
-function aggiungiConto() {
-  let n = document.getElementById('nuovoConto').value;
-  if(n && !settings.conti.includes(n)) { settings.conti.push(n); document.getElementById('nuovoConto').value=''; save(); }
+// =======================
+// ORE COSTO (Anno: mese-per-mese)
+// =======================
+function getYearHoursCost(year) {
+  let sumHours = 0;
+  for(let m=0; m<12; m++) {
+    const monthDate = new Date(year, m, 1);
+    const monthWage = getWageMonthData(monthDate).hourlyWage; // paga oraria del mese (base mese / ore mese)
+    if(monthWage <= 0) continue;
+    const start = new Date(year, m, 1).getTime();
+    const end = new Date(year, m + 1, 0).getTime();
+    const expensesMonth = (db.trx || [])
+      .filter(tx => tx.type === 'uscita' && tx.timestamp >= start && tx.timestamp <= end)
+      .reduce((s, tx) => s + tx.amount, 0);
+    sumHours += (expensesMonth / monthWage);
+  }
+  return sumHours;
 }
-
-function salvaImpostazioni() {
-  let o = parseFloat(document.getElementById('oreSettimanali').value);
-  if(o > 0) settings.oreWeek = o;
-  
-  settings.riposi = Array.from(document.querySelectorAll('.chk-riposo:checked')).map(c => parseInt(c.value));
-  save();
-}
-
-function getPeriodTrx(date, mode) {
-  return db.trx.filter(t => {
-    let d = new Date(t.timestamp);
-    if(mode === 'day') return d.toDateString() === date.toDateString();
-    if(mode === 'month') return d.getMonth() === date.getMonth() && d.getFullYear() === date.getFullYear();
-    return d.getFullYear() === date.getFullYear();
-  });
-}
-
+// =======================
+// ANALISI (Piano)
+ // =======================
 function calcolaImpatto() {
   let c = parseFloat(document.getElementById('anaCosto').value);
-  let w = getWageData(currentDate);
-  if(!c || w.base === 0) return document.getElementById('resImpatto').innerText = "Imposta lo stipendio base.";
-  let perc = (c / w.base) * 100;
-  let ore = c / w.wage;
-  document.getElementById('resImpatto').innerHTML = `Assorbe il <span style="color:var(--red)">${perc.toFixed(1)}%</span> dello stipendio base.<br>Equivale a <span style="color:var(--red)">${ore.toFixed(1)} ore</span> di lavoro.`;
+  if(isNaN(c) || c <= 0) {
+    document.getElementById('resImpatto').innerText = "Inserisci un costo valido.";
+    return;
+  }
+  let baseDenom = 0; // SOLO stipendio base
+  let hourly = 0;    // paga oraria
+  if(viewMode === 'year') {
+    const year = currentDate.getFullYear();
+    baseDenom = getYearBaseTotal(year);
+    hourly = getYearHourlyWage(year);
+  } else {
+    const m = getWageMonthData(currentDate);
+    baseDenom = m.base;
+    hourly = m.hourlyWage;
+  }
+  if(baseDenom <= 0 || hourly <= 0) {
+    document.getElementById('resImpatto').innerText = "Imposta lo stipendio base e le ore/riposi nelle Impostazioni.";
+    return;
+  }
+  let perc = (c / baseDenom) * 100;
+  let ore = c / hourly;
+  document.getElementById('resImpatto').innerHTML =
+    `Assorbe il <span style="color:var(--red)">${perc.toFixed(1)}%</span> dello stipendio base.<br>` +
+    `Equivale a <span style="color:var(--red)">${ore.toFixed(1)} ore</span> di lavoro.`;
 }
-
 function calcolaSostenibilita() {
   let obj = parseFloat(document.getElementById('anaObiettivo').value);
   let anni = parseFloat(document.getElementById('anaAnni').value);
-  if(!obj || !anni) return;
-  
-  let keys = Object.keys(db.stipendi);
-  let avgBase = keys.length > 0 ? keys.reduce((s,k)=>s+db.stipendi[k],0) / keys.length : getWageData(currentDate).base;
-  if(avgBase === 0) return document.getElementById('resSostenibilita').innerText = "Storico stipendi assente.";
-
-  let risparmioMese = obj / (anni * 12);
-  let perc = (risparmioMese / avgBase) * 100;
-  document.getElementById('resSostenibilita').innerHTML = `Devi mettere da parte <span style="color:var(--purple)">€${risparmioMese.toFixed(0)}</span> al mese.<br>Pari al <span style="color:var(--purple)">${perc.toFixed(1)}%</span> del tuo stipendio base medio.`;
-}
-
-function render() {
-  // HEADER
-  let opts = { month: 'long', year: 'numeric' };
-  if(viewMode === 'day') opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  if(viewMode === 'year') opts = { year: 'numeric' };
-  document.getElementById('dateTitle').innerText = currentDate.toLocaleDateString('it-IT', opts);
-  document.getElementById('dateSub').innerText = `VISTA: ${viewMode.toUpperCase()}`;
-  document.getElementById('cardStipendio').style.display = viewMode === 'month' ? 'block' : 'none';
-
-  // WAGE DATA
-  let wd = getWageData(currentDate);
-  if(viewMode === 'month') document.getElementById('inpStipendio').value = wd.base || '';
-  
-  let workingHours = 0;
-  if(viewMode === 'day') workingHours = settings.riposi.includes(currentDate.getDay()) ? 0 : wd.hrDay;
-  else if(viewMode === 'month') workingHours = wd.hrMese;
-  
-  // TRANSACTIONS
-  let periodTrx = getPeriodTrx(currentDate, viewMode);
-  let extraEntrate = periodTrx.filter(t=>t.type==='entrata').reduce((s,t)=>s+t.amount,0);
-  let totUscite = periodTrx.filter(t=>t.type==='uscita').reduce((s,t)=>s+t.amount,0);
-  
-  let refBase = 0;
-  if(viewMode === 'month') refBase = wd.base;
-  else if(viewMode === 'year') {
-    let y = currentDate.getFullYear();
-    Object.keys(db.stipendi).forEach(k => { if(k.startsWith(y)) refBase += db.stipendi[k]; });
-  } else {
-    refBase = wd.hrMese > 0 ? (wd.base / wd.ggMese) : 0; // Approssimazione giornaliera
+  if(isNaN(obj) || obj <= 0 || isNaN(anni) || anni <= 0) {
+    document.getElementById('resSostenibilita').innerText = "Inserisci obiettivo (€) e anni validi.";
+    return;
   }
-
-  let totEntrate = refBase + extraEntrate;
-  let net = totEntrate - totUscite;
-
-  document.getElementById('valOra').innerText = `€${wd.wage.toFixed(2)}`;
-  document.getElementById('valEnt').innerText = `€${totEntrate.toFixed(0)}`;
-  document.getElementById('valUsc').innerText = `€${totUscite.toFixed(0)}`;
-  let elNet = document.getElementById('valNet');
-  elNet.innerText = `€${net.toFixed(0)}`;
-  elNet.style.color = net < 0 ? 'var(--red)' : 'var(--text)';
-  document.getElementById('valOreUsc').innerText = wd.wage > 0 ? `${(totUscite/wd.wage).toFixed(1)}h` : '0h';
-
-  let assorbimento = totEntrate > 0 ? (totUscite/totEntrate)*100 : 0;
-  document.getElementById('budgetPerc').innerText = `${assorbimento.toFixed(1)}%`;
-  let bFill = document.getElementById('budgetFill');
-  bFill.style.width = `${Math.min(assorbimento, 100)}%`;
-  bFill.style.background = assorbimento > 80 ? 'var(--red)' : (assorbimento > 50 ? 'var(--orange)' : 'var(--green)');
-
-  // FORM SELECTS
-  let selDa = document.getElementById('trxContoDa');
-  let selA = document.getElementById('trxContoA');
-  let selFrom = document.getElementById('trxContoFrom');
-  selDa.innerHTML = ''; selA.innerHTML = ''; selFrom.innerHTML = '';
-  settings.conti.forEach(c => {
-    selDa.add(new Option(c,c)); selA.add(new Option(c,c)); selFrom.add(new Option(c,c));
+  const requiredMonthlySaving = obj / (anni * 12);
+  // costruiamo mesi con stipendio base
+  const stipendKeys = Object.keys(db.stipendi || {});
+  const months = stipendKeys.map(k => {
+    const [yStr, mStr] = k.split('-');
+    const year = parseInt(yStr);
+    const month = parseInt(mStr);
+    const monthStart = new Date(year, month, 1).getTime();
+    const monthEnd = new Date(year, month + 1, 0).getTime();
+    const baseSalary = db.stipendi[k] || 0;
+    const extraIncome = (db.trx || [])
+      .filter(tx => tx.type === 'entrata' && tx.timestamp >= monthStart && tx.timestamp <= monthEnd)
+      .reduce((s, tx) => s + tx.amount, 0);
+    const expenses = (db.trx || [])
+      .filter(tx => tx.type === 'uscita' && tx.timestamp >= monthStart && tx.timestamp <= monthEnd)
+      .reduce((s, tx) => s + tx.amount, 0);
+    return {
+      monthKey: k,
+      baseSalary,
+      extraIncome,
+      expenses,
+      availableToSave: baseSalary + extraIncome - expenses
+    };
   });
-
-  // LISTA
-  if(document.getElementById('page-list').classList.contains('active')) {
-    let listHTML = '';
-    periodTrx.sort((a,b)=>b.timestamp-a.timestamp).forEach(t => {
-      let iconSvg = t.type==='entrata' ? icnEntrate[t.cat] : (t.type==='uscita' ? icnUscite[t.cat] : '<path d="M8 7h8v4l4-5-4-5v4H6v6h2V7zm8 10H8v-4l-4 5 4 5v-4h10v-6h-2v4z"/>');
-      let catText = t.type === 'transfer' ? `${t.fromAcc} ➔ ${t.toAcc}` : t.cat;
-      let colorClass = t.type;
-      let sign = t.type === 'uscita' ? '-' : (t.type==='entrata'?'+':'');
-      
-      listHTML += `
-      <div class="list-item">
-        <div class="item-icon ${colorClass}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg||icnGeneric}</svg></div>
-        <div class="item-details">
-          <div class="item-title">${t.name}</div>
-          <div class="item-cat">${catText}</div>
-        </div>
-        <div class="item-amount" style="color: var(--${t.type==='uscita'?'red':(t.type==='entrata'?'green':'purple')})">${sign}€${t.amount.toFixed(2)}</div>
-        <button class="del-btn" onclick="eliminaTrx(${t.id})">✕</button>
-      </div>`;
-    });
-    document.getElementById('listaMovimenti').innerHTML = listHTML || '<div style="color:var(--sub); text-align:center; padding:20px;">Nessun movimento.</div>';
+  if(months.length === 0) {
+    document.getElementById('resSostenibilita').innerText = "Storico stipendi assente.";
+    return;
   }
-
-  // SETTINGS
-  if(document.getElementById('page-settings').classList.contains('active')) {
-    document.getElementById('oreSettimanali').value = settings.oreWeek;
-    document.querySelectorAll('.chk-riposo').forEach(c => c.checked = settings.riposi.includes(parseInt(c.value)));
-    document.getElementById('listaConti').innerHTML = settings.conti.map((c,i) => `<div style="padding:10px; border-bottom:1px solid var(--border)">${c} <button onclick="settings.conti.splice(${i},1); save()" style="float:right; background:none; border:none; color:var(--red)">Elimina</button></div>`).join('');
-  }
+  // Stima iniziale: mese selezionato (finché abbiamo <2 mesi)
+  // Poi media su tutti i mesi disponibili (come da piano)
+  const initialMonthKey = getMeseKey(currentDate);
+  const initial = months.find(m => m.monthKey === initialMonthKey) || months[0];
+  const avgAvailable = months.reduce((s, m) => s + m.availableToSave, 0) / months.length;
+  const avgBase = months.reduce((s, m) => s + m.baseSalary, 0) / months.length;
+  const useAvg = months.length >= 2;
+  const basisAvail = useAvg ? avgAvailable : initial.availableToSave;
+  const basisBase = useAvg ? avgBase : initial.baseSalary;
+  const isSustainable = requiredMonthlySaving <= basisAvail;
+  const deficit = Math.max(0, requiredMonthlySaving - basisAvail);
+  const percent = basisBase > 0 ? (requiredMonthlySaving / basisBase) * 100 : 0;
+  document.getElementById('resSostenibilita').innerHTML =
+    `Devi mettere da parte <span style="color:var(--purple)">€${requiredMonthlySaving.toFixed(0)}</span> al mese.<br>` +
+    `Pari a <span style="color:var(--purple)">${percent.toFixed(1)}%</span> del tuo stipendio base${useAvg ? " medio" : ""}.` +
+    `<br><span style="font-weight:700; color:${isSustainable ? "var(--green)" : "var(--red)"};">` +
+    `${isSustainable ? "Sostenibile" : "Non sostenibile"}</span>` +
+    (!isSustainable ? `<br>Deficit stimato: circa <span style="font-weight:700; color:var(--red);">€${deficit.toFixed(0)}</span>/mese` : "");
 }
-
+// =======================
+// EXPORT / RESET
+// =======================
 function exportData() {
   let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
   let dlAnchorElem = document.createElement('a');
@@ -468,16 +517,145 @@ function exportData() {
   dlAnchorElem.click();
   dlAnchorElem.remove();
 }
-
 function resetData() {
   if(confirm("Attenzione: questa azione eliminerà tutti i dati. Procedere?")) {
     localStorage.removeItem(DB_KEY);
+    localStorage.removeItem(SET_KEY);
     location.reload();
   }
 }
-
-aggiornaFormTrx();
-render();
+// =======================
+// RENDER
+// =======================
+function render() {
+  // header
+  let opts = { month: 'long', year: 'numeric' };
+  if(viewMode === 'day') opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  if(viewMode === 'year') opts = { year: 'numeric' };
+  const title = currentDate.toLocaleDateString('it-IT', opts).toUpperCase();
+  document.getElementById('dateTitle').innerText = title;
+  document.getElementById('dateSub').innerText = `VISTA: ${viewMode.toUpperCase()}`;
+  // visibilità stipendio base solo in month
+  document.getElementById('cardStipendio').style.display = viewMode === 'month' ? 'block' : 'none';
+  // wage base/oraria coerente
+  let baseForPeriod = 0;
+  let hourlyForCost = 0;
+  if(viewMode === 'month') {
+    const m = getWageMonthData(currentDate);
+    baseForPeriod = m.base;
+    hourlyForCost = m.hourlyWage;
+  } else if(viewMode === 'day') {
+    // base giornaliera stimata ma hourly: usa sempre wage oraria del mese
+    const m = getWageMonthData(currentDate);
+    baseForPeriod = getDayBase(currentDate);
+    hourlyForCost = m.hourlyWage;
+  } else { // year
+    const year = currentDate.getFullYear();
+    baseForPeriod = getYearBaseTotal(year);
+    hourlyForCost = getYearHourlyWage(year);
+  }
+  // period trx: extras e uscite includono solo entrate/uscite (trasferimenti esclusi)
+  const periodTrx = getPeriodTrx(currentDate, viewMode);
+  const extraEntrate = periodTrx
+    .filter(t => t.type === 'entrata')
+    .reduce((s, t) => s + t.amount, 0);
+  const totUscite = periodTrx
+    .filter(t => t.type === 'uscita')
+    .reduce((s, t) => s + t.amount, 0);
+  const totEntrate = baseForPeriod + extraEntrate;
+  const net = totEntrate - totUscite;
+  // ORE COSTO: in year mese-per-mese
+  let oreCosto = 0;
+  if(viewMode === 'year') {
+    oreCosto = getYearHoursCost(currentDate.getFullYear());
+  } else {
+    oreCosto = (hourlyForCost > 0) ? (totUscite / hourlyForCost) : 0;
+  }
+  // Assorbimento stipendio: uscite / (stipendio base + extra)
+  let assorbimento = (totEntrate > 0) ? (totUscite / totEntrate) * 100 : 0;
+  assorbimento = Math.max(0, Math.min(100, assorbimento));
+  // visori principali
+  document.getElementById('valOra').innerText = `€${(hourlyForCost > 0 ? hourlyForCost : 0).toFixed(2)}`;
+  document.getElementById('valEnt').innerText = `€${totEntrate.toFixed(0)}`;
+  document.getElementById('valUsc').innerText = `€${totUscite.toFixed(0)}`;
+  document.getElementById('valNet').innerText = `€${net.toFixed(0)}`;
+  let elNet = document.getElementById('valNet');
+  elNet.style.color = net < 0 ? 'var(--red)' : 'var(--text)';
+  document.getElementById('valOreUsc').innerText = `${(oreCosto || 0).toFixed(1)}h`;
+  document.getElementById('budgetPerc').innerText = `${assorbimento.toFixed(1)}%`;
+  let bFill = document.getElementById('budgetFill');
+  bFill.style.width = `${assorbimento}%`;
+  bFill.style.background = assorbimento > 80 ? 'var(--red)' : (assorbimento > 50 ? 'var(--orange)' : 'var(--green)');
+  // setup selects conti
+  let selDa = document.getElementById('trxContoDa');
+  let selA = document.getElementById('trxContoA');
+  let selFrom = document.getElementById('trxContoFrom');
+  selDa.innerHTML = '';
+  selA.innerHTML = '';
+  selFrom.innerHTML = '';
+  (settings.conti || []).forEach(c => {
+    selDa.add(new Option(c, c));
+    selA.add(new Option(c, c));
+    selFrom.add(new Option(c, c));
+  });
+  // aggiorna input stipendio per mese corrente
+  if(viewMode === 'month') {
+    let mKey = getMeseKey(currentDate);
+    document.getElementById('inpStipendio').value = (db.stipendi && db.stipendi[mKey]) ? db.stipendi[mKey] : '';
+  }
+  // form transazioni categorie coerenti
+  aggiornaFormTrx();
+  // Lista movimenti (include anche trasferimenti)
+  if(document.getElementById('page-list').classList.contains('active')) {
+    let listHTML = '';
+    let sorted = [...periodTrx].sort((a,b)=>b.timestamp-a.timestamp);
+    sorted.forEach(t => {
+      let iconSvg = icnGeneric;
+      if(t.type === 'entrata') iconSvg = icnEntrate[t.cat] || icnGeneric;
+      else if(t.type === 'uscita') iconSvg = icnUscite[t.cat] || icnGeneric;
+      else iconSvg = icnTransfer;
+      let catText = (t.type === 'transfer') ? `${t.fromAcc} ➔ ${t.toAcc}` : (t.cat || '');
+      let sign = t.type === 'uscita' ? '-' : (t.type === 'entrata' ? '+' : '');
+      let color = (t.type === 'uscita') ? 'var(--red)' : (t.type === 'entrata') ? 'var(--green)' : 'var(--purple)';
+      let colorClass = (t.type === 'uscita') ? 'uscita' : (t.type === 'transfer') ? 'trasferimento' : '';
+      listHTML += `
+      <div class="list-item">
+        <div class="item-icon ${colorClass}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            ${iconSvg}
+          </svg>
+        </div>
+        <div class="item-details">
+          <div class="item-title">${t.name}</div>
+          <div class="item-cat">${catText}</div>
+        </div>
+        <div class="item-amount" style="color:${color}">
+          ${sign}€${t.amount.toFixed(2)}
+        </div>
+        <button class="del-btn" onclick="eliminaTrx(${t.id})">✕</button>
+      </div>`;
+    });
+    document.getElementById('listaMovimenti').innerHTML =
+      listHTML || '<div style="color:var(--sub); text-align:center; padding:20px;">Nessun movimento.</div>';
+  }
+  // Settings UI
+  if(document.getElementById('page-settings').classList.contains('active')) {
+    document.getElementById('oreSettimanali').value = settings.oreWeek || 0;
+    document.querySelectorAll('.chk-riposo').forEach(c => {
+      c.checked = (settings.riposi || []).includes(parseInt(c.value));
+    });
+    document.getElementById('listaConti').innerHTML = (settings.conti || []).map((c,i) =>
+      `<div style="padding:10px; border-bottom:1px solid var(--border)">${c}
+        <button onclick="settings.conti.splice(${i},1); save()" style="float:right; background:none; border:none; color:var(--red)">Elimina</button>
+      </div>`
+    ).join('');
+  }
+}
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  aggiornaFormTrx();
+  render();
+});
 </script>
 </body>
 </html>
