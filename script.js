@@ -39,6 +39,10 @@ window.onload = () => {
     renderRecurringList();
     renderHistoryChart();
     renderAvgBox();
+    // Handle PWA shortcuts
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'expense') { openModal(); setModalType('usc'); }
+    if (params.get('action') === 'income')  { openModal(); setModalType('inc'); }
   }
 };
 
@@ -549,20 +553,103 @@ function render() {
     renderHistoryChart();
     renderAvgBox();
   }
+
+  // ── Spend Today widget (solo vista mensile)
+  const stCard = document.getElementById('spendTodayCard');
+  const stAmt  = document.getElementById('spendTodayAmt');
+  const stSub  = document.getElementById('spendTodaySub');
+  if (stCard && viewMode === 'month' && net !== 0) {
+    const today  = new Date();
+    const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+    const dayOfMonth  = today.getDate();
+    const daysLeft    = daysInMonth - dayOfMonth + 1;
+    const spendable   = net / daysLeft;
+    if (spendable > 0) {
+      stCard.style.display = 'block';
+      stAmt.textContent = `€${spendable.toFixed(0)}`;
+      stSub.textContent = `Flusso netto €${fmt(net)} · ${daysLeft} giorni al mese`;
+    } else {
+      stCard.style.display = 'none';
+    }
+  } else if (stCard) stCard.style.display = 'none';
+
+  // ── Positive feedback banner
+  const pb = document.getElementById('positiveBanner');
+  if (pb && viewMode === 'month') {
+    const perc = totInc > 0 ? (net / totInc) * 100 : 0;
+    if (perc >= 20 && totInc > 0) {
+      const msgs = [
+        `🎉 Ottimo mese! Stai risparmiando il ${perc.toFixed(0)}% delle entrate.`,
+        `💪 Bene! Ogni euro risparmiato è un passo verso la libertà finanziaria.`,
+        `✨ Sei in positivo del ${perc.toFixed(0)}%. Continua così!`,
+      ];
+      pb.style.display = 'block';
+      pb.textContent = msgs[new Date().getDate() % msgs.length];
+    } else { pb.style.display = 'none'; }
+  } else if (pb) pb.style.display = 'none';
+
+  // ── Settings badge (spese fisse non applicate)
+  const badge = document.getElementById('settingsBadge');
+  if (badge && viewMode === 'month') {
+    const k = curKey(); initKey(k);
+    const notApplied = recurring.filter(r => !db[k].appliedRec.includes(r.id));
+    badge.style.display = notApplied.length ? 'block' : 'none';
+    badge.textContent   = notApplied.length || '';
+  }
 }
 
 function renderRow(item, type) {
-  return `<div class="tx-row">
-    <div class="tx-emoji" style="background:${item.color}22;">${item.emoji || (type==='usc'?'💸':'💰')}</div>
-    <div class="tx-info">
-      <span class="tx-cat">${item.nome || item.cat}</span>
-      <span class="tx-sub">${item.cat}</span>
-    </div>
-    <div class="tx-right">
-      <span class="tx-amt" style="color:${type==='usc'?'var(--red)':'var(--green)'}">
-        ${type==='usc'?'−':'+'} €${item.imp.toFixed(0)}
-      </span>
-      <button class="del-btn-sm" onclick="deleteItem(${item.id},'${type}','${item.monthKey}')">✕</button>
+  const id = item.id, mKey = item.monthKey;
+  return `<div class="tx-swipe-wrap" id="wrap_${id}">
+    <div class="tx-delete-bg" id="delbg_${id}">Elimina</div>
+    <div class="tx-row-inner"
+      ontouchstart="swipeStart(event,${id})"
+      ontouchmove="swipeMove(event,${id})"
+      ontouchend="swipeEnd(event,${id},'${type}','${mKey}')"
+      id="inner_${id}">
+      <div class="tx-emoji" style="background:${item.color || '#8e8e93'}22;">${item.emoji || (type==='usc'?'💸':'💰')}</div>
+      <div class="tx-info">
+        <span class="tx-cat">${item.nome || item.cat}</span>
+        <span class="tx-sub">${item.cat}</span>
+      </div>
+      <div class="tx-right">
+        <span class="tx-amt" style="color:${type==='usc'?'var(--red)':'var(--green)'}">
+          ${type==='usc'?'−':'+'} €${item.imp.toFixed(0)}
+        </span>
+      </div>
     </div>
   </div>`;
+}
+
+// ─── SWIPE TO DELETE ────────────────────────────────────────────────────
+let swipeData = {};
+function swipeStart(e, id) {
+  swipeData[id] = { startX: e.touches[0].clientX, dx: 0 };
+}
+function swipeMove(e, id) {
+  if (!swipeData[id]) return;
+  const dx = e.touches[0].clientX - swipeData[id].startX;
+  swipeData[id].dx = dx;
+  if (dx >= 0) return; // only left swipe
+  const inner = document.getElementById('inner_' + id);
+  const bg    = document.getElementById('delbg_' + id);
+  const travel = Math.min(Math.abs(dx), 80);
+  if (inner) inner.style.transform = `translateX(-${travel}px)`;
+  if (bg)    bg.style.transform    = `translateX(${100 - (travel/80)*100}%)`;
+}
+function swipeEnd(e, id, type, monthKey) {
+  if (!swipeData[id]) return;
+  const dx = swipeData[id].dx;
+  const inner = document.getElementById('inner_' + id);
+  const bg    = document.getElementById('delbg_' + id);
+  if (dx < -60) {
+    // Confirm delete
+    const wrap = document.getElementById('wrap_' + id);
+    if (wrap) { wrap.style.opacity='0'; wrap.style.transition='opacity .2s'; }
+    setTimeout(() => deleteItem(id, type, monthKey), 200);
+  } else {
+    if (inner) inner.style.transform = '';
+    if (bg)    bg.style.transform    = '';
+  }
+  delete swipeData[id];
 }
