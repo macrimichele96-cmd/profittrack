@@ -107,7 +107,7 @@ function completeOnboarding() {
   // Compatibilità
   const ore   = calcOreMese(oreGiorno, restDays, now.getFullYear(), now.getMonth(), 0);
   const pagaH = ore > 0 ? stip / ore : 0;
-  db[k].settings = { stip, oreGiorno, restDays, ore, oreExtra:0, pagaH };
+  db[k].settings = { stip, oreGiorno, restDays, ore, oreExtra:0, pagaH, _fromGlobal:false };
   gSettings = { stip, oreGiorno, pagaH, restDays };
   localStorage.setItem('pt_settings', JSON.stringify(gSettings));
   save();
@@ -176,13 +176,22 @@ function showPage(pageId, el) {
 function cycleViewMode() {
   if      (viewMode === 'day')   viewMode = 'month';
   else if (viewMode === 'month') viewMode = 'year';
-  else                           viewMode = 'day';
+  else                           viewMode = 'month'; // anno → torna a mese (day si apre dal calendario)
   render();
+}
+
+function onDatePillTap() {
+  if (viewMode === 'day') {
+    toggleCalendar();
+  } else {
+    cycleViewMode();
+  }
 }
 
 function changeDate(dir) {
   if (viewMode === 'day') {
-    currentView.setDate(currentView.getDate() + dir);
+    // Frecce saltano 7 giorni in vista giorno — per un giorno usa il calendario
+    currentView.setDate(currentView.getDate() + dir * 7);
   } else if (viewMode === 'month') {
     currentView.setDate(1);
     currentView.setMonth(currentView.getMonth() + dir);
@@ -236,18 +245,37 @@ function prevKey(k) {
 }
 
 // Ritorna i parametri di lavoro (ore, giorni riposo) per il mese k
+// I workParams (ore/giorno, giorni riposo) SI propagano come default
+// perché non cambiano spesso — lo stipendio invece no
 function getWorkParams(k) {
   if (db[k] && db[k].workParams) return db[k].workParams;
+  // Cerca il mese più recente con workParams impostati
+  const [ky, km] = k.split('-').map(Number);
+  const keys = Object.keys(db)
+    .filter(x => {
+      if (!db[x].workParams) return false;
+      const [xy, xm] = x.split('-').map(Number);
+      return xy < ky || (xy === ky && xm < km);
+    })
+    .sort((a,b) => {
+      const [ay,am] = a.split('-').map(Number);
+      const [by,bm] = b.split('-').map(Number);
+      return (by*12+bm) - (ay*12+am);
+    });
+  if (keys.length) return db[keys[0]].workParams;
   // Fallback a gSettings
   return { oreGiorno: gSettings.oreGiorno || 8, restDays: gSettings.restDays || [0,6], oreExtra: 0 };
 }
 
-// Ritorna lo stipendio incassato nel mese k (pagato per il lavoro del mese precedente)
+// Ritorna lo stipendio incassato nel mese k
+// IMPORTANTE: ritorna 0 se il mese non ha dati espliciti — no propagazione globale
 function getSalaryForMonth(k) {
   if (db[k] && db[k].salary != null) return db[k].salary;
-  // Fallback: cerca nei vecchi settings per compatibilità
-  if (db[k] && db[k].settings && db[k].settings.stip) return db[k].settings.stip;
-  return gSettings.stip || 0;
+  // Compatibilità con vecchio campo settings (solo se quel mese aveva settings propri)
+  if (db[k] && db[k].settings && db[k].settings.stip && !db[k].settings._fromGlobal) {
+    return db[k].settings.stip;
+  }
+  return 0; // Mai propagare globalmente — ogni mese ha il suo stipendio
 }
 
 // Ore lavorate nel mese k (basate sui workParams di k)
@@ -277,8 +305,8 @@ function getEffectiveSettings(k) {
 }
 
 function getAvgSettings() {
-  // Usa tutti i mesi che hanno uno stipendio salvato
-  const keys = Object.keys(db).filter(k => getSalaryForMonth(k) > 0);
+  // Usa solo mesi con salary esplicito (non propagato)
+  const keys = Object.keys(db).filter(k => db[k] && db[k].salary != null && db[k].salary > 0);
   if (!keys.length) {
     if (!gSettings.stip) return { stip:0, pagaH:0, oreGiorno:8, count:0 };
     return { stip: gSettings.stip, pagaH: gSettings.pagaH || 0, oreGiorno: gSettings.oreGiorno || 8, count: 0 };
@@ -713,6 +741,82 @@ function renderGroupedList(income, expenses, k) {
   `).join('');
 }
 
+
+// ─── CALENDARIO GIORNALIERO ───────────────────────────────────────────────
+let calendarOpen = false;
+
+function toggleCalendar() {
+  calendarOpen = !calendarOpen;
+  const cal = document.getElementById('dayCalendar');
+  if (calendarOpen) {
+    buildCalendar();
+    cal.classList.add('active');
+  } else {
+    cal.classList.remove('active');
+  }
+}
+
+function closeCalendar() {
+  calendarOpen = false;
+  document.getElementById('dayCalendar').classList.remove('active');
+}
+
+function buildCalendar() {
+  const y = currentView.getFullYear(), m = currentView.getMonth();
+  const today = new Date();
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Dom
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const restDays = gSettings.restDays || [0,6];
+
+  let html = `<div class="cal-nav">
+    <button onclick="calShiftMonth(-1)">‹</button>
+    <span>${MONTH_FULL[m]} ${y}</span>
+    <button onclick="calShiftMonth(1)">›</button>
+  </div>`;
+  html += '<div class="cal-grid">';
+  // Headers Dom-Sab
+  ['D','L','M','M','G','V','S'].forEach(d => {
+    html += `<div class="cal-head">${d}</div>`;
+  });
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell"></div>';
+  // Days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(y, m, d);
+    const wd = date.getDay();
+    const isToday = y === today.getFullYear() && m === today.getMonth() && d === today.getDate();
+    const isCurr  = y === currentView.getFullYear() && m === currentView.getMonth() && d === currentView.getDate();
+    const isRest  = restDays.includes(wd);
+    const k = monthKey(y, m);
+    const hasData = db[k] && (
+      (db[k].expenses||[]).some(e => new Date(e.ts||e.id).getDate() === d && new Date(e.ts||e.id).getMonth() === m) ||
+      (db[k].income  ||[]).some(i => new Date(i.ts||i.id).getDate() === d && new Date(i.ts||i.id).getMonth() === m)
+    );
+    const cls = [
+      'cal-cell cal-day',
+      isRest  ? 'cal-rest'    : '',
+      isToday ? 'cal-today'   : '',
+      isCurr  ? 'cal-current' : '',
+      hasData ? 'cal-has-data': '',
+    ].join(' ').trim();
+    html += `<div class="${cls}" onclick="selectCalDay(${d})">${d}${hasData && !isCurr ? '<span class="cal-dot"></span>' : ''}</div>`;
+  }
+  html += '</div>';
+  document.getElementById('dayCalendar').innerHTML = html;
+}
+
+function calShiftMonth(dir) {
+  currentView.setDate(1);
+  currentView.setMonth(currentView.getMonth() + dir);
+  buildCalendar();
+}
+
+function selectCalDay(d) {
+  currentView.setDate(d);
+  closeCalendar();
+  render();
+}
+
 // ─── RENDER PRINCIPALE ────────────────────────────────────────────────────
 function render() {
   let dateStr = '', totInc = 0, totUsc = 0, net = 0, pagaH = 0;
@@ -824,8 +928,9 @@ function render() {
     if (dw) dw.style.display = 'none';
     Object.keys(db).forEach(k => {
       if (!k.startsWith(year)) return;
-      const d = db[k]; const s = getEffectiveSettings(k);
-      totInc += (s ? s.stip : 0) + (d.income||[]).reduce((a,b) => a+b.imp, 0);
+      const d = db[k];
+      const salary = getSalaryForMonth(k); // Solo salary esplicito, no propagazione
+      totInc += salary + (d.income||[]).reduce((a,b) => a+b.imp, 0);
       totUsc += (d.expenses||[]).reduce((a,b) => a+b.imp, 0);
       (d.income  ||[]).forEach(i => allIncome.push({...i,  monthKey:k}));
       (d.expenses||[]).forEach(e => allExpenses.push({...e, monthKey:k}));
@@ -835,8 +940,14 @@ function render() {
 
   // ── Header
   document.getElementById('dateLabel').textContent = dateStr;
-  document.getElementById('viewBadge').textContent =
-    viewMode === 'day' ? 'GIORNO' : viewMode === 'year' ? 'ANNO' : 'MESE';
+  const vb = document.getElementById('viewBadge');
+  if (viewMode === 'day') {
+    vb.textContent = 'TOCCA PER CALENDARIO';
+  } else if (viewMode === 'year') {
+    vb.textContent = 'ANNO';
+  } else {
+    vb.textContent = 'MESE';
+  }
 
   // ── Hero
   document.getElementById('heroAmount').textContent = `${net < 0 ? '−' : ''}€${fmt(net)}`;

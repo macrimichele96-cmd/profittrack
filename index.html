@@ -59,13 +59,16 @@
   <!-- TOP NAV -->
   <div class="top-nav">
     <div class="top-nav-inner">
-      <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
-      <div class="date-pill" onclick="cycleViewMode()">
+      <button class="nav-arrow" id="navLeft" onclick="changeDate(-1)">‹</button>
+      <div class="date-pill" onclick="onDatePillTap()">
         <span id="dateLabel"></span>
         <span id="viewBadge" class="view-badge"></span>
       </div>
-      <button class="nav-arrow" onclick="changeDate(1)">›</button>
+      <button class="nav-arrow" id="navRight" onclick="changeDate(1)">›</button>
     </div>
+    <!-- Calendar dropdown for day view -->
+    <div class="day-calendar" id="dayCalendar"></div>
+    <div class="cal-backdrop" id="calBackdrop" onclick="closeCalendar()"></div>
   </div>
 
   <!-- ═══ PAGE: RIEPILOGO ═══ -->
@@ -320,20 +323,20 @@
   <!-- TAB BAR -->
   <div class="tab-bar">
     <div class="tab-item active" onclick="showPage('page-home',this)">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div class="tab-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <span>Riepilogo</span>
     </div>
     <div class="tab-item" onclick="showPage('page-movimenti',this)">
-      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
       <span>Movimenti</span>
     </div>
     <div class="tab-item" id="tabAnalisi" onclick="showPage('page-analisi',this)">
-      <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
       <span>Analisi</span>
     </div>
     <div class="tab-item" id="tabSettings" onclick="showPage('page-settings',this)">
-      <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+      <div class="tab-icon-wrap"><span id="settingsBadge" class="tab-badge" style="display:none;"></span>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg></div>
       <span>Impostazioni</span>
     </div>
   </div>

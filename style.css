@@ -458,3 +458,118 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
   font-size:13px; font-weight:600; margin-bottom:14px;
   display:flex; align-items:center; gap:6px;
 }
+
+/* ═══════════════ CALENDAR DROPDOWN ═══════════════ */
+.day-calendar {
+  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  width: min(340px, 94vw);
+  background: var(--card-bg);
+  border: .5px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  z-index: 2000;
+  padding: 14px;
+  display: none;
+  animation: calDrop .2s cubic-bezier(.32,1,.23,1);
+}
+.day-calendar.active { display: block; }
+.cal-backdrop {
+  position: fixed; inset: 0; z-index: 1999;
+  display: none;
+}
+.day-calendar.active ~ .cal-backdrop { display: block; }
+
+.cal-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.cal-nav span { font-size: 15px; font-weight: 600; }
+.cal-nav button {
+  background: var(--glass2); border: none; color: var(--blue);
+  font-size: 20px; font-weight: 300; width: 32px; height: 32px;
+  border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+}
+.cal-head {
+  text-align: center; font-size: 11px; font-weight: 600;
+  color: var(--sub); padding: 4px 0;
+}
+.cal-cell { text-align: center; }
+.cal-day {
+  position: relative;
+  font-size: 14px; font-weight: 500; padding: 8px 2px;
+  border-radius: 10px; cursor: pointer;
+  transition: background .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cal-day:active { opacity: .7; }
+.cal-rest  { color: var(--sub); }
+.cal-today { font-weight: 700; color: var(--blue); }
+.cal-today::after {
+  content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%; background: var(--blue);
+}
+.cal-current {
+  background: var(--blue); color: #fff !important; font-weight: 700;
+}
+.cal-current::after { display: none; }
+.cal-has-data { }
+.cal-dot {
+  position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 3px; border-radius: 50%; background: var(--green);
+}
+
+@keyframes calDrop { from { opacity:0; transform:translateX(-50%) translateY(-8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* ═══════════════ GRAPHIC REFINEMENTS ═══════════════ */
+
+/* Hero card: subtle gradient shimmer */
+.hero-card {
+  background: linear-gradient(145deg, rgba(38,38,40,0.85) 0%, rgba(28,28,30,0.72) 100%);
+}
+@media (prefers-color-scheme: light) {
+  .hero-card { background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(242,242,247,0.82) 100%); }
+}
+
+/* Tab bar: pill indicator instead of fill */
+.tab-bar { padding-top: 8px; }
+.tab-item.active svg { fill: none; }  /* reset fill for cleaner look */
+.tab-item.active .tab-icon-wrap { background: rgba(10,132,255,.12); border-radius: 12px; }
+.tab-icon-wrap { padding: 6px 16px; border-radius: 12px; transition: background .2s; display: flex; align-items: center; justify-content: center; }
+
+/* Smoother card corners */
+.glass-card { border-radius: 22px; }
+.hero-card  { border-radius: 26px; }
+
+/* Stats row: slightly more spacing */
+.stats-row { padding: 14px 20px 0; gap: 4px; }
+.stat-chip  { gap: 10px; }
+.stat-divider { height: 36px; margin: 0 4px; }
+
+/* Amount: tighter letter-spacing on small screens */
+@media (max-width: 380px) {
+  .hero-amount { font-size: 44px; }
+}
+
+/* Section header: slightly bolder */
+.section-header span { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+
+/* Recents: no bottom border on last swipe wrap */
+.recent-list .tx-swipe-wrap:last-child { border-bottom: none; }
+
+/* Smooth page transitions */
+.page.active { animation: pageIn .22s cubic-bezier(.4,0,.2,1); }
+@keyframes pageIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* View badge: more pill-like */
+.view-badge {
+  font-size: 9px; font-weight: 700; color: var(--blue);
+  letter-spacing: .8px; padding: 2px 9px;
+  background: rgba(10,132,255,.12); border-radius: 20px;
+  margin-top: 1px;
+}
+
+/* Day view: arrows become week-skip buttons */
+.nav-arrow { font-size: 26px; padding: 4px 12px; }
