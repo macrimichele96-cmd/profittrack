@@ -174,10 +174,14 @@ function showPage(pageId, el) {
 }
 
 function cycleViewMode() {
-  if      (viewMode === 'day')   viewMode = 'month';
-  else if (viewMode === 'month') viewMode = 'year';
-  else                           viewMode = 'month'; // anno → torna a mese (day si apre dal calendario)
+  if      (viewMode === 'month') viewMode = 'year';
+  else if (viewMode === 'year')  viewMode = 'day';
+  else                           viewMode = 'month';
+  // Quando si entra in vista giorno, porta al giorno di oggi
+  if (viewMode === 'day') currentView = new Date();
   render();
+  // Apri subito il calendario quando si entra in vista giorno
+  if (viewMode === 'day') setTimeout(() => toggleCalendar(), 150);
 }
 
 function onDatePillTap() {
@@ -942,7 +946,7 @@ function render() {
   document.getElementById('dateLabel').textContent = dateStr;
   const vb = document.getElementById('viewBadge');
   if (viewMode === 'day') {
-    vb.textContent = 'TOCCA PER CALENDARIO';
+    vb.textContent = 'GIORNO · TAP = CALENDARIO';
   } else if (viewMode === 'year') {
     vb.textContent = 'ANNO';
   } else {
