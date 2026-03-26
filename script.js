@@ -93,15 +93,24 @@ function bootApp() {
 }
 
 function completeOnboarding() {
-  const stip     = parseFloat(document.getElementById('ob_stip').value) || 0;
+  const stip      = parseFloat(document.getElementById('ob_stip').value) || 0;
   const oreGiorno = parseFloat(document.getElementById('ob_ore').value)  || 0;
   if (stip <= 0 || oreGiorno <= 0) { shakeEl('onboarding'); return; }
   const restDays = [];
   document.querySelectorAll('#ob_days .day-btn.active').forEach(b => restDays.push(parseInt(b.dataset.day)));
   const now = new Date();
-  const pagaH = calcPagaH(stip, oreGiorno, restDays, now.getFullYear(), now.getMonth(), 0);
+  const k = monthKey(now.getFullYear(), now.getMonth());
+  // In onboarding salviamo tutto sul mese corrente come punto di partenza
+  if (!db[k]) db[k] = { settings:null, income:[], expenses:[], appliedRec:[] };
+  db[k].workParams = { oreGiorno, restDays, oreExtra: 0 };
+  db[k].salary     = stip;
+  // Compatibilità
+  const ore   = calcOreMese(oreGiorno, restDays, now.getFullYear(), now.getMonth(), 0);
+  const pagaH = ore > 0 ? stip / ore : 0;
+  db[k].settings = { stip, oreGiorno, restDays, ore, oreExtra:0, pagaH };
   gSettings = { stip, oreGiorno, pagaH, restDays };
   localStorage.setItem('pt_settings', JSON.stringify(gSettings));
+  save();
   bootApp();
 }
 
@@ -125,17 +134,30 @@ function getSelectedRestDays(containerId) {
 }
 
 function liveCalcPreview() {
-  const stip     = parseFloat(document.getElementById('set_stip').value) || 0;
-  const oreG     = parseFloat(document.getElementById('set_ore').value)  || 0;
+  const oreG     = parseFloat(document.getElementById('set_ore').value)    || 0;
+  const stip     = parseFloat(document.getElementById('set_stip').value)   || 0;
   const oreExtra = parseFloat(document.getElementById('set_extra')?.value) || 0;
   const restDays = getSelectedRestDays('set_days');
   const el = document.getElementById('calcPreview');
-  if (!el || stip <= 0 || oreG <= 0) { if(el) el.style.display='none'; return; }
-  const now = new Date();
-  const ore = calcOreMese(oreG, restDays, now.getFullYear(), now.getMonth(), oreExtra);
-  const pagaH = stip / ore;
-  const wd = countWorkDays(now.getFullYear(), now.getMonth(), restDays);
-  el.innerHTML = `<strong>${wd}</strong> giorni lav. · <strong>${ore}h</strong> mensili · <strong>€${pagaH.toFixed(2)}/h</strong>`;
+  if (!el || oreG <= 0) { if(el) el.style.display='none'; return; }
+
+  // Mese corrente = mese in cui si lavora
+  const vY = currentView.getFullYear(), vM = currentView.getMonth();
+  const oreCorrenti = calcOreMese(oreG, restDays, vY, vM, oreExtra);
+  const wdCorrenti  = countWorkDays(vY, vM, restDays);
+
+  // Il pagaH usa lo stipendio di QUESTO mese ÷ ore del MESE PRECEDENTE
+  // (stipendio corrente = pagamento per lavoro del mese scorso)
+  const prevY = vM === 0 ? vY-1 : vY, prevM = vM === 0 ? 11 : vM-1;
+  const orePrec = calcOreMese(oreG, restDays, prevY, prevM, 0);
+  const wdPrec  = countWorkDays(prevY, prevM, restDays);
+
+  let html = `<strong>${wdCorrenti}</strong> giorni lav. questo mese · <strong>${oreCorrenti}h</strong>`;
+  if (stip > 0 && orePrec > 0) {
+    const pagaH = stip / orePrec;
+    html += `<br>€${stip.toFixed(0)} ÷ ${orePrec}h (${MONTH_NAMES[prevM]}) = <strong>€${pagaH.toFixed(2)}/h</strong>`;
+  }
+  el.innerHTML = html;
   el.style.display = 'block';
 }
 
@@ -197,28 +219,78 @@ function initMonthKey(k) {
 }
 function save() { localStorage.setItem('pt_db', JSON.stringify(db)); }
 
-// Ottieni impostazioni effettive per un mese
+// ─── MODELLO STIPENDIO SFASATO ─────────────────────────────────────────────
+// workParams[k]  = { oreGiorno, restDays, oreExtra }  → mese in cui si LAVORA
+// stip[k]        = valore stipendio                    → mese in cui si INCASSA
+// pagaH[k]       = stip[k] / ore[k-1]                 → il pagamento di k ÷ ore del mese precedente
+//
+// Esempio: lavori Gennaio → prendi stipendio a Febbraio
+//   workParams["2025-0"] = { oreGiorno:8, restDays:[0,6] }
+//   stip["2025-1"]       = 1800   (incassato a Febbraio)
+//   pagaH usato in Febbraio = 1800 / ore_di_Gennaio
+
+function prevKey(k) {
+  const [y, m] = k.split('-').map(Number);
+  if (m === 0) return `${y-1}-11`;
+  return `${y}-${m-1}`;
+}
+
+// Ritorna i parametri di lavoro (ore, giorni riposo) per il mese k
+function getWorkParams(k) {
+  if (db[k] && db[k].workParams) return db[k].workParams;
+  // Fallback a gSettings
+  return { oreGiorno: gSettings.oreGiorno || 8, restDays: gSettings.restDays || [0,6], oreExtra: 0 };
+}
+
+// Ritorna lo stipendio incassato nel mese k (pagato per il lavoro del mese precedente)
+function getSalaryForMonth(k) {
+  if (db[k] && db[k].salary != null) return db[k].salary;
+  // Fallback: cerca nei vecchi settings per compatibilità
+  if (db[k] && db[k].settings && db[k].settings.stip) return db[k].settings.stip;
+  return gSettings.stip || 0;
+}
+
+// Ore lavorate nel mese k (basate sui workParams di k)
+function getOreForMonth(k) {
+  const wp = getWorkParams(k);
+  const [y, m] = k.split('-').map(Number);
+  return calcOreMese(wp.oreGiorno, wp.restDays, y, m, wp.oreExtra || 0);
+}
+
+// PagaH per il mese k = stip_incassato_in_k / ore_lavorate_in_k-1
+function getPagaHForMonth(k) {
+  const stip = getSalaryForMonth(k);
+  const prevK = prevKey(k);
+  const orePrec = getOreForMonth(prevK);
+  if (orePrec <= 0 || stip <= 0) return 0;
+  return stip / orePrec;
+}
+
+// Compatibilità con il vecchio sistema
 function getEffectiveSettings(k) {
-  if (db[k] && db[k].settings) return db[k].settings;
-  // Costruisci dalle gSettings per quel mese
-  const [year, mon] = k.split('-').map(Number);
-  if (!gSettings.stip) return null;
-  const ore = calcOreMese(gSettings.oreGiorno || 8, gSettings.restDays || [0,6], year, mon, 0);
-  const pagaH = ore > 0 ? gSettings.stip / ore : 0;
-  return { stip: gSettings.stip, oreGiorno: gSettings.oreGiorno, restDays: gSettings.restDays, ore, pagaH, oreExtra: 0 };
+  const stip  = getSalaryForMonth(k);
+  const wp    = getWorkParams(k);
+  const [y, m] = k.split('-').map(Number);
+  const ore   = calcOreMese(wp.oreGiorno, wp.restDays, y, m, wp.oreExtra || 0);
+  const pagaH = getPagaHForMonth(k);
+  return { stip, oreGiorno: wp.oreGiorno, restDays: wp.restDays, ore, oreExtra: wp.oreExtra || 0, pagaH };
 }
 
 function getAvgSettings() {
-  const months = Object.values(db).filter(m => m.settings && m.settings.stip > 0);
-  if (!months.length) {
+  // Usa tutti i mesi che hanno uno stipendio salvato
+  const keys = Object.keys(db).filter(k => getSalaryForMonth(k) > 0);
+  if (!keys.length) {
     if (!gSettings.stip) return { stip:0, pagaH:0, oreGiorno:8, count:0 };
-    return { stip: gSettings.stip, pagaH: gSettings.pagaH, oreGiorno: gSettings.oreGiorno, count: 0 };
+    return { stip: gSettings.stip, pagaH: gSettings.pagaH || 0, oreGiorno: gSettings.oreGiorno || 8, count: 0 };
   }
+  const stips  = keys.map(k => getSalaryForMonth(k));
+  const pagaHs = keys.map(k => getPagaHForMonth(k)).filter(p => p > 0);
+  const oreGs  = keys.map(k => getWorkParams(k).oreGiorno || 8);
   return {
-    stip:      months.reduce((a,m) => a + m.settings.stip,  0) / months.length,
-    pagaH:     months.reduce((a,m) => a + m.settings.pagaH, 0) / months.length,
-    oreGiorno: months.reduce((a,m) => a + (m.settings.oreGiorno || 8), 0) / months.length,
-    count:     months.length
+    stip:      stips.reduce((a,b) => a+b, 0) / stips.length,
+    pagaH:     pagaHs.length ? pagaHs.reduce((a,b) => a+b, 0) / pagaHs.length : 0,
+    oreGiorno: oreGs.reduce((a,b)  => a+b, 0) / oreGs.length,
+    count:     keys.length
   };
 }
 
@@ -304,19 +376,30 @@ function saveSettings() {
   const oreG     = parseFloat(document.getElementById('set_ore').value)   || 0;
   const oreExtra = parseFloat(document.getElementById('set_extra')?.value) || 0;
   const restDays = getSelectedRestDays('set_days');
-  if (stip <= 0 || oreG <= 0) { shakeEl('settingsCard'); return; }
-
-  const year = currentView.getFullYear();
-  const mon  = currentView.getMonth();
-  const ore  = calcOreMese(oreG, restDays, year, mon, oreExtra);
-  const pagaH = stip / ore;
+  if (oreG <= 0) { shakeEl('settingsCard'); return; }
 
   const k = curMonthKey(); initMonthKey(k);
-  db[k].settings = { stip, oreGiorno: oreG, restDays, ore, oreExtra, pagaH };
 
-  // Aggiorna anche gSettings (serve come fallback per mesi senza impostazione)
-  gSettings = { stip, oreGiorno: oreG, restDays, pagaH };
+  // Salva i parametri di lavoro sul mese corrente (quando si lavora)
+  db[k].workParams = { oreGiorno: oreG, restDays, oreExtra };
+
+  // Lo stipendio appartiene al mese corrente (è il pagamento per il lavoro del mese precedente)
+  // Salvalo solo se è stato inserito
+  if (stip > 0) {
+    db[k].salary = stip;
+  }
+
+  // Aggiorna gSettings come fallback globale
+  gSettings = { stip: stip || gSettings.stip, oreGiorno: oreG, restDays, pagaH: getPagaHForMonth(k) };
   localStorage.setItem('pt_settings', JSON.stringify(gSettings));
+
+  // Mantieni compatibilità con vecchio campo settings
+  db[k].settings = {
+    stip: getSalaryForMonth(k),
+    oreGiorno: oreG, restDays, ore: getOreForMonth(k),
+    oreExtra, pagaH: getPagaHForMonth(k)
+  };
+
   save(); liveCalcPreview(); render(); renderAvgBox();
 }
 
@@ -647,7 +730,7 @@ function render() {
     initMonthKey(currentK);
     const data = db[currentK];
     const s    = getEffectiveSettings(currentK);
-    if (s) pagaH = s.pagaH;
+    pagaH = getPagaHForMonth(currentK);
 
     // Filtra per giorno
     const tsStart = new Date(y, m, d, 0, 0, 0).getTime();
@@ -682,20 +765,25 @@ function render() {
     const data = db[currentK];
     const s    = getEffectiveSettings(currentK);
     dateStr    = `${MONTH_FULL[currentView.getMonth()]} ${currentView.getFullYear()}`;
-    if (s) {
-      totInc = s.stip + (data.income||[]).reduce((a,b) => a+b.imp, 0);
-      pagaH  = s.pagaH;
-      document.getElementById('set_stip').value = s.stip;
-      document.getElementById('set_ore').value  = s.oreGiorno || '';
-      if (s.oreExtra > 0) {
-        document.getElementById('set_extra').value = s.oreExtra;
-        document.getElementById('overtimeField').style.display = 'block';
-        document.getElementById('overtimeChevron').textContent = '−';
-      }
-      liveCalcPreview();
-    } else {
-      totInc = (data.income||[]).reduce((a,b) => a+b.imp, 0);
+    // Stipendio = quello incassato in questo mese (pagato per il lavoro del mese precedente)
+    const salary = getSalaryForMonth(currentK);
+    // PagaH = stipendio di questo mese / ore del mese precedente
+    pagaH = getPagaHForMonth(currentK);
+    const wp = getWorkParams(currentK);
+    totInc = salary + (data.income||[]).reduce((a,b) => a+b.imp, 0);
+
+    // Popola i campi impostazioni
+    const setStip = document.getElementById('set_stip');
+    const setOre  = document.getElementById('set_ore');
+    if (setStip) setStip.value = salary > 0 ? salary : '';
+    if (setOre)  setOre.value  = wp.oreGiorno || '';
+    if (wp.oreExtra > 0) {
+      const extF = document.getElementById('set_extra');
+      if (extF) extF.value = wp.oreExtra;
+      document.getElementById('overtimeField').style.display = 'block';
+      document.getElementById('overtimeChevron').textContent = '−';
     }
+    liveCalcPreview();
     totUsc = (data.expenses||[]).reduce((a,b) => a+b.imp, 0);
     net    = totInc - totUsc;
     allIncome   = (data.income  ||[]).map(i => ({...i, monthKey:currentK}));
@@ -708,6 +796,15 @@ function render() {
     // Settings label
     const sl = document.getElementById('settingsMonthLabel');
     if (sl) sl.textContent = `${MONTH_NAMES[currentView.getMonth()]} ${currentView.getFullYear()}`;
+
+    // Salary info row — spiega il modello sfasato
+    const sir = document.getElementById('salaryInfoRow');
+    if (sir) {
+      const prevM = currentView.getMonth() === 0 ? 11 : currentView.getMonth() - 1;
+      const prevYr = currentView.getMonth() === 0 ? currentView.getFullYear()-1 : currentView.getFullYear();
+      sir.innerHTML = `📅 Lo stipendio inserito qui è il pagamento per il lavoro di <strong>${MONTH_NAMES[prevM]} ${prevYr}</strong>. Il valore ora (€/h) si calcola automaticamente su quel mese.`;
+      sir.style.display = 'block';
+    }
 
     // Recurring banner
     const banner = document.getElementById('recurringApplyBanner');
@@ -751,6 +848,22 @@ function render() {
     heroSub.textContent = `€${pagaH.toFixed(2)} / ora`;
     heroSub.style.display = 'block';
   } else heroSub.style.display = 'none';
+
+  // Trend vs mese precedente (solo vista mese)
+  const heroTrend = document.getElementById('heroTrend');
+  if (heroTrend && viewMode === 'month') {
+    const prevK2 = prevKey(currentK || curMonthKey());
+    const prevData = getMonthData(prevK2);
+    if (prevData.totInc > 0 || prevData.uscite > 0) {
+      const diff = net - prevData.net;
+      const arrow = diff >= 0 ? '↑' : '↓';
+      const color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+      heroTrend.innerHTML = `<span style="color:${color}">${arrow} €${fmt(Math.abs(diff))}</span> <span style="opacity:.6;font-size:11px;">vs ${MONTH_NAMES[new Date(prevK2.split('-')[0], prevK2.split('-')[1]).getMonth()]}</span>`;
+      heroTrend.style.display = 'block';
+    } else {
+      heroTrend.style.display = 'none';
+    }
+  } else if (heroTrend) heroTrend.style.display = 'none';
 
   let perc = totInc > 0 ? Math.min(100, totUsc/totInc*100) : 0;
   document.getElementById('heroBar').style.width      = perc + '%';

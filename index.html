@@ -76,6 +76,7 @@
         <div class="hero-label" id="heroLabel">Flusso Netto</div>
         <div class="hero-amount" id="heroAmount">€0</div>
         <div class="hero-sub" id="heroSub"></div>
+        <div class="hero-trend" id="heroTrend" style="display:none;"></div>
         <div class="hero-bar-wrap">
           <div class="hero-bar-track">
             <div class="hero-bar-fill" id="heroBar"></div>
@@ -220,11 +221,14 @@
       <div class="glass-card" id="settingsCard">
         <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
 
+        <!-- Stipendio: va sul mese corrente (è il pagamento per il lavoro del mese precedente) -->
+        <div class="salary-info-row" id="salaryInfoRow"></div>
+
         <div class="settings-field">
-          <label>Stipendio mensile netto</label>
+          <label>Stipendio ricevuto questo mese</label>
           <div class="amount-input-wrap">
             <span class="currency-sym">€</span>
-            <input id="set_stip" type="number" inputmode="decimal" placeholder="0">
+            <input id="set_stip" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
 

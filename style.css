@@ -107,6 +107,7 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
 }
 .hero-label { font-size:12px; font-weight:600; color:var(--sub); text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
 .hero-amount { font-size:52px; font-weight:700; letter-spacing:-2px; line-height:1; margin-bottom:4px; transition:color .3s; }
+@media (min-height: 750px) { .hero-amount { font-size:58px; } }
 .hero-sub { font-size:14px; color:var(--sub); margin-bottom:16px; }
 .hero-bar-wrap { display:flex; align-items:center; gap:10px; }
 .hero-bar-track { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
@@ -240,6 +241,8 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
   -webkit-tap-highlight-color:transparent; transition:color .2s;
 }
 .tab-item.active { color:var(--blue); }
+.tab-item svg { transition:transform .15s ease; }
+.tab-item.active svg { transform:scale(1.1); }
 .tab-item svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .tab-item.active svg { fill:currentColor; }
 .tab-item span:not(.tab-badge) { font-size:9px; font-weight:600; letter-spacing:.2px; }
@@ -281,6 +284,7 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
   font-size:52px; font-weight:700; letter-spacing:-2px; color:var(--text);
   font-family:inherit; -webkit-appearance:none; padding:0;
 }
+@media (min-height: 750px) { .modal-amount-input { font-size:60px; } }
 .modal-amount-input::placeholder { color:var(--sub2); }
 .cat-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
 .cat-pill {
@@ -439,3 +443,18 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
 @keyframes fadeUp  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
 .shake { animation:shake .4s ease; }
+
+/* ─── SALARY INFO ROW ─── */
+.salary-info-row {
+  font-size:12px; color:var(--sub); line-height:1.5;
+  padding:10px 12px; background:rgba(255,159,10,.07);
+  border:.5px solid rgba(255,159,10,.2); border-radius:10px;
+  margin-bottom:14px; display:none;
+}
+.salary-info-row strong { color:var(--orange); }
+
+/* ─── HERO TREND ─── */
+.hero-trend {
+  font-size:13px; font-weight:600; margin-bottom:14px;
+  display:flex; align-items:center; gap:6px;
+}
