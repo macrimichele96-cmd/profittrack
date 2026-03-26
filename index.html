@@ -5,195 +5,332 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
 <title>ProfitTrack</title>
-
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="image.png">
-
-
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="timeline-nav-wrapper">
-  <div class="timeline-nav">
-    <button class="nav-btn" onclick="changeDate(-1)">❮</button>
-    <div class="current-date" id="dateHeader" onclick="toggleViewMode()"></div>
-    <button class="nav-btn" onclick="changeDate(1)">❯</button>
-  </div>
-</div>
-
-<div id="page-home" class="page active">
-  <div class="container">
-    <div class="summary-grid">
-      <div class="summary-box highlight" id="boxPaga">
-        <span class="lab">Tua Ora</span>
-        <div id="valoreOra" class="val">€0.00</div>
-      </div>
-      <div class="summary-box">
-        <span class="lab">Entrate</span>
-        <div id="monthInVal" class="val" style="color:var(--green)">€0</div>
-      </div>
-      <div class="summary-box">
-        <span class="lab">Uscite</span>
-        <div id="monthOutVal" data-val="0" class="val" style="color:var(--red)">€0</div>
-      </div>
-      <div class="summary-box highlight" style="grid-column: span 2; border-color: var(--border); background: var(--card)">
-        <span class="lab">Flusso Cassa Netto</span>
-        <div id="monthNetVal" class="val">€0</div>
-      </div>
-      <div class="summary-box">
-        <span class="lab">Ore Lavoro</span>
-        <div id="monthHoursVal" class="val" style="color:var(--orange)">0h</div>
-      </div>
-    </div>
-
-    <div class="card budget-container">
-      <div class="budget-header">
-        <span>Capacità di Spesa Assorbita</span>
-        <span id="budgetPerc">0%</span>
-      </div>
-      <div class="budget-track">
-        <div id="budgetBar" class="budget-fill"></div>
-      </div>
-    </div>
-
-    <div class="card" id="settingsCard" style="background: var(--border);">
-      <h3>Impostazioni <span id="setupDateLabel" style="text-transform: none; color:var(--blue)"></span></h3>
-      <div class="row">
-        <input id="set_stip_mese" type="number" placeholder="Busta Paga €">
-        <input id="set_ore_mese" type="number" placeholder="Ore Lavorate">
-      </div>
-      <button class="btn btn-outline" style="padding: 12px; font-size: 14px; background: var(--card);" onclick="saveMonthlySalary()">Salva Parametri Mese</button>
-    </div>
-
-    <div class="card">
-      <h3>Aggiungi Entrata</h3>
-      <div class="row">
-        <input id="in_nome_ent" placeholder="Nome (es. Bonus)">
-        <div class="custom-select-container">
-          <div class="custom-select-btn" onclick="toggleDropdown('ent_drop')">
-            <svg class="cat-svg" viewBox="0 0 24 24" id="ent_icon_display"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            <span id="ent_label_display">Extra</span>
-          </div>
-          <div class="custom-dropdown" id="ent_drop">
-            <div class="custom-option" onclick="selectCategory('ent', 'Extra', '<path d=\'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6\'></path>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Extra
-            </div>
-            <div class="custom-option" onclick="selectCategory('ent', 'Investimenti', '<polyline points=\'23 6 13.5 15.5 8.5 10.5 1 18\'></polyline><polyline points=\'17 6 23 6 23 12\'></polyline>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Investimenti
-            </div>
-            <div class="custom-option" onclick="selectCategory('ent', 'Regalo', '<rect x=\'3\' y=\'8\' width=\'18\' height=\'14\' rx=\'2\' ry=\'2\'></rect><path d=\'M12 5a3 3 0 1 0-3 3v0h6a3 3 0 1 0-3-3z\'></path><line x1=\'12\' y1=\'8\' x2=\'12\' y2=\'22\'></line>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="14" rx="2" ry="2"></rect><path d="M12 5a3 3 0 1 0-3 3v0h6a3 3 0 1 0-3-3z"></path><line x1="12" y1="8" x2="12" y2="22"></line></svg> Regalo
-            </div>
-          </div>
+<!-- ════════════════════════════════ ONBOARDING ════════════════════════════ -->
+<div id="onboarding" class="onboarding-overlay" style="display:none;">
+  <div class="onboarding-card">
+    <div class="onboarding-icon">💰</div>
+    <h1 class="onboarding-title">ProfitTrack</h1>
+    <p class="onboarding-sub">Tieni traccia di entrate e uscite.<br>Scopri quanto vale davvero il tuo tempo.</p>
+    <div class="onboarding-fields">
+      <div class="field-group">
+        <label>Stipendio mensile netto</label>
+        <div class="amount-input-wrap">
+          <span class="currency-sym">€</span>
+          <input id="ob_stip" type="number" inputmode="decimal" placeholder="1.800">
         </div>
       </div>
-      <input id="in_importo_ent" type="number" placeholder="Importo €">
-      <button class="btn btn-green" onclick="addIncome()">Registra Entrata</button>
-    </div>
-
-    <div class="card">
-      <h3>Aggiungi Uscita</h3>
-      <div class="row">
-        <input id="in_nome_usc" placeholder="Nome (es. Spesa)">
-        <div class="custom-select-container">
-          <div class="custom-select-btn" onclick="toggleDropdown('usc_drop')">
-            <svg class="cat-svg" viewBox="0 0 24 24" id="usc_icon_display"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-            <span id="usc_label_display">Cibo</span>
-          </div>
-          <div class="custom-dropdown" id="usc_drop">
-            <div class="custom-option" onclick="selectCategory('usc', 'Cibo', '<circle cx=\'9\' cy=\'21\' r=\'1\'></circle><circle cx=\'20\' cy=\'21\' r=\'1\'></circle><path d=\'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6\'></path>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> Cibo
-            </div>
-            <div class="custom-option" onclick="selectCategory('usc', 'Casa', '<path d=\'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\'></path><polyline points=\'9 22 9 12 15 12 15 22\'></polyline>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Casa
-            </div>
-            <div class="custom-option" onclick="selectCategory('usc', 'Trasporti', '<rect x=\'1\' y=\'3\' width=\'15\' height=\'13\'></rect><polygon points=\'16 8 20 8 23 11 23 16 16 16 16 8\'></polygon><circle cx=\'5.5\' cy=\'18.5\' r=\'2.5\'></circle><circle cx=\'18.5\' cy=\'18.5\' r=\'2.5\'></circle>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Trasporti
-            </div>
-            <div class="custom-option" onclick="selectCategory('usc', 'Svago', '<circle cx=\'12\' cy=\'12\' r=\'10\'></circle><polygon points=\'10 8 16 12 10 16 10 8\'></polygon>')">
-              <svg class="cat-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg> Svago
-            </div>
-          </div>
+      <div class="field-group">
+        <label>Ore lavorate a settimana</label>
+        <div class="amount-input-wrap">
+          <span class="currency-sym" style="font-size:15px;">h</span>
+          <input id="ob_ore" type="number" inputmode="decimal" placeholder="40">
         </div>
       </div>
-      <input id="in_importo_usc" type="number" placeholder="Importo €">
-      <button class="btn btn-blue" onclick="addExpense()">Registra Uscita</button>
     </div>
+    <button class="btn-primary" onclick="completeOnboarding()">Inizia →</button>
+    <p class="onboarding-note">Potrai modificarli in qualsiasi momento da Impostazioni.</p>
   </div>
 </div>
 
-<div id="page-list" class="page">
-  <div class="container">
-    <div class="card">
-      <h3>Entrate <span id="listDateLabelEnt" style="color:var(--green)"></span></h3>
-      <div id="incomeList"></div>
-    </div>
-    <div class="card">
-      <h3>Uscite <span id="listDateLabelUsc" style="color:var(--red)"></span></h3>
-      <div id="expenseList"></div>
-      <div id="topSpesaContainer"></div>
-      <div id="resFisso" style="margin-top: 15px; font-size: 12px; color: var(--sub); text-align: center; font-weight: 600;"></div>
+<!-- ════════════════════════════════ MAIN APP ══════════════════════════════ -->
+<div id="app" style="display:none;">
+
+  <!-- TOP NAV -->
+  <div class="top-nav">
+    <div class="top-nav-inner">
+      <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
+      <div class="date-pill" onclick="toggleViewMode()">
+        <span id="dateLabel"></span>
+        <span id="viewBadge" class="view-badge"></span>
+      </div>
+      <button class="nav-arrow" onclick="changeDate(1)">›</button>
     </div>
   </div>
-</div>
 
-<div id="page-tool" class="page">
-  <div class="container">
-    <div class="card">
-      <h3>Deterrente Acquisto</h3>
-      <input id="det_prezzo" type="number" placeholder="Prezzo tentazione (€)">
-      <button class="btn btn-orange" onclick="validaAcquisto()">Ne vale la pena?</button>
-      <div id="detOut" class="deterrente-res"></div>
+  <!-- ─── PAGE: HOME ─── -->
+  <div id="page-home" class="page active">
+
+    <!-- Hero card -->
+    <div class="hero-section">
+      <div class="hero-card">
+        <div class="hero-label" id="heroLabel">Flusso Netto</div>
+        <div class="hero-amount" id="heroAmount">€0</div>
+        <div class="hero-sub" id="heroSub"></div>
+        <div class="hero-bar-wrap">
+          <div class="hero-bar-track">
+            <div class="hero-bar-fill" id="heroBar"></div>
+          </div>
+          <span class="hero-bar-label" id="heroBarLabel">0% speso</span>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <h3>Sostenibilità Obiettivo</h3>
-      <input id="obj_target" type="number" placeholder="Cifra da raggiungere €">
-      <input id="obj_anni" type="number" placeholder="Anni per arrivarci">
-      <button class="btn btn-green" onclick="calcolaSostenibilita()">Calcola Sforzo</button>
-      <div id="objOut" style="margin-top:15px;"></div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-chip">
+        <span class="stat-chip-icon">↑</span>
+        <div>
+          <div class="stat-chip-val" id="statIn" style="color:var(--green)">€0</div>
+          <div class="stat-chip-lab">Entrate</div>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-chip">
+        <span class="stat-chip-icon">↓</span>
+        <div>
+          <div class="stat-chip-val" id="statOut" style="color:var(--red)">€0</div>
+          <div class="stat-chip-lab">Uscite</div>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-chip" id="chipOra" style="display:none;">
+        <span class="stat-chip-icon">⏱</span>
+        <div>
+          <div class="stat-chip-val" id="statOra" style="color:var(--orange)">€0</div>
+          <div class="stat-chip-lab">Tua Ora</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="section-header">
+      <span>Recenti</span>
+      <button class="see-all-btn" onclick="showPage('page-movimenti',document.querySelectorAll('.tab-item')[1])">Vedi tutti</button>
+    </div>
+    <div class="recent-list" id="recentList"></div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="openModal()">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <!-- ─── PAGE: MOVIMENTI ─── -->
+  <div id="page-movimenti" class="page">
+    <div class="page-scroll">
+
+      <!-- Pie chart -->
+      <div class="glass-card" id="pieSection" style="display:none;">
+        <div class="card-title">Uscite per categoria</div>
+        <div class="pie-row">
+          <svg id="pieChart" width="120" height="120" viewBox="0 0 120 120"></svg>
+          <div class="pie-legend" id="pieLegend"></div>
+        </div>
+      </div>
+
+      <!-- Income list -->
+      <div class="glass-card">
+        <div class="card-title-row">
+          <span class="card-title">Entrate</span>
+          <span id="movIncLabel" class="card-badge green-badge"></span>
+        </div>
+        <div id="incomeList"><div class="empty-state">Nessuna entrata</div></div>
+      </div>
+
+      <!-- Expense list -->
+      <div class="glass-card">
+        <div class="card-title-row">
+          <span class="card-title">Uscite</span>
+          <span id="movOutLabel" class="card-badge red-badge"></span>
+        </div>
+        <div id="expenseList"><div class="empty-state">Nessuna uscita</div></div>
+      </div>
+
+    </div>
+    <button class="fab" onclick="openModal()">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+
+  <!-- ─── PAGE: ANALISI ─── -->
+  <div id="page-analisi" class="page">
+    <div class="page-scroll">
+
+      <!-- Storico -->
+      <div class="glass-card">
+        <div class="card-title">Storico 12 Mesi</div>
+        <div id="historyChart"></div>
+        <div id="historyLegend"></div>
+      </div>
+
+      <!-- Strumenti -->
+      <div class="glass-card">
+        <div class="card-title">Analisi Finanziaria</div>
+        <div id="avgInfoBox" class="avg-box"></div>
+
+        <div class="analysis-section">
+          <div class="analysis-label">🛍 Deterrente Acquisto</div>
+          <p class="analysis-desc">Quanto lavoro vale questo acquisto?</p>
+          <div class="amount-input-wrap" style="margin:10px 0;">
+            <span class="currency-sym">€</span>
+            <input id="det_prezzo" type="number" inputmode="decimal" placeholder="Prezzo tentazione">
+          </div>
+          <button class="btn-secondary btn-orange-tint" onclick="validaAcquisto()">Ne vale la pena?</button>
+          <div id="detOut" class="analysis-result orange-result" style="display:none;"></div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="analysis-section">
+          <div class="analysis-label">🎯 Obiettivo di Risparmio</div>
+          <p class="analysis-desc">Quanto devi mettere da parte ogni mese?</p>
+          <div class="amount-input-wrap" style="margin:10px 0 8px;">
+            <span class="currency-sym">€</span>
+            <input id="obj_target" type="number" inputmode="decimal" placeholder="Cifra da raggiungere">
+          </div>
+          <div class="amount-input-wrap" style="margin-bottom:10px;">
+            <span class="currency-sym" style="font-size:14px;">anni</span>
+            <input id="obj_anni" type="number" inputmode="decimal" placeholder="In quanti anni">
+          </div>
+          <button class="btn-secondary btn-green-tint" onclick="calcolaSostenibilita()">Calcola</button>
+          <div id="objOut" class="analysis-result green-result" style="display:none;"></div>
+        </div>
+      </div>
+
     </div>
   </div>
-</div>
 
-<div id="page-set" class="page">
-  <div class="container">
-    <div class="card">
-      <h3>Gestione Dati</h3>
-      <button class="btn btn-outline" style="background: var(--card);" onclick="exportCSV()">Esporta in Excel (CSV)</button>
-      <button class="btn btn-outline" style="margin-top: 10px; background: var(--card);" onclick="exportBackup()">Esporta Backup JSON</button>
-      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red); margin-top: 25px; background: var(--card);" onclick="resetData()">Cancella Tutti i Dati</button>
+  <!-- ─── PAGE: IMPOSTAZIONI ─── -->
+  <div id="page-settings" class="page">
+    <div class="page-scroll">
+
+      <!-- Parametri mese -->
+      <div class="glass-card" id="settingsCard">
+        <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
+        <div class="settings-field">
+          <label>Stipendio mensile netto</label>
+          <div class="amount-input-wrap">
+            <span class="currency-sym">€</span>
+            <input id="set_stip" type="number" inputmode="decimal" placeholder="0">
+          </div>
+        </div>
+        <div class="settings-field">
+          <label>Ore settimanali</label>
+          <div class="amount-input-wrap">
+            <span class="currency-sym" style="font-size:15px;">h</span>
+            <input id="set_ore" type="number" inputmode="decimal" placeholder="0">
+          </div>
+        </div>
+        <div class="overtime-row" onclick="toggleOvertime()">
+          <span>Straordinari questo mese (ore extra)</span>
+          <span id="overtimeChevron" style="color:var(--blue);">+</span>
+        </div>
+        <div id="overtimeField" style="display:none;">
+          <div class="amount-input-wrap" style="margin-top:8px;">
+            <span class="currency-sym" style="font-size:15px;">h</span>
+            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" style="margin-bottom:0;">
+          </div>
+        </div>
+        <div id="calcPreview" class="calc-preview"></div>
+        <button class="btn-primary" onclick="saveSettings()">Salva</button>
+      </div>
+
+      <!-- Spese fisse -->
+      <div class="glass-card">
+        <div class="card-title">Spese Fisse</div>
+        <p class="card-desc">Affitto, abbonamenti... aggiungili una volta e applicali ogni mese con un tap.</p>
+        <div id="recurringApplyBanner" style="display:none;" class="apply-banner">
+          <span id="recurringApplyText"></span>
+          <button class="pill-btn" onclick="applyRecurring()">Applica</button>
+        </div>
+        <div class="add-recurring-row">
+          <div class="mini-cat-sel" onclick="toggleDropdown('rec_drop')">
+            <svg class="cat-svg-sm" viewBox="0 0 24 24" id="rec_icon"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span id="rec_label">Casa</span>
+            <div class="custom-dropdown" id="rec_drop">
+              <div class="custom-option" onclick="selectRecCat('Casa','<path d=\'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\'></path><polyline points=\'9 22 9 12 15 12 15 22\'></polyline>')">🏠 Casa</div>
+              <div class="custom-option" onclick="selectRecCat('Abbonamenti','<path d=\'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z\'></path>')">📦 Abbonamenti</div>
+              <div class="custom-option" onclick="selectRecCat('Trasporti','<rect x=\'1\' y=\'3\' width=\'15\' height=\'13\'></rect><circle cx=\'5.5\' cy=\'18.5\' r=\'2.5\'></circle><circle cx=\'18.5\' cy=\'18.5\' r=\'2.5\'></circle>')">🚗 Trasporti</div>
+              <div class="custom-option" onclick="selectRecCat('Salute','<path d=\'M22 12h-4l-3 9L9 3l-3 9H2\'></path>')">❤️ Salute</div>
+              <div class="custom-option" onclick="selectRecCat('Cibo','<circle cx=\'9\' cy=\'21\' r=\'1\'></circle><circle cx=\'20\' cy=\'21\' r=\'1\'></circle><path d=\'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6\'></path>')">🛒 Cibo</div>
+            </div>
+          </div>
+          <input id="rec_nota" placeholder="Nome" style="flex:1;">
+          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:70px;">
+          <button class="icon-btn-add" onclick="saveRecurring()">+</button>
+        </div>
+        <div id="recurringList"></div>
+      </div>
+
+      <!-- Dati -->
+      <div class="glass-card">
+        <div class="card-title">Dati</div>
+        <button class="settings-row-btn" onclick="exportCSV()">
+          <span>Esporta CSV</span>
+          <span class="row-chevron">›</span>
+        </button>
+        <button class="settings-row-btn" onclick="exportBackup()">
+          <span>Esporta Backup JSON</span>
+          <span class="row-chevron">›</span>
+        </button>
+        <label class="settings-row-btn" style="cursor:pointer;">
+          <span>Importa Backup JSON</span>
+          <span class="row-chevron">›</span>
+          <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
+        </label>
+        <button class="settings-row-btn danger-btn" onclick="resetData()">
+          <span>Cancella tutti i dati</span>
+          <span class="row-chevron" style="color:var(--red);">›</span>
+        </button>
+      </div>
+
     </div>
   </div>
-</div>
 
-<div class="tab-bar">
-  <div class="tab-item active" onclick="showPage('page-home', this)">
-    <div class="tab-icon">
+  <!-- ─── BOTTOM TAB BAR ─── -->
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="showPage('page-home',this)">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span>Riepilogo</span>
     </div>
-    <span class="tab-label">Riepilogo</span>
-  </div>
-  <div class="tab-item" onclick="showPage('page-list', this)">
-    <div class="tab-icon">
-      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+    <div class="tab-item" onclick="showPage('page-movimenti',this)">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Movimenti</span>
     </div>
-    <span class="tab-label">Movimenti</span>
-  </div>
-  <div class="tab-item" onclick="showPage('page-tool', this)">
-    <div class="tab-icon">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+    <div class="tab-item" onclick="showPage('page-analisi',this)">
+      <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Analisi</span>
     </div>
-    <span class="tab-label">Analisi</span>
-  </div>
-  <div class="tab-item" onclick="showPage('page-set', this)">
-    <div class="tab-icon">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <div class="tab-item" onclick="showPage('page-settings',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+      <span>Impostazioni</span>
     </div>
-    <span class="tab-label">Opzioni</span>
   </div>
+
+</div><!-- /app -->
+
+<!-- ════════════════════════ MODAL INSERIMENTO ═════════════════════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
+<div class="modal-sheet" id="modalSheet">
+  <div class="modal-handle"></div>
+
+  <!-- Type toggle -->
+  <div class="type-toggle">
+    <button class="type-btn active" id="typeBtnUsc" onclick="setModalType('usc')">Uscita</button>
+    <button class="type-btn" id="typeBtnInc" onclick="setModalType('inc')">Entrata</button>
+  </div>
+
+  <!-- Amount -->
+  <div class="modal-amount-row">
+    <span class="modal-currency">€</span>
+    <input id="modal_amount" class="modal-amount-input" type="number" inputmode="decimal" placeholder="0">
+  </div>
+
+  <!-- Category pills -->
+  <div class="cat-grid" id="catGrid"></div>
+
+  <!-- Confirm -->
+  <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
 </div>
 
 <script src="script.js"></script>
