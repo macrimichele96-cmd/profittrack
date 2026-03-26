@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<!-- ════════════════════════════════ ONBOARDING ════════════════════════════ -->
+<!-- ══════════════════════ ONBOARDING ══════════════════════ -->
 <div id="onboarding" class="onboarding-overlay" style="display:none;">
   <div class="onboarding-card">
     <div class="onboarding-icon">💰</div>
@@ -25,30 +25,42 @@
         <label>Stipendio mensile netto</label>
         <div class="amount-input-wrap">
           <span class="currency-sym">€</span>
-          <input id="ob_stip" type="number" inputmode="decimal" placeholder="1.800">
+          <input id="ob_stip" type="number" inputmode="decimal" placeholder="1800">
         </div>
       </div>
       <div class="field-group">
-        <label>Ore lavorate a settimana</label>
+        <label>Ore lavorate al giorno</label>
         <div class="amount-input-wrap">
           <span class="currency-sym" style="font-size:15px;">h</span>
-          <input id="ob_ore" type="number" inputmode="decimal" placeholder="40">
+          <input id="ob_ore" type="number" inputmode="decimal" placeholder="8">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Giorni di riposo</label>
+        <div class="day-picker" id="ob_days">
+          <button class="day-btn" data-day="1">Lun</button>
+          <button class="day-btn" data-day="2">Mar</button>
+          <button class="day-btn" data-day="3">Mer</button>
+          <button class="day-btn" data-day="4">Gio</button>
+          <button class="day-btn" data-day="5">Ven</button>
+          <button class="day-btn active" data-day="6">Sab</button>
+          <button class="day-btn active" data-day="0">Dom</button>
         </div>
       </div>
     </div>
     <button class="btn-primary" onclick="completeOnboarding()">Inizia →</button>
-    <p class="onboarding-note">Potrai modificarli in qualsiasi momento da Impostazioni.</p>
+    <p class="onboarding-note">Potrai modificare tutto in qualsiasi momento da Impostazioni.</p>
   </div>
 </div>
 
-<!-- ════════════════════════════════ MAIN APP ══════════════════════════════ -->
+<!-- ══════════════════════ APP ══════════════════════════════ -->
 <div id="app" style="display:none;">
 
   <!-- TOP NAV -->
   <div class="top-nav">
     <div class="top-nav-inner">
       <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
-      <div class="date-pill" onclick="toggleViewMode()">
+      <div class="date-pill" onclick="cycleViewMode()">
         <span id="dateLabel"></span>
         <span id="viewBadge" class="view-badge"></span>
       </div>
@@ -56,10 +68,9 @@
     </div>
   </div>
 
-  <!-- ─── PAGE: HOME ─── -->
+  <!-- ═══ PAGE: RIEPILOGO ═══ -->
   <div id="page-home" class="page active">
 
-    <!-- Hero card -->
     <div class="hero-section">
       <div class="hero-card">
         <div class="hero-label" id="heroLabel">Flusso Netto</div>
@@ -74,10 +85,9 @@
       </div>
     </div>
 
-    <!-- Stats row -->
     <div class="stats-row">
       <div class="stat-chip">
-        <span class="stat-chip-icon">↑</span>
+        <span class="stat-chip-icon" style="color:var(--green)">↑</span>
         <div>
           <div class="stat-chip-val" id="statIn" style="color:var(--green)">€0</div>
           <div class="stat-chip-lab">Entrate</div>
@@ -85,7 +95,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-chip">
-        <span class="stat-chip-icon">↓</span>
+        <span class="stat-chip-icon" style="color:var(--red)">↓</span>
         <div>
           <div class="stat-chip-val" id="statOut" style="color:var(--red)">€0</div>
           <div class="stat-chip-lab">Uscite</div>
@@ -93,43 +103,43 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-chip" id="chipOra" style="display:none;">
-        <span class="stat-chip-icon">⏱</span>
+        <span class="stat-chip-icon" style="color:var(--orange)">⏱</span>
         <div>
           <div class="stat-chip-val" id="statOra" style="color:var(--orange)">€0</div>
-          <div class="stat-chip-lab">Tua Ora</div>
+          <div class="stat-chip-lab" id="statOraLab">Tua Ora</div>
         </div>
       </div>
     </div>
 
-
-    <!-- Spend today widget -->
+    <!-- Spend today — solo vista giornaliera/mensile -->
     <div id="spendTodayCard" class="spend-today-card" style="display:none;">
-      <div class="spend-today-label">💡 Puoi ancora spendere oggi</div>
+      <div class="spend-today-label" id="spendTodayLabel">💡 Puoi ancora spendere oggi</div>
       <div class="spend-today-amount" id="spendTodayAmt">€0</div>
       <div class="spend-today-sub" id="spendTodaySub"></div>
     </div>
 
-    <!-- Positive feedback banner -->
+    <!-- Positive feedback -->
     <div id="positiveBanner" class="positive-banner" style="display:none;"></div>
 
-    <!-- Recent transactions -->
+    <!-- Day worked indicator (solo vista giorno) -->
+    <div id="dayWorkedCard" class="day-worked-card" style="display:none;">
+      <span id="dayWorkedText"></span>
+    </div>
+
     <div class="section-header">
-      <span>Recenti</span>
+      <span id="recentTitle">Recenti</span>
       <button class="see-all-btn" onclick="showPage('page-movimenti',document.querySelectorAll('.tab-item')[1])">Vedi tutti</button>
     </div>
     <div class="recent-list" id="recentList"></div>
 
-    <!-- FAB -->
     <button class="fab" onclick="openModal()">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
 
-  <!-- ─── PAGE: MOVIMENTI ─── -->
+  <!-- ═══ PAGE: MOVIMENTI ═══ -->
   <div id="page-movimenti" class="page">
     <div class="page-scroll">
-
-      <!-- Pie chart -->
       <div class="glass-card" id="pieSection" style="display:none;">
         <div class="card-title">Uscite per categoria</div>
         <div class="pie-row">
@@ -137,8 +147,6 @@
           <div class="pie-legend" id="pieLegend"></div>
         </div>
       </div>
-
-      <!-- Income list -->
       <div class="glass-card">
         <div class="card-title-row">
           <span class="card-title">Entrate</span>
@@ -146,8 +154,6 @@
         </div>
         <div id="incomeList"><div class="empty-state">Nessuna entrata</div></div>
       </div>
-
-      <!-- Expense list -->
       <div class="glass-card">
         <div class="card-title-row">
           <span class="card-title">Uscite</span>
@@ -155,26 +161,22 @@
         </div>
         <div id="expenseList"><div class="empty-state">Nessuna uscita</div></div>
       </div>
-
     </div>
     <button class="fab" onclick="openModal()">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
 
-
-  <!-- ─── PAGE: ANALISI ─── -->
+  <!-- ═══ PAGE: ANALISI ═══ -->
   <div id="page-analisi" class="page">
     <div class="page-scroll">
 
-      <!-- Storico -->
       <div class="glass-card">
         <div class="card-title">Storico 12 Mesi</div>
         <div id="historyChart"></div>
         <div id="historyLegend"></div>
       </div>
 
-      <!-- Strumenti -->
       <div class="glass-card">
         <div class="card-title">Analisi Finanziaria</div>
         <div id="avgInfoBox" class="avg-box"></div>
@@ -211,13 +213,13 @@
     </div>
   </div>
 
-  <!-- ─── PAGE: IMPOSTAZIONI ─── -->
+  <!-- ═══ PAGE: IMPOSTAZIONI ═══ -->
   <div id="page-settings" class="page">
     <div class="page-scroll">
 
-      <!-- Parametri mese -->
       <div class="glass-card" id="settingsCard">
         <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
+
         <div class="settings-field">
           <label>Stipendio mensile netto</label>
           <div class="amount-input-wrap">
@@ -225,13 +227,28 @@
             <input id="set_stip" type="number" inputmode="decimal" placeholder="0">
           </div>
         </div>
+
         <div class="settings-field">
-          <label>Ore settimanali</label>
+          <label>Ore lavorate al giorno</label>
           <div class="amount-input-wrap">
             <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_ore" type="number" inputmode="decimal" placeholder="0">
+            <input id="set_ore" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
+
+        <div class="settings-field">
+          <label>Giorni di riposo settimanali</label>
+          <div class="day-picker" id="set_days">
+            <button class="day-btn" data-day="1" onclick="toggleDayBtn(this)">Lun</button>
+            <button class="day-btn" data-day="2" onclick="toggleDayBtn(this)">Mar</button>
+            <button class="day-btn" data-day="3" onclick="toggleDayBtn(this)">Mer</button>
+            <button class="day-btn" data-day="4" onclick="toggleDayBtn(this)">Gio</button>
+            <button class="day-btn" data-day="5" onclick="toggleDayBtn(this)">Ven</button>
+            <button class="day-btn" data-day="6" onclick="toggleDayBtn(this)">Sab</button>
+            <button class="day-btn" data-day="0" onclick="toggleDayBtn(this)">Dom</button>
+          </div>
+        </div>
+
         <div class="overtime-row" onclick="toggleOvertime()">
           <span>Straordinari questo mese (ore extra)</span>
           <span id="overtimeChevron" style="color:var(--blue);">+</span>
@@ -239,9 +256,10 @@
         <div id="overtimeField" style="display:none;">
           <div class="amount-input-wrap" style="margin-top:8px;">
             <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" style="margin-bottom:0;">
+            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" style="margin-bottom:0;" oninput="liveCalcPreview()">
           </div>
         </div>
+
         <div id="calcPreview" class="calc-preview"></div>
         <button class="btn-primary" onclick="saveSettings()">Salva</button>
       </div>
@@ -256,18 +274,19 @@
         </div>
         <div class="add-recurring-row">
           <div class="mini-cat-sel" onclick="toggleDropdown('rec_drop')">
-            <svg class="cat-svg-sm" viewBox="0 0 24 24" id="rec_icon"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span id="rec_emoji">🏠</span>
             <span id="rec_label">Casa</span>
             <div class="custom-dropdown" id="rec_drop">
-              <div class="custom-option" onclick="selectRecCat('Casa','<path d=\'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\'></path><polyline points=\'9 22 9 12 15 12 15 22\'></polyline>')">🏠 Casa</div>
-              <div class="custom-option" onclick="selectRecCat('Abbonamenti','<path d=\'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z\'></path>')">📦 Abbonamenti</div>
-              <div class="custom-option" onclick="selectRecCat('Trasporti','<rect x=\'1\' y=\'3\' width=\'15\' height=\'13\'></rect><circle cx=\'5.5\' cy=\'18.5\' r=\'2.5\'></circle><circle cx=\'18.5\' cy=\'18.5\' r=\'2.5\'></circle>')">🚗 Trasporti</div>
-              <div class="custom-option" onclick="selectRecCat('Salute','<path d=\'M22 12h-4l-3 9L9 3l-3 9H2\'></path>')">❤️ Salute</div>
-              <div class="custom-option" onclick="selectRecCat('Cibo','<circle cx=\'9\' cy=\'21\' r=\'1\'></circle><circle cx=\'20\' cy=\'21\' r=\'1\'></circle><path d=\'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6\'></path>')">🛒 Cibo</div>
+              <div class="custom-option" onclick="selectRecCat('Casa','🏠')">🏠 Casa</div>
+              <div class="custom-option" onclick="selectRecCat('Abbonamenti','📦')">📦 Abbonamenti</div>
+              <div class="custom-option" onclick="selectRecCat('Trasporti','🚗')">🚗 Trasporti</div>
+              <div class="custom-option" onclick="selectRecCat('Salute','❤️')">❤️ Salute</div>
+              <div class="custom-option" onclick="selectRecCat('Cibo','🛒')">🛒 Cibo</div>
+              <div class="custom-option" onclick="selectRecCat('Altro','💸')">💸 Altro</div>
             </div>
           </div>
-          <input id="rec_nota" placeholder="Nome" style="flex:1;">
-          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:70px;">
+          <input id="rec_nota" placeholder="Nome">
+          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:72px;flex-shrink:0;">
           <button class="icon-btn-add" onclick="saveRecurring()">+</button>
         </div>
         <div id="recurringList"></div>
@@ -277,31 +296,27 @@
       <div class="glass-card">
         <div class="card-title">Dati</div>
         <button class="settings-row-btn" onclick="exportCSV()">
-          <span>Esporta CSV</span>
-          <span class="row-chevron">›</span>
+          <span>Esporta CSV</span><span class="row-chevron">›</span>
         </button>
         <button class="settings-row-btn" onclick="exportBackup()">
-          <span>Esporta Backup JSON</span>
-          <span class="row-chevron">›</span>
+          <span>Esporta Backup JSON</span><span class="row-chevron">›</span>
         </button>
         <label class="settings-row-btn" style="cursor:pointer;">
-          <span>Importa Backup JSON</span>
-          <span class="row-chevron">›</span>
+          <span>Importa Backup JSON</span><span class="row-chevron">›</span>
           <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
         </label>
         <button class="settings-row-btn danger-btn" onclick="resetData()">
-          <span>Cancella tutti i dati</span>
-          <span class="row-chevron" style="color:var(--red);">›</span>
+          <span>Cancella tutti i dati</span><span class="row-chevron" style="color:var(--red);">›</span>
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- ─── BOTTOM TAB BAR ─── -->
+  <!-- TAB BAR -->
   <div class="tab-bar">
     <div class="tab-item active" onclick="showPage('page-home',this)">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Riepilogo</span>
     </div>
     <div class="tab-item" onclick="showPage('page-movimenti',this)">
@@ -313,7 +328,7 @@
       <span>Analisi</span>
     </div>
     <div class="tab-item" id="tabSettings" onclick="showPage('page-settings',this)">
-      <span id="settingsBadge" class="tab-badge" style="display:none;">!</span>
+      <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
       <span>Impostazioni</span>
     </div>
@@ -321,27 +336,19 @@
 
 </div><!-- /app -->
 
-<!-- ════════════════════════ MODAL INSERIMENTO ═════════════════════════════ -->
+<!-- ══════════════════════ MODAL ══════════════════════════ -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
 <div class="modal-sheet" id="modalSheet">
   <div class="modal-handle"></div>
-
-  <!-- Type toggle -->
   <div class="type-toggle">
     <button class="type-btn active" id="typeBtnUsc" onclick="setModalType('usc')">Uscita</button>
     <button class="type-btn" id="typeBtnInc" onclick="setModalType('inc')">Entrata</button>
   </div>
-
-  <!-- Amount -->
   <div class="modal-amount-row">
     <span class="modal-currency">€</span>
     <input id="modal_amount" class="modal-amount-input" type="number" inputmode="decimal" placeholder="0">
   </div>
-
-  <!-- Category pills -->
   <div class="cat-grid" id="catGrid"></div>
-
-  <!-- Confirm -->
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
 </div>
 
