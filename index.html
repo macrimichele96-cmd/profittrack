@@ -67,8 +67,8 @@
       <button class="nav-arrow" id="navRight" onclick="changeDate(1)">›</button>
     </div>
     <!-- Calendar dropdown for day view -->
-    <div class="day-calendar" id="dayCalendar"></div>
     <div class="cal-backdrop" id="calBackdrop" onclick="closeCalendar()"></div>
+    <div class="day-calendar" id="dayCalendar"></div>
   </div>
 
   <!-- ═══ PAGE: RIEPILOGO ═══ -->
@@ -360,20 +360,9 @@
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
 </div>
 
-<!-- Fixed recurring category overlay -->
-<div class="fixed-dropdown-backdrop" id="recDropBackdrop" onclick="closeRecDropdown()"></div>
-<div class="fixed-dropdown" id="recDropOverlay">
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Casa','🏠')">🏠 Casa</div>
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Abbonamenti','📦')">📦 Abbonamenti</div>
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Trasporti','🚗')">🚗 Trasporti</div>
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Salute','❤️')">❤️ Salute</div>
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Cibo','🛒')">🛒 Cibo</div>
-  <div class="fixed-dropdown-option" onclick="selectRecCat('Altro','💸')">💸 Altro</div>
-</div>
-
 <!-- Recurring category sheet -->
-<div class="modal-backdrop" id="recCatBackdrop" onclick="closeRecCatSheet()" style="display:none;opacity:0;pointer-events:none;"></div>
-<div class="modal-sheet" id="recCatSheet" style="transform:translateY(100%);">
+<div class="sheet-backdrop" id="recCatBackdrop" onclick="closeRecCatSheet()"></div>
+<div class="bottom-sheet" id="recCatSheet" style="transform:translateY(100%);">
   <div class="modal-handle"></div>
   <div style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center;">Categoria Spesa Fissa</div>
   <div class="rec-cat-grid">

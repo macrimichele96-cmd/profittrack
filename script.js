@@ -741,18 +741,16 @@ function renderGroupedList(income, expenses, k) {
 function openRecCatSheet() {
   const backdrop = document.getElementById('recCatBackdrop');
   const sheet    = document.getElementById('recCatSheet');
-  backdrop.style.display      = 'block';
-  backdrop.style.pointerEvents = 'all';
-  backdrop.style.opacity      = '1';
-  sheet.style.transform       = 'translateY(0)';
+  if (!backdrop || !sheet) return;
+  backdrop.classList.add('active');
+  sheet.classList.add('active');
 }
 function closeRecCatSheet() {
   const backdrop = document.getElementById('recCatBackdrop');
   const sheet    = document.getElementById('recCatSheet');
-  backdrop.style.opacity       = '0';
-  backdrop.style.pointerEvents = 'none';
-  sheet.style.transform        = 'translateY(100%)';
-  setTimeout(() => backdrop.style.display = 'none', 300);
+  if (!backdrop || !sheet) return;
+  backdrop.classList.remove('active');
+  sheet.classList.remove('active');
 }
 function selectRecCat(label, emoji) {
   currentRecCat = { label, emoji };
@@ -766,18 +764,34 @@ let calendarOpen = false;
 
 function toggleCalendar() {
   calendarOpen = !calendarOpen;
-  const cal = document.getElementById('dayCalendar');
+  const cal      = document.getElementById('dayCalendar');
+  const backdrop = document.getElementById('calBackdrop');
   if (calendarOpen) {
     buildCalendar();
-    cal.classList.add('active');
+    cal.style.display      = 'block';
+    backdrop.style.display = 'block';
+    // Force reflow then animate
+    cal.getBoundingClientRect();
+    cal.style.opacity    = '1';
+    cal.style.transform  = 'translateX(-50%) translateY(0)';
   } else {
-    cal.classList.remove('active');
+    cal.style.opacity   = '0';
+    cal.style.transform = 'translateX(-50%) translateY(-8px)';
+    backdrop.style.display = 'none';
+    setTimeout(() => { cal.style.display = 'none'; }, 200);
   }
 }
 
 function closeCalendar() {
   calendarOpen = false;
-  document.getElementById('dayCalendar').classList.remove('active');
+  const cal      = document.getElementById('dayCalendar');
+  const backdrop = document.getElementById('calBackdrop');
+  if (cal) {
+    cal.style.opacity   = '0';
+    cal.style.transform = 'translateX(-50%) translateY(-8px)';
+    setTimeout(() => { cal.style.display = 'none'; }, 200);
+  }
+  if (backdrop) backdrop.style.display = 'none';
 }
 
 function buildCalendar() {
