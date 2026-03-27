@@ -177,19 +177,9 @@ function cycleViewMode() {
   if      (viewMode === 'month') viewMode = 'year';
   else if (viewMode === 'year')  viewMode = 'day';
   else                           viewMode = 'month';
-  // Quando si entra in vista giorno, porta al giorno di oggi
   if (viewMode === 'day') currentView = new Date();
+  closeCalendar();
   render();
-  // Apri subito il calendario quando si entra in vista giorno
-  if (viewMode === 'day') setTimeout(() => toggleCalendar(), 150);
-}
-
-function onDatePillTap() {
-  if (viewMode === 'day') {
-    toggleCalendar();
-  } else {
-    cycleViewMode();
-  }
 }
 
 function changeDate(dir) {
@@ -746,6 +736,31 @@ function renderGroupedList(income, expenses, k) {
 }
 
 
+
+// ─── RECURRING CATEGORY SHEET ─────────────────────────────────────────────
+function openRecCatSheet() {
+  const backdrop = document.getElementById('recCatBackdrop');
+  const sheet    = document.getElementById('recCatSheet');
+  backdrop.style.display      = 'block';
+  backdrop.style.pointerEvents = 'all';
+  backdrop.style.opacity      = '1';
+  sheet.style.transform       = 'translateY(0)';
+}
+function closeRecCatSheet() {
+  const backdrop = document.getElementById('recCatBackdrop');
+  const sheet    = document.getElementById('recCatSheet');
+  backdrop.style.opacity       = '0';
+  backdrop.style.pointerEvents = 'none';
+  sheet.style.transform        = 'translateY(100%)';
+  setTimeout(() => backdrop.style.display = 'none', 300);
+}
+function selectRecCat(label, emoji) {
+  currentRecCat = { label, emoji };
+  document.getElementById('rec_label').textContent = label;
+  document.getElementById('rec_emoji').textContent = emoji;
+  closeRecCatSheet();
+}
+
 // ─── CALENDARIO GIORNALIERO ───────────────────────────────────────────────
 let calendarOpen = false;
 
@@ -946,12 +961,15 @@ function render() {
   document.getElementById('dateLabel').textContent = dateStr;
   const vb = document.getElementById('viewBadge');
   if (viewMode === 'day') {
-    vb.textContent = 'GIORNO · TAP = CALENDARIO';
+    vb.textContent = 'GIORNO';
   } else if (viewMode === 'year') {
     vb.textContent = 'ANNO';
   } else {
     vb.textContent = 'MESE';
   }
+  // Mostra il pulsante calendario solo in vista giorno
+  const calBtn = document.getElementById('calOpenBtn');
+  if (calBtn) calBtn.style.display = viewMode === 'day' ? 'flex' : 'none';
 
   // ── Hero
   document.getElementById('heroAmount').textContent = `${net < 0 ? '−' : ''}€${fmt(net)}`;

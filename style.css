@@ -574,3 +574,43 @@ input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
 
 /* Day view: arrows become week-skip buttons */
 .nav-arrow { font-size: 26px; padding: 4px 12px; }
+
+/* ─── CAL OPEN BUTTON (vista giorno) ─── */
+.cal-open-btn {
+  background: rgba(10,132,255,.12); border: none; border-radius: 10px;
+  color: var(--blue); font-size: 18px; padding: 4px 8px;
+  cursor: pointer; display: flex; align-items: center;
+  -webkit-tap-highlight-color: transparent;
+  position: absolute; right: 16px;
+}
+
+/* ─── REC CAT BUTTON ─── */
+.rec-cat-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--glass2); border: .5px solid var(--border);
+  border-radius: 10px; padding: 10px 10px;
+  font-size: 13px; color: var(--text); cursor: pointer;
+  white-space: nowrap; flex-shrink: 0; font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.rec-cat-btn:active { opacity: .7; }
+
+/* ─── REC CAT GRID ─── */
+.rec-cat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  padding-bottom: 8px;
+}
+.rec-cat-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--glass2); border: .5px solid var(--border);
+  border-radius: 14px; padding: 14px 8px; cursor: pointer;
+  font-family: inherit; color: var(--text);
+  font-size: 22px; transition: background .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rec-cat-option span { font-size: 12px; font-weight: 600; color: var(--sub); }
+.rec-cat-option:active { background: rgba(10,132,255,.12); }
+
+/* ─── REC CAT SHEET transition ─── */
+#recCatSheet { transition: transform .32s cubic-bezier(.32,1,.23,1); }
+#recCatBackdrop { transition: opacity .25s ease; }

@@ -60,9 +60,9 @@
   <div class="top-nav">
     <div class="top-nav-inner">
       <button class="nav-arrow" id="navLeft" onclick="changeDate(-1)">‹</button>
-      <div class="date-pill" onclick="onDatePillTap()">
-        <span id="dateLabel"></span>
-        <span id="viewBadge" class="view-badge"></span>
+      <div class="date-pill">
+        <span id="dateLabel" onclick="onDateLabelTap()"></span>
+        <span id="viewBadge" class="view-badge" onclick="cycleViewMode()"></span>
       </div>
       <button class="nav-arrow" id="navRight" onclick="changeDate(1)">›</button>
     </div>
@@ -280,20 +280,13 @@
           <button class="pill-btn" onclick="applyRecurring()">Applica</button>
         </div>
         <div class="add-recurring-row">
-          <div class="mini-cat-sel" onclick="toggleDropdown('rec_drop')">
+          <button class="rec-cat-btn" onclick="openRecCatSheet()">
             <span id="rec_emoji">🏠</span>
             <span id="rec_label">Casa</span>
-            <div class="custom-dropdown" id="rec_drop">
-              <div class="custom-option" onclick="selectRecCat('Casa','🏠')">🏠 Casa</div>
-              <div class="custom-option" onclick="selectRecCat('Abbonamenti','📦')">📦 Abbonamenti</div>
-              <div class="custom-option" onclick="selectRecCat('Trasporti','🚗')">🚗 Trasporti</div>
-              <div class="custom-option" onclick="selectRecCat('Salute','❤️')">❤️ Salute</div>
-              <div class="custom-option" onclick="selectRecCat('Cibo','🛒')">🛒 Cibo</div>
-              <div class="custom-option" onclick="selectRecCat('Altro','💸')">💸 Altro</div>
-            </div>
-          </div>
-          <input id="rec_nota" placeholder="Nome">
-          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:72px;flex-shrink:0;">
+            <span style="font-size:10px;color:var(--sub);margin-left:2px;">▾</span>
+          </button>
+          <input id="rec_nota" placeholder="Nome" style="flex:1;min-width:0;">
+          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:64px;flex-shrink:0;">
           <button class="icon-btn-add" onclick="saveRecurring()">+</button>
         </div>
         <div id="recurringList"></div>
@@ -367,6 +360,37 @@
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
 </div>
 
+<!-- Fixed recurring category overlay -->
+<div class="fixed-dropdown-backdrop" id="recDropBackdrop" onclick="closeRecDropdown()"></div>
+<div class="fixed-dropdown" id="recDropOverlay">
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Casa','🏠')">🏠 Casa</div>
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Abbonamenti','📦')">📦 Abbonamenti</div>
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Trasporti','🚗')">🚗 Trasporti</div>
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Salute','❤️')">❤️ Salute</div>
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Cibo','🛒')">🛒 Cibo</div>
+  <div class="fixed-dropdown-option" onclick="selectRecCat('Altro','💸')">💸 Altro</div>
+</div>
+
+<!-- Recurring category sheet -->
+<div class="modal-backdrop" id="recCatBackdrop" onclick="closeRecCatSheet()" style="display:none;opacity:0;pointer-events:none;"></div>
+<div class="modal-sheet" id="recCatSheet" style="transform:translateY(100%);">
+  <div class="modal-handle"></div>
+  <div style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center;">Categoria Spesa Fissa</div>
+  <div class="rec-cat-grid">
+    <button class="rec-cat-option" onclick="selectRecCat('Casa','🏠')">🏠<span>Casa</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Affitto','🏠')">🏠<span>Affitto</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Abbonamenti','📦')">📦<span>Abbonamenti</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Netflix','📺')">📺<span>Netflix</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Spotify','🎵')">🎵<span>Spotify</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Trasporti','🚗')">🚗<span>Trasporti</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Assicurazione','🛡️')">🛡️<span>Assicurazione</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Salute','❤️')">❤️<span>Salute</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Palestra','💪')">💪<span>Palestra</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Telefono','📱')">📱<span>Telefono</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Internet','🌐')">🌐<span>Internet</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Altro','💸')">💸<span>Altro</span></button>
+  </div>
+</div>
 <script src="script.js"></script>
 </body>
 </html>
