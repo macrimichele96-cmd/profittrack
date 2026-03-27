@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<!-- ══════════════════════ ONBOARDING ══════════════════════ -->
+<!-- ══ ONBOARDING ══ -->
 <div id="onboarding" class="onboarding-overlay" style="display:none;">
   <div class="onboarding-card">
     <div class="onboarding-icon">💰</div>
@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Giorni di riposo</label>
+        <label>Giorni di riposo settimanali</label>
         <div class="day-picker" id="ob_days">
           <button class="day-btn" data-day="1">Lun</button>
           <button class="day-btn" data-day="2">Mar</button>
@@ -53,25 +53,29 @@
   </div>
 </div>
 
-<!-- ══════════════════════ APP ══════════════════════════════ -->
+<!-- ══ APP ══ -->
 <div id="app" style="display:none;">
 
   <!-- TOP NAV -->
   <div class="top-nav">
     <div class="top-nav-inner">
-      <button class="nav-arrow" id="navLeft" onclick="changeDate(-1)">‹</button>
-      <div class="date-pill">
-        <span id="dateLabel" onclick="onDateLabelTap()"></span>
-        <span id="viewBadge" class="view-badge" onclick="cycleViewMode()"></span>
+      <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
+
+      <!-- Tap sul titolo = cicla MESE/ANNO. In vista GIORNO: tap = calendario -->
+      <div class="date-pill" onclick="handleDatePillTap()">
+        <span id="dateLabel"></span>
+        <span id="viewBadge" class="view-badge"></span>
       </div>
-      <button class="nav-arrow" id="navRight" onclick="changeDate(1)">›</button>
+
+      <button class="nav-arrow" onclick="changeDate(1)">›</button>
     </div>
-    <!-- Calendar dropdown for day view -->
+
+    <!-- Calendario dropdown (visibile solo in vista GIORNO) -->
     <div class="cal-backdrop" id="calBackdrop" onclick="closeCalendar()"></div>
     <div class="day-calendar" id="dayCalendar"></div>
   </div>
 
-  <!-- ═══ PAGE: RIEPILOGO ═══ -->
+  <!-- ═══ RIEPILOGO ═══ -->
   <div id="page-home" class="page active">
 
     <div class="hero-section">
@@ -81,9 +85,7 @@
         <div class="hero-sub" id="heroSub"></div>
         <div class="hero-trend" id="heroTrend" style="display:none;"></div>
         <div class="hero-bar-wrap">
-          <div class="hero-bar-track">
-            <div class="hero-bar-fill" id="heroBar"></div>
-          </div>
+          <div class="hero-bar-track"><div class="hero-bar-fill" id="heroBar"></div></div>
           <span class="hero-bar-label" id="heroBarLabel">0% speso</span>
         </div>
       </div>
@@ -110,24 +112,29 @@
         <span class="stat-chip-icon" style="color:var(--orange)">⏱</span>
         <div>
           <div class="stat-chip-val" id="statOra" style="color:var(--orange)">€0</div>
-          <div class="stat-chip-lab" id="statOraLab">Tua Ora</div>
+          <div class="stat-chip-lab">Tua Ora</div>
         </div>
       </div>
     </div>
 
-    <!-- Spend today — solo vista giornaliera/mensile -->
-    <div id="spendTodayCard" class="spend-today-card" style="display:none;">
-      <div class="spend-today-label" id="spendTodayLabel">💡 Puoi ancora spendere oggi</div>
-      <div class="spend-today-amount" id="spendTodayAmt">€0</div>
-      <div class="spend-today-sub" id="spendTodaySub"></div>
+    <!-- Safe-to-Spend predittivo -->
+    <div id="safeSpendCard" class="safe-spend-card" style="display:none;">
+      <div class="safe-spend-label">💡 Disponibilità Reale</div>
+      <div class="safe-spend-amount" id="safeSpendAmt">€0</div>
+      <div class="safe-spend-sub" id="safeSpendSub"></div>
     </div>
 
     <!-- Positive feedback -->
     <div id="positiveBanner" class="positive-banner" style="display:none;"></div>
 
-    <!-- Day worked indicator (solo vista giorno) -->
+    <!-- Day worked indicator -->
     <div id="dayWorkedCard" class="day-worked-card" style="display:none;">
       <span id="dayWorkedText"></span>
+    </div>
+
+    <!-- Update banner (SW) -->
+    <div id="updateBanner" class="update-banner" style="display:none;">
+      🆕 Nuova versione disponibile — <button onclick="applyUpdate()">Aggiorna</button>
     </div>
 
     <div class="section-header">
@@ -137,11 +144,13 @@
     <div class="recent-list" id="recentList"></div>
 
     <button class="fab" onclick="openModal()">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
     </button>
   </div>
 
-  <!-- ═══ PAGE: MOVIMENTI ═══ -->
+  <!-- ═══ MOVIMENTI ═══ -->
   <div id="page-movimenti" class="page">
     <div class="page-scroll">
       <div class="glass-card" id="pieSection" style="display:none;">
@@ -156,35 +165,34 @@
           <span class="card-title">Entrate</span>
           <span id="movIncLabel" class="card-badge green-badge"></span>
         </div>
-        <div id="incomeList"><div class="empty-state">Nessuna entrata</div></div>
+        <div id="incomeList"></div>
       </div>
       <div class="glass-card">
         <div class="card-title-row">
           <span class="card-title">Uscite</span>
           <span id="movOutLabel" class="card-badge red-badge"></span>
         </div>
-        <div id="expenseList"><div class="empty-state">Nessuna uscita</div></div>
+        <div id="expenseList"></div>
       </div>
     </div>
     <button class="fab" onclick="openModal()">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
     </button>
   </div>
 
-  <!-- ═══ PAGE: ANALISI ═══ -->
+  <!-- ═══ ANALISI ═══ -->
   <div id="page-analisi" class="page">
     <div class="page-scroll">
-
       <div class="glass-card">
         <div class="card-title">Storico 12 Mesi</div>
         <div id="historyChart"></div>
         <div id="historyLegend"></div>
       </div>
-
       <div class="glass-card">
         <div class="card-title">Analisi Finanziaria</div>
         <div id="avgInfoBox" class="avg-box"></div>
-
         <div class="analysis-section">
           <div class="analysis-label">🛍 Deterrente Acquisto</div>
           <p class="analysis-desc">Quanto lavoro vale questo acquisto?</p>
@@ -195,9 +203,7 @@
           <button class="btn-secondary btn-orange-tint" onclick="validaAcquisto()">Ne vale la pena?</button>
           <div id="detOut" class="analysis-result orange-result" style="display:none;"></div>
         </div>
-
         <div class="section-divider"></div>
-
         <div class="analysis-section">
           <div class="analysis-label">🎯 Obiettivo di Risparmio</div>
           <p class="analysis-desc">Quanto devi mettere da parte ogni mese?</p>
@@ -213,20 +219,16 @@
           <div id="objOut" class="analysis-result green-result" style="display:none;"></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ═══ PAGE: IMPOSTAZIONI ═══ -->
+  <!-- ═══ IMPOSTAZIONI ═══ -->
   <div id="page-settings" class="page">
     <div class="page-scroll">
 
       <div class="glass-card" id="settingsCard">
         <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
-
-        <!-- Stipendio: va sul mese corrente (è il pagamento per il lavoro del mese precedente) -->
         <div class="salary-info-row" id="salaryInfoRow"></div>
-
         <div class="settings-field">
           <label>Stipendio ricevuto questo mese</label>
           <div class="amount-input-wrap">
@@ -234,7 +236,6 @@
             <input id="set_stip" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
-
         <div class="settings-field">
           <label>Ore lavorate al giorno</label>
           <div class="amount-input-wrap">
@@ -242,7 +243,6 @@
             <input id="set_ore" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
-
         <div class="settings-field">
           <label>Giorni di riposo settimanali</label>
           <div class="day-picker" id="set_days">
@@ -255,7 +255,6 @@
             <button class="day-btn" data-day="0" onclick="toggleDayBtn(this)">Dom</button>
           </div>
         </div>
-
         <div class="overtime-row" onclick="toggleOvertime()">
           <span>Straordinari questo mese (ore extra)</span>
           <span id="overtimeChevron" style="color:var(--blue);">+</span>
@@ -263,15 +262,13 @@
         <div id="overtimeField" style="display:none;">
           <div class="amount-input-wrap" style="margin-top:8px;">
             <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" style="margin-bottom:0;" oninput="liveCalcPreview()">
+            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
-
         <div id="calcPreview" class="calc-preview"></div>
         <button class="btn-primary" onclick="saveSettings()">Salva</button>
       </div>
 
-      <!-- Spese fisse -->
       <div class="glass-card">
         <div class="card-title">Spese Fisse</div>
         <p class="card-desc">Affitto, abbonamenti... aggiungili una volta e applicali ogni mese con un tap.</p>
@@ -283,7 +280,7 @@
           <button class="rec-cat-btn" onclick="openRecCatSheet()">
             <span id="rec_emoji">🏠</span>
             <span id="rec_label">Casa</span>
-            <span style="font-size:10px;color:var(--sub);margin-left:2px;">▾</span>
+            <span class="rec-cat-chevron">▾</span>
           </button>
           <input id="rec_nota" placeholder="Nome" style="flex:1;min-width:0;">
           <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:64px;flex-shrink:0;">
@@ -292,7 +289,6 @@
         <div id="recurringList"></div>
       </div>
 
-      <!-- Dati -->
       <div class="glass-card">
         <div class="card-title">Dati</div>
         <button class="settings-row-btn" onclick="exportCSV()">
@@ -327,13 +323,13 @@
       </div>
       <span>Movimenti</span>
     </div>
-    <div class="tab-item" id="tabAnalisi" onclick="showPage('page-analisi',this)">
+    <div class="tab-item" onclick="showPage('page-analisi',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       </div>
       <span>Analisi</span>
     </div>
-    <div class="tab-item" id="tabSettings" onclick="showPage('page-settings',this)">
+    <div class="tab-item" onclick="showPage('page-settings',this)">
       <div class="tab-icon-wrap">
         <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
@@ -344,7 +340,9 @@
 
 </div><!-- /app -->
 
-<!-- ══════════════════════ MODAL ══════════════════════════ -->
+<!-- ══ MODALS ══ -->
+
+<!-- Entry modal -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
 <div class="modal-sheet" id="modalSheet">
   <div class="modal-handle"></div>
@@ -354,20 +352,22 @@
   </div>
   <div class="modal-amount-row">
     <span class="modal-currency">€</span>
-    <input id="modal_amount" class="modal-amount-input" type="number" inputmode="decimal" placeholder="0">
+    <input id="modal_amount" class="modal-amount-input" type="number" inputmode="decimal" placeholder="0" oninput="onModalAmountInput()">
   </div>
+  <!-- Time deterrent (shown live for expenses) -->
+  <div id="timeDeterrent" class="time-deterrent" style="display:none;"></div>
   <div class="cat-grid" id="catGrid"></div>
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
 </div>
 
 <!-- Recurring category sheet -->
 <div class="sheet-backdrop" id="recCatBackdrop" onclick="closeRecCatSheet()"></div>
-<div class="bottom-sheet" id="recCatSheet" style="transform:translateY(100%);">
+<div class="bottom-sheet" id="recCatSheet">
   <div class="modal-handle"></div>
-  <div style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center;">Categoria Spesa Fissa</div>
+  <div class="bottom-sheet-title">Categoria Spesa Fissa</div>
   <div class="rec-cat-grid">
     <button class="rec-cat-option" onclick="selectRecCat('Casa','🏠')">🏠<span>Casa</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Affitto','🏠')">🏠<span>Affitto</span></button>
+    <button class="rec-cat-option" onclick="selectRecCat('Affitto','🏡')">🏡<span>Affitto</span></button>
     <button class="rec-cat-option" onclick="selectRecCat('Abbonamenti','📦')">📦<span>Abbonamenti</span></button>
     <button class="rec-cat-option" onclick="selectRecCat('Netflix','📺')">📺<span>Netflix</span></button>
     <button class="rec-cat-option" onclick="selectRecCat('Spotify','🎵')">🎵<span>Spotify</span></button>
@@ -380,6 +380,7 @@
     <button class="rec-cat-option" onclick="selectRecCat('Altro','💸')">💸<span>Altro</span></button>
   </div>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
