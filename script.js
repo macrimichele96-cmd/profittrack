@@ -259,8 +259,11 @@ function openCalendar() {
   const bd  = document.getElementById('calBackdrop');
   cal.style.display = 'block';
   bd.style.display  = 'block';
+  // Double rAF ensures iOS Safari applies display:block before transition
   requestAnimationFrame(() => {
-    cal.classList.add('open');
+    requestAnimationFrame(() => {
+      cal.classList.add('open');
+    });
   });
 }
 
@@ -574,7 +577,7 @@ function renderRecurringList() {
     <div class="rec-row">
       <span class="rec-emoji">${r.emoji||'📌'}</span>
       <span class="rec-name">${r.nome}</span>
-      <span class="rec-amt">€${r.imp.toFixed(0)}</span>
+      <span class="rec-amt">€${fmtAmt(r.imp)}</span>
       <button class="del-btn-sm" onclick="deleteRecurring(${r.id})">✕</button>
     </div>`).join('') +
     `<div class="rec-total">Totale fisso €${tot.toFixed(0)}/mese</div>`;
@@ -757,7 +760,19 @@ function swipeEnd(e,id,type,k){
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
 function shakeEl(id){const el=document.getElementById(id);if(!el)return;el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),500);}
-function fmt(n){return Math.abs(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function fmt(n) {
+  const abs = Math.abs(n);
+  // Mostra decimali solo se ci sono centesimi significativi
+  const hasDecimals = (abs % 1) >= 0.005;
+  const formatted = hasDecimals ? abs.toFixed(2) : abs.toFixed(0);
+  return formatted.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function fmtAmt(n) {
+  // Per importi nelle liste: mostra sempre 2 decimali se non intero
+  const abs = Math.abs(n);
+  const hasDecimals = (abs % 1) >= 0.005;
+  return hasDecimals ? abs.toFixed(2) : abs.toFixed(0);
+}
 
 function emptyState(msg) {
   return `<div class="empty-state-box">
@@ -787,22 +802,25 @@ function groupByDate(items){
 }
 
 function renderRow(item,type,k){
-  const id=item.id;
-  return`<div class="tx-swipe-wrap" id="wrap_${id}">
+  const id    = item.id;
+  const color = item.color || '#8E8E93';
+  // Show category name if nome == cat (no custom name), else show custom name
+  const label = (item.nome && item.nome !== item.cat) ? item.nome : item.cat;
+  return `<div class="tx-swipe-wrap" id="wrap_${id}">
     <div class="tx-delete-bg" id="delbg_${id}">Elimina</div>
     <div class="tx-row-inner"
       ontouchstart="swipeStart(event,${id})"
       ontouchmove="swipeMove(event,${id})"
       ontouchend="swipeEnd(event,${id},'${type}','${k}')"
       id="inner_${id}">
-      <div class="tx-emoji" style="background:${item.color||'#8e8e93'}22;">${item.emoji||'💸'}</div>
+      <div class="tx-emoji" style="background:linear-gradient(135deg,${color}30 0%,${color}18 100%);">${item.emoji||'💸'}</div>
       <div class="tx-info">
-        <span class="tx-cat">${item.nome||item.cat}</span>
-        <span class="tx-sub">${item.cat}</span>
+        <span class="tx-cat">${label}</span>
+        <span class="tx-sub" style="color:${color}cc;">${item.cat}</span>
       </div>
       <div class="tx-right">
         <span class="tx-amt" style="color:${type==='usc'?'var(--red)':'var(--green)'}">
-          ${type==='usc'?'−':'+'} €${item.imp.toFixed(0)}
+          ${type==='usc'?'−':'+'} €${fmtAmt(item.imp)}
         </span>
       </div>
     </div>
@@ -912,9 +930,13 @@ function render(){
     vb.title='Tocca per cambiare vista';
   }
   // Mostra pulsante calendario solo se siamo in vista giorno o mese
+  // Cal picker button: visible in MESE and GIORNO view
   const calBtn = document.getElementById('calPickerBtn');
-  if(calBtn){
-    calBtn.style.display = (viewMode==='day'||viewMode==='month') ? 'flex' : 'none';
+  if (calBtn) {
+    const showCal = (viewMode === 'day' || viewMode === 'month');
+    calBtn.style.display  = showCal ? 'flex' : 'none';
+    calBtn.style.opacity  = showCal ? '1' : '0';
+    calBtn.style.pointerEvents = showCal ? 'auto' : 'none';
   }
 
   // Hero
