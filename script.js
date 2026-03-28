@@ -205,21 +205,33 @@ function showPage(pageId, el) {
 }
 
 // Tap sul date-pill:
-// - vista GIORNO → apre/chiude il calendario
-// - vista MESE   → passa ad ANNO
-// - vista ANNO   → passa a GIORNO (poi apre calendario)
+// Tap sul titolo data: cicla sempre GIORNO→MESE→ANNO→GIORNO
+// Il calendario si apre con il pulsante 📅 che appare solo in vista giorno
 function handleDatePillTap() {
   if (viewMode === 'day') {
-    toggleCalendar();
+    viewMode = 'month';
+    // Resetta al primo del mese corrente
+    currentView.setDate(1);
+    closeCalendar();
+    render();
   } else if (viewMode === 'month') {
     viewMode = 'year';
+    currentView.setDate(1);
     render();
-  } else { // year
-    viewMode = 'day';
-    currentView = new Date();
+  } else { // year → torna a month (non a day direttamente)
+    viewMode = 'month';
+    currentView = new Date(); // torna al mese corrente
+    currentView.setDate(1);
     render();
-    setTimeout(() => toggleCalendar(), 120);
   }
+}
+
+// Apre il calendario per scegliere un giorno specifico
+function openDayPicker() {
+  viewMode = 'day';
+  currentView = new Date();
+  render();
+  setTimeout(() => openCalendar(), 60);
 }
 
 function changeDate(dir) {
@@ -269,7 +281,12 @@ function buildCalendar() {
   const restDays = gSettings.restDays || [0,6];
   const k = monthKey(y, m);
 
-  let html = `<div class="cal-nav">
+  let html = `<div class="cal-header-actions">
+    <button class="cal-view-btn" onclick="switchToMonthView()">Mese</button>
+    <button class="cal-view-btn" onclick="switchToYearView()">Anno</button>
+    <button class="cal-close-btn" onclick="closeCalendar()">✕</button>
+  </div>
+  <div class="cal-nav">
     <button onclick="calShiftMonth(-1)">‹</button>
     <span>${MONTH_FULL[m]} ${y}</span>
     <button onclick="calShiftMonth(1)">›</button>
@@ -313,6 +330,23 @@ function selectCalDay(y, m, d) {
   currentView = new Date(y, m, d);
   viewMode = 'day';
   closeCalendar();
+  render();
+}
+
+function switchToMonthView() {
+  const calY = currentView.getFullYear();
+  const calM = currentView.getMonth();
+  closeCalendar();
+  viewMode = 'month';
+  currentView = new Date(calY, calM, 1);
+  render();
+}
+
+function switchToYearView() {
+  const calY = currentView.getFullYear();
+  closeCalendar();
+  viewMode = 'year';
+  currentView = new Date(calY, 0, 1);
   render();
 }
 
@@ -868,8 +902,19 @@ function render(){
   document.getElementById('dateLabel').textContent=dateStr;
   const vb=document.getElementById('viewBadge');
   if(vb){
-    vb.textContent=viewMode==='day'?'GIORNO':viewMode==='year'?'ANNO':'MESE';
-    vb.title=viewMode==='day'?'Tocca per il calendario':'Tocca per cambiare vista';
+    if(viewMode==='day'){
+      vb.textContent='GIORNO · ↑ MESE';
+    } else if(viewMode==='year'){
+      vb.textContent='ANNO · ↑ MESE';
+    } else {
+      vb.textContent='MESE · ↑ ANNO';
+    }
+    vb.title='Tocca per cambiare vista';
+  }
+  // Mostra pulsante calendario solo se siamo in vista giorno o mese
+  const calBtn = document.getElementById('calPickerBtn');
+  if(calBtn){
+    calBtn.style.display = (viewMode==='day'||viewMode==='month') ? 'flex' : 'none';
   }
 
   // Hero
