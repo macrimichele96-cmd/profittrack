@@ -231,7 +231,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   backdrop-filter:blur(28px) saturate(1.3);-webkit-backdrop-filter:blur(28px) saturate(1.3);
   border-top:.5px solid var(--border);
   display:flex;justify-content:space-around;align-items:flex-end;
-  padding:10px 0 calc(12px + env(safe-area-inset-bottom));
+  padding:8px 0 max(env(safe-area-inset-bottom), 12px);
   z-index:999;
 }
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;color:var(--sub);cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;transition:color .2s;}
@@ -246,26 +246,56 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 /* ─── MODAL ─── */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:599;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .modal-backdrop.active{opacity:1;pointer-events:all;}
+/* ─── MODAL — struttura a 3 zone fisse ─── */
 .modal-sheet{
   position:fixed;bottom:0;left:0;width:100%;z-index:600;
   background:var(--card-bg);
   border-top-left-radius:26px;border-top-right-radius:26px;
-  padding:12px 20px calc(var(--tab-h) + 20px);
   transform:translateY(100%);
   transition:transform .38s cubic-bezier(.32,1,.23,1);
   box-shadow:0 -2px 0 rgba(255,255,255,.06) inset, 0 -16px 60px rgba(0,0,0,.40);
-  max-height:90vh;overflow-y:auto;
+  height:88vh; max-height:88vh;
+  display:flex; flex-direction:column; overflow:hidden;
 }
 .modal-sheet.active{transform:translateY(0);}
-.modal-handle{width:40px;height:5px;background:var(--sub2);border-radius:3px;margin:0 auto 20px;}
-.type-toggle{display:flex;background:var(--card-bg2);border-radius:12px;padding:3px;margin-bottom:20px;}
-.type-btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:15px;font-weight:600;background:transparent;color:var(--sub);cursor:pointer;transition:background .2s,color .2s;font-family:inherit;}
+
+/* TOP: handle · close · toggle · importo */
+.modal-top{ flex-shrink:0; padding:12px 20px 0; }
+.modal-handle-row{
+  display:flex; align-items:center; justify-content:center;
+  position:relative; margin-bottom:14px;
+}
+.modal-handle{width:40px;height:5px;background:var(--sub2);border-radius:3px;}
+.modal-close-btn{
+  position:absolute; right:0; top:50%; transform:translateY(-50%);
+  background:var(--glass2); border:.5px solid var(--border);
+  color:var(--sub); font-size:15px; font-weight:700;
+  width:30px; height:30px; border-radius:15px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:background .15s; font-family:inherit;
+}
+.modal-close-btn:active{background:rgba(142,142,147,.25);}
+.type-toggle{display:flex;background:var(--card-bg2);border-radius:12px;padding:3px;margin-bottom:10px;}
+.type-btn{flex:1;padding:8px;border:none;border-radius:10px;font-size:15px;font-weight:600;background:transparent;color:var(--sub);cursor:pointer;transition:background .2s,color .2s;font-family:inherit;-webkit-tap-highlight-color:transparent;}
 .type-btn.active{background:var(--card-bg);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.2);}
-.modal-amount-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;padding:0 4px;}
-.modal-currency{font-size:38px;font-weight:300;color:var(--sub);line-height:1;}
-.modal-amount-input{flex:1;background:none;border:none;outline:none;font-size:52px;font-weight:700;letter-spacing:-2px;color:var(--text);font-family:inherit;-webkit-appearance:none;padding:0;}
-@media (min-height:750px){.modal-amount-input{font-size:60px;}}
-.modal-amount-input::placeholder{color:var(--sub2);}
+.modal-amount-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;padding:0 4px;min-height:54px;}
+.modal-currency{font-size:34px;font-weight:300;color:var(--sub);line-height:1;flex-shrink:0;}
+
+/* MEZZO: categorie scrollabili */
+.modal-scroll{
+  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:4px 20px 6px; min-height:0;
+}
+
+/* BOTTOM: numpad + conferma — sempre visibili */
+.modal-bottom{
+  flex-shrink:0;
+  padding:6px 16px calc(env(safe-area-inset-bottom) + 8px);
+  background:var(--card-bg);
+  border-top:.5px solid var(--border2);
+}
+
 
 /* ─── TIME DETERRENT ─── */
 .time-deterrent{font-size:13px;font-weight:600;text-align:center;padding:8px 12px;border-radius:10px;margin-bottom:12px;color:var(--sub);background:var(--glass2);}
@@ -273,10 +303,10 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .td-red{color:var(--red);background:rgba(255,69,58,.12);}
 
 /* ─── CAT GRID ─── */
-.cat-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+.cat-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
 .cat-pill{
   display:flex;align-items:center;gap:7px;
-  padding:10px 15px;border-radius:22px;
+  padding:8px 12px;border-radius:20px;
   border:1.5px solid var(--border);
   background:var(--glass2);
   color:var(--text);font-size:14px;font-weight:500;
@@ -288,7 +318,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .cat-pill.active{background:color-mix(in srgb,var(--cat-color) 18%,transparent);border-color:var(--cat-color);color:var(--cat-color);}
 .cat-pill:active{transform:scale(.95);}
 .cat-pill-emoji{font-size:16px;}
-.modal-confirm-btn{margin-top:0;}
+.modal-confirm-btn{margin-top:0;padding:14px;font-size:16px;}
 .btn-green{background:var(--green)!important;}
 
 /* ─── BUTTONS ─── */
@@ -450,7 +480,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .account-scroll {
   flex: 1; display: flex; gap: 8px;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; padding-bottom: 2px;
+  scrollbar-width: none; padding-bottom: 2px; padding-right:8px;
 }
 .account-scroll::-webkit-scrollbar { display: none; }
 .acc-chip {
@@ -555,10 +585,10 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 /* ─── NUMPAD ─── */
 .numpad {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; margin: 12px 0 16px;
+  gap: 7px; margin: 4px 0 8px;
 }
 .np-btn {
-  height: 58px; border-radius: 14px;
+  height: 50px; border-radius: 13px;
   background: var(--glass2); border: .5px solid var(--border);
   color: var(--text); font-size: 24px; font-weight: 500;
   cursor: pointer; font-family: inherit;
