@@ -49,7 +49,7 @@
       </div>
     </div>
     <button class="btn-primary" onclick="completeOnboarding()">Inizia →</button>
-    <p class="onboarding-note">Potrai modificare tutto in qualsiasi momento da Impostazioni.</p>
+    <p class="onboarding-note">Potrai modificare tutto da Impostazioni.</p>
   </div>
 </div>
 
@@ -60,26 +60,27 @@
   <div class="top-nav">
     <div class="top-nav-inner">
       <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
-
-      <!-- Tap = cicla viste. Pulsante 📅 = apri/chiudi calendario -->
       <div class="date-pill" onclick="handleDatePillTap()">
         <span id="dateLabel"></span>
         <span id="viewBadge" class="view-badge"></span>
       </div>
-      <button id="calPickerBtn" class="cal-picker-btn" onclick="toggleCalendar()" style="display:none;" title="Calendario">
+      <button id="calPickerBtn" class="cal-picker-btn" onclick="toggleCalendar()" style="display:none;">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/></svg>
       </button>
-
       <button class="nav-arrow" onclick="changeDate(1)">›</button>
     </div>
-
-    <!-- Calendario dropdown (visibile solo in vista GIORNO) -->
     <div class="cal-backdrop" id="calBackdrop" onclick="closeCalendar()"></div>
     <div class="day-calendar" id="dayCalendar"></div>
   </div>
 
   <!-- ═══ RIEPILOGO ═══ -->
   <div id="page-home" class="page active">
+
+    <!-- Account selector bar -->
+    <div class="account-bar" id="accountBar">
+      <div class="account-scroll" id="accountScroll"></div>
+      <button class="account-add-btn" onclick="openAccountSheet()">+</button>
+    </div>
 
     <div class="hero-section">
       <div class="hero-card">
@@ -120,25 +121,15 @@
       </div>
     </div>
 
-    <!-- Safe-to-Spend predittivo -->
     <div id="safeSpendCard" class="safe-spend-card" style="display:none;">
       <div class="safe-spend-label">💡 Disponibilità Reale</div>
       <div class="safe-spend-amount" id="safeSpendAmt">€0</div>
       <div class="safe-spend-sub" id="safeSpendSub"></div>
     </div>
 
-    <!-- Positive feedback -->
     <div id="positiveBanner" class="positive-banner" style="display:none;"></div>
-
-    <!-- Day worked indicator -->
-    <div id="dayWorkedCard" class="day-worked-card" style="display:none;">
-      <span id="dayWorkedText"></span>
-    </div>
-
-    <!-- Update banner (SW) -->
-    <div id="updateBanner" class="update-banner" style="display:none;">
-      🆕 Nuova versione disponibile — <button onclick="applyUpdate()">Aggiorna</button>
-    </div>
+    <div id="dayWorkedCard" class="day-worked-card" style="display:none;"><span id="dayWorkedText"></span></div>
+    <div id="updateBanner" class="update-banner" style="display:none;">🆕 Nuova versione — <button onclick="applyUpdate()">Aggiorna</button></div>
 
     <div class="section-header">
       <span id="recentTitle">Recenti</span>
@@ -147,9 +138,7 @@
     <div class="recent-list"><div class="recent-card" id="recentList"></div></div>
 
     <button class="fab" onclick="openModal()">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
 
@@ -159,7 +148,7 @@
       <div class="glass-card" id="pieSection" style="display:none;">
         <div class="card-title">Uscite per categoria</div>
         <div class="pie-row">
-          <svg id="pieChart" width="120" height="120" viewBox="0 0 120 120"></svg>
+          <svg id="pieChart" width="130" height="130" viewBox="0 0 130 130"></svg>
           <div class="pie-legend" id="pieLegend"></div>
         </div>
       </div>
@@ -179,20 +168,28 @@
       </div>
     </div>
     <button class="fab" onclick="openModal()">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
 
   <!-- ═══ ANALISI ═══ -->
   <div id="page-analisi" class="page">
     <div class="page-scroll">
+      <!-- Donut chart statistiche -->
+      <div class="glass-card">
+        <div class="card-title">Distribuzione Spese del Mese</div>
+        <div class="donut-container" id="donutContainer">
+          <svg id="donutSvg" viewBox="0 0 200 200" width="160" height="160"></svg>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+      <!-- Storico -->
       <div class="glass-card">
         <div class="card-title">Storico 12 Mesi</div>
         <div id="historyChart"></div>
         <div id="historyLegend"></div>
       </div>
+      <!-- Analisi -->
       <div class="glass-card">
         <div class="card-title">Analisi Finanziaria</div>
         <div id="avgInfoBox" class="avg-box"></div>
@@ -229,6 +226,14 @@
   <div id="page-settings" class="page">
     <div class="page-scroll">
 
+      <!-- Conti -->
+      <div class="glass-card">
+        <div class="card-title">Conti</div>
+        <div id="accountsList"></div>
+        <button class="btn-secondary" style="margin-top:10px;background:rgba(10,132,255,.1);color:var(--blue);" onclick="openAccountSheet()">+ Nuovo Conto</button>
+      </div>
+
+      <!-- Parametri -->
       <div class="glass-card" id="settingsCard">
         <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
         <div class="salary-info-row" id="salaryInfoRow"></div>
@@ -272,9 +277,10 @@
         <button class="btn-primary" onclick="saveSettings()">Salva</button>
       </div>
 
+      <!-- Spese Fisse -->
       <div class="glass-card">
         <div class="card-title">Spese Fisse</div>
-        <p class="card-desc">Affitto, abbonamenti... aggiungili una volta e applicali ogni mese con un tap.</p>
+        <p class="card-desc">Aggiungili una volta e applicali ogni mese con un tap.</p>
         <div id="recurringApplyBanner" style="display:none;" class="apply-banner">
           <span id="recurringApplyText"></span>
           <button class="pill-btn" onclick="applyRecurring()">Applica</button>
@@ -282,7 +288,7 @@
         <div class="add-recurring-row">
           <button class="rec-cat-btn" onclick="openRecCatSheet()">
             <span id="rec_emoji">🏠</span>
-            <span id="rec_label">Casa</span>
+            <span id="rec_label">Affitto</span>
             <span class="rec-cat-chevron">▾</span>
           </button>
           <input id="rec_nota" placeholder="Nome" style="flex:1;min-width:0;">
@@ -292,6 +298,7 @@
         <div id="recurringList"></div>
       </div>
 
+      <!-- Dati -->
       <div class="glass-card">
         <div class="card-title">Dati</div>
         <button class="settings-row-btn" onclick="exportCSV()">
@@ -317,50 +324,123 @@
     <div class="tab-item active" onclick="showPage('page-home',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </div>
-      <span>Riepilogo</span>
+      </div><span>Riepilogo</span>
     </div>
     <div class="tab-item" onclick="showPage('page-movimenti',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      </div>
-      <span>Movimenti</span>
+      </div><span>Movimenti</span>
     </div>
     <div class="tab-item" onclick="showPage('page-analisi',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      </div>
-      <span>Analisi</span>
+      </div><span>Analisi</span>
     </div>
     <div class="tab-item" onclick="showPage('page-settings',this)">
       <div class="tab-icon-wrap">
         <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
-      </div>
-      <span>Impostazioni</span>
+      </div><span>Impostazioni</span>
     </div>
   </div>
 
 </div><!-- /app -->
 
-<!-- ══ MODALS ══ -->
+<!-- ══════════════════════ MODALS ══════════════════════════ -->
 
-<!-- Entry modal -->
+<!-- Entry modal with numpad -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
 <div class="modal-sheet" id="modalSheet">
   <div class="modal-handle"></div>
+
+  <!-- Type toggle -->
   <div class="type-toggle">
     <button class="type-btn active" id="typeBtnUsc" onclick="setModalType('usc')">Uscita</button>
     <button class="type-btn" id="typeBtnInc" onclick="setModalType('inc')">Entrata</button>
   </div>
+
+  <!-- Amount display (readonly, driven by numpad) -->
   <div class="modal-amount-row">
     <span class="modal-currency">€</span>
-    <input id="modal_amount" class="modal-amount-input" type="number" inputmode="decimal" placeholder="0" oninput="onModalAmountInput()">
+    <div class="modal-amount-display" id="amountDisplay">0</div>
   </div>
-  <!-- Time deterrent (shown live for expenses) -->
+
+  <!-- Time deterrent -->
   <div id="timeDeterrent" class="time-deterrent" style="display:none;"></div>
+
+  <!-- Category pills -->
   <div class="cat-grid" id="catGrid"></div>
+
+  <!-- Date + Account row -->
+  <div class="modal-meta-row">
+    <button class="meta-btn" id="dateSelectorBtn" onclick="openDatePicker()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="dateSelectorLabel">Oggi</span>
+    </button>
+    <button class="meta-btn" id="accountSelectorBtn" onclick="openAccountPicker()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span id="accountSelectorLabel">Principale</span>
+    </button>
+  </div>
+
+  <!-- Custom Numpad -->
+  <div class="numpad" id="numpad">
+    <button class="np-btn" onclick="numpadInput('7')">7</button>
+    <button class="np-btn" onclick="numpadInput('8')">8</button>
+    <button class="np-btn" onclick="numpadInput('9')">9</button>
+    <button class="np-btn" onclick="numpadInput('4')">4</button>
+    <button class="np-btn" onclick="numpadInput('5')">5</button>
+    <button class="np-btn" onclick="numpadInput('6')">6</button>
+    <button class="np-btn" onclick="numpadInput('1')">1</button>
+    <button class="np-btn" onclick="numpadInput('2')">2</button>
+    <button class="np-btn" onclick="numpadInput('3')">3</button>
+    <button class="np-btn" onclick="numpadInput(',')">&#44;</button>
+    <button class="np-btn" onclick="numpadInput('0')">0</button>
+    <button class="np-btn np-del" onclick="numpadDelete()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+    </button>
+  </div>
+
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Aggiungi Uscita</button>
+</div>
+
+<!-- Date picker sheet -->
+<div class="sheet-backdrop" id="datePickerBackdrop" onclick="closeDatePicker()"></div>
+<div class="bottom-sheet" id="datePickerSheet">
+  <div class="modal-handle"></div>
+  <div class="bottom-sheet-title">Seleziona Data</div>
+  <input type="date" id="datePickerInput" class="date-native-input">
+  <button class="btn-primary" style="margin-top:16px;" onclick="confirmDatePick()">Conferma</button>
+</div>
+
+<!-- Account picker sheet -->
+<div class="sheet-backdrop" id="accountPickerBackdrop" onclick="closeAccountPicker()"></div>
+<div class="bottom-sheet" id="accountPickerSheet">
+  <div class="modal-handle"></div>
+  <div class="bottom-sheet-title">Seleziona Conto</div>
+  <div id="accountPickerList"></div>
+</div>
+
+<!-- Account creation sheet -->
+<div class="sheet-backdrop" id="accountSheetBackdrop" onclick="closeAccountSheet()"></div>
+<div class="bottom-sheet" id="accountSheet">
+  <div class="modal-handle"></div>
+  <div class="bottom-sheet-title">Nuovo Conto</div>
+  <div class="settings-field">
+    <label>Nome del conto</label>
+    <div class="amount-input-wrap">
+      <input id="newAccountName" placeholder="es. Banca, Contanti..." style="font-size:16px;">
+    </div>
+  </div>
+  <div class="account-emoji-pick" id="accountEmojiPick">
+    <button class="ae-btn active" data-emoji="🏦" onclick="selectAccountEmoji(this)">🏦</button>
+    <button class="ae-btn" data-emoji="💳" onclick="selectAccountEmoji(this)">💳</button>
+    <button class="ae-btn" data-emoji="💵" onclick="selectAccountEmoji(this)">💵</button>
+    <button class="ae-btn" data-emoji="💰" onclick="selectAccountEmoji(this)">💰</button>
+    <button class="ae-btn" data-emoji="📱" onclick="selectAccountEmoji(this)">📱</button>
+    <button class="ae-btn" data-emoji="🪙" onclick="selectAccountEmoji(this)">🪙</button>
+  </div>
+  <button class="btn-primary" onclick="saveNewAccount()">Crea Conto</button>
 </div>
 
 <!-- Recurring category sheet -->
@@ -368,20 +448,7 @@
 <div class="bottom-sheet" id="recCatSheet">
   <div class="modal-handle"></div>
   <div class="bottom-sheet-title">Categoria Spesa Fissa</div>
-  <div class="rec-cat-grid">
-    <button class="rec-cat-option" onclick="selectRecCat('Casa','🏠')">🏠<span>Casa</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Affitto','🏡')">🏡<span>Affitto</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Abbonamenti','📦')">📦<span>Abbonamenti</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Netflix','📺')">📺<span>Netflix</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Spotify','🎵')">🎵<span>Spotify</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Trasporti','🚗')">🚗<span>Trasporti</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Assicurazione','🛡️')">🛡️<span>Assicurazione</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Salute','❤️')">❤️<span>Salute</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Palestra','💪')">💪<span>Palestra</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Telefono','📱')">📱<span>Telefono</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Internet','🌐')">🌐<span>Internet</span></button>
-    <button class="rec-cat-option" onclick="selectRecCat('Altro','💸')">💸<span>Altro</span></button>
-  </div>
+  <div class="rec-cat-grid" id="recCatGrid"></div>
 </div>
 
 <script src="script.js"></script>
