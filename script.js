@@ -53,6 +53,7 @@ let transferDate = new Date();
 let transferFromAccountId = 'main';
 let transferToAccountId = null;
 let onbSalaryAccountId = 'main';
+let accountInitTargetId = null;
 
 // Edit contexts
 let editContext = null;           // { kind:'entry'|'salary', prevK, id, prevType }
@@ -119,7 +120,19 @@ async function saveAccountsIDB() {
 // ─── SICUREZZA INPUT ─────────────────────────────────────────────────────────
 function sanitizeAmount(val) {
   if (typeof val === 'number') return isNaN(val)||val<0 ? 0 : Math.round(val*100)/100;
-  const s = String(val).replace(',','.').replace(/[^0-9.]/g,'');
+  let s = String(val).trim();
+  s = s.replace(/\s+/g,'');
+  s = s.replace(/€|EUR/gi,'');
+  // Gestisce formati "1.800" (thousands) e "1.800,50" (thousands + decimal)
+  if (s.includes('.') && s.includes(',')) {
+    // "." migliaia, "," decimale
+    s = s.replace(/\./g,'').replace(',', '.');
+  } else {
+    // "." migliaia (se sembra migliaia), oppure decimale
+    s = s.replace(/\.(?=\d{3}(?:\D|$))/g,'');
+    if (s.includes(',')) s = s.replace(',', '.');
+  }
+  s = s.replace(/[^0-9.]/g,'');
   const n = parseFloat(s);
   return isNaN(n)||n<0 ? 0 : Math.round(n*100)/100;
 }
@@ -199,6 +212,18 @@ function setKeyboardOffset() {
   const vv = window.visualViewport;
   const diff = Math.max(0, window.innerHeight - vv.height);
   document.documentElement.style.setProperty('--kb-offset', `${diff}px`);
+
+  // Assicura che il bottone "Done" resti visibile e tappabile
+  if (diff > 30) {
+    const entrySheet = document.getElementById('modalSheet');
+    if (entrySheet && entrySheet.classList.contains('active')) {
+      requestAnimationFrame(() => { entrySheet.scrollTop = entrySheet.scrollHeight; });
+    }
+    const trSheet = document.getElementById('transferModalSheet');
+    if (trSheet && trSheet.classList.contains('active')) {
+      requestAnimationFrame(() => { trSheet.scrollTop = trSheet.scrollHeight; });
+    }
+  }
 }
 function startKeyboardTracking() {
   if (kbTrack.active) return;
@@ -397,6 +422,7 @@ function renderAccountsList() {
     `<div class="acc-row">
       <span class="acc-emoji">${a.emoji}</span>
       <span class="acc-name">${a.name}</span>
+      <button class="init-btn-sm" onclick="openAccountInitSheet('${a.id}')">€</button>
       ${a.id!=='main'?`<button class="del-btn-sm" onclick="deleteAccount('${a.id}')">✕</button>`:''}
     </div>`
   ).join('');
@@ -414,6 +440,8 @@ function openAccountSheet() {
   document.getElementById('accountSheetBackdrop').classList.add('active');
   document.getElementById('accountSheet').classList.add('active');
   document.getElementById('newAccountName').value='';
+  const initEl = document.getElementById('newAccountInit');
+  if (initEl) initEl.value = '';
   selectedAccountEmoji='🏦';
   document.querySelectorAll('.ae-btn').forEach(b=>b.classList.toggle('active',b.dataset.emoji==='🏦'));
 }
@@ -429,11 +457,102 @@ function selectAccountEmoji(btn) {
 async function saveNewAccount() {
   const name=document.getElementById('newAccountName').value.trim();
   if(!name) { shakeEl('newAccountName'); return; }
+  const initVal = sanitizeAmount(document.getElementById('newAccountInit')?.value);
   const acc={id:'acc_'+Date.now(), name, emoji:selectedAccountEmoji};
+
+  const k = curMonthKey();
+  initMonthKey(k);
+
+  if(initVal > 0) {
+    const entryId = Date.now() + Math.random();
+    const initTs = Date.now();
+    db[k].income.push({
+      id: entryId,
+      ts: initTs,
+      imp: initVal,
+      cat: 'Saldo iniziale',
+      emoji: '💰',
+      color: '#32D74B',
+      accountId: acc.id,
+      isInit: true,
+      initEntryId: entryId,
+    });
+    acc.initAmount = initVal;
+    acc.initK = k;
+    acc.initEntryId = entryId;
+    acc.initTs = initTs;
+  }
+
   accounts.push(acc);
-  await saveAccountsIDB();
+  await Promise.all([save(), saveAccountsIDB()]);
   closeAccountSheet();
-  renderAccountBar(); renderAccountsList();
+  renderAccountBar(); renderAccountsList(); render();
+}
+
+// ─── Account initial amount sheet ─────────────────────────────────────
+function openAccountInitSheet(accountId) {
+  accountInitTargetId = accountId;
+  const acc = accounts.find(a => a.id === accountId) || accounts[0];
+  const lab = document.getElementById('accountInitLabel');
+  if (lab) lab.textContent = `${acc.emoji} ${acc.name}`;
+  const amtEl = document.getElementById('accountInitAmount');
+  const initVal = sanitizeAmount(acc.initAmount ?? acc.initVal ?? 0);
+  if (amtEl) amtEl.value = initVal > 0 ? String(initVal) : '';
+  document.getElementById('accountInitBackdrop').classList.add('active');
+  document.getElementById('accountInitSheet').classList.add('active');
+}
+
+function closeAccountInitSheet() {
+  document.getElementById('accountInitBackdrop').classList.remove('active');
+  document.getElementById('accountInitSheet').classList.remove('active');
+  accountInitTargetId = null;
+}
+
+async function saveAccountInitial() {
+  if (!accountInitTargetId) return;
+  const acc = accounts.find(a => a.id === accountInitTargetId);
+  if (!acc) return;
+
+  const amount = sanitizeAmount(document.getElementById('accountInitAmount')?.value);
+  const nowTs = Date.now();
+
+  const prevK = acc.initK || curMonthKey();
+  initMonthKey(prevK);
+
+  // Remove old init entry if any
+  if (acc.initEntryId != null) {
+    db[prevK].income = (db[prevK].income || []).filter(i => i.id !== acc.initEntryId);
+    acc.initEntryId = null;
+    acc.initK = null;
+    acc.initAmount = null;
+    acc.initTs = null;
+  }
+
+  if (amount > 0) {
+    const entryId = Date.now() + Math.random();
+    const entryTs = nowTs;
+    db[prevK].income.push({
+      id: entryId,
+      ts: entryTs,
+      imp: amount,
+      cat: 'Saldo iniziale',
+      emoji: '💰',
+      color: '#32D74B',
+      accountId: acc.id,
+      isInit: true,
+      initEntryId: entryId,
+    });
+    acc.initAmount = amount;
+    acc.initK = prevK;
+    acc.initEntryId = entryId;
+    acc.initTs = entryTs;
+  }
+
+  await Promise.all([save(), saveAccountsIDB()]);
+  closeAccountInitSheet();
+  renderAccountBar();
+  renderAccountsList();
+  render();
 }
 
 // Account picker (riutilizzato per modal: entry/salary/transfer)

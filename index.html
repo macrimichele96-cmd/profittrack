@@ -447,6 +447,13 @@
       <input id="newAccountName" placeholder="es. Banca, Contanti..." style="font-size:16px;">
     </div>
   </div>
+  <div class="settings-field">
+    <label>Importo iniziale (opzionale)</label>
+    <div class="amount-input-wrap">
+      <span class="currency-sym">€</span>
+      <input id="newAccountInit" type="number" inputmode="decimal" placeholder="0" style="font-size:16px;">
+    </div>
+  </div>
   <div class="account-emoji-pick" id="accountEmojiPick">
     <button class="ae-btn active" data-emoji="🏦" onclick="selectAccountEmoji(this)">🏦</button>
     <button class="ae-btn" data-emoji="💳" onclick="selectAccountEmoji(this)">💳</button>
@@ -464,6 +471,31 @@
   <div class="modal-handle"></div>
   <div class="bottom-sheet-title">Categoria Spesa Fissa</div>
   <div class="rec-cat-grid" id="recCatGrid"></div>
+</div>
+
+<!-- Account initial amount sheet -->
+<div class="sheet-backdrop" id="accountInitBackdrop" onclick="closeAccountInitSheet()"></div>
+<div class="bottom-sheet" id="accountInitSheet">
+  <div class="modal-handle"></div>
+  <div class="bottom-sheet-title">Importo iniziale</div>
+
+  <div class="settings-field">
+    <label>Conto</label>
+    <div class="amount-input-wrap">
+      <span class="currency-sym" style="font-size:18px;">👛</span>
+      <span id="accountInitLabel" style="font-weight:700;color:var(--text);"></span>
+    </div>
+  </div>
+
+  <div class="settings-field">
+    <label>Importo</label>
+    <div class="amount-input-wrap">
+      <span class="currency-sym">€</span>
+      <input id="accountInitAmount" type="number" inputmode="decimal" placeholder="0" style="font-size:16px;">
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="saveAccountInitial()">Salva</button>
 </div>
 
 <!-- ══ Transfer modal ══ -->

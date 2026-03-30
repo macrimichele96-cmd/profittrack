@@ -112,7 +112,17 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
 
 .transfer-quick-row{
-  margin:8px 0 12px;
+  max-width:500px;
+  margin:6px auto 12px;
+  padding:0 16px;
+}
+
+.transfer-quick-row .btn-secondary{
+  background:rgba(10,132,255,.12);
+  color:var(--blue);
+  border:.5px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
 }
 
 /* ─── HERO ─── */
@@ -225,6 +235,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .tx-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .tx-amt{font-size:15px;font-weight:700;}
 .del-btn-sm{background:rgba(255,69,58,.10);color:var(--red);border:none;border-radius:8px;width:26px;height:26px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.init-btn-sm{background:rgba(10,132,255,.12);color:var(--blue);border:none;border-radius:8px;width:26px;height:26px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
 /* ─── EMPTY STATE ─── */
 .empty-state-box{display:flex;flex-direction:column;align-items:center;padding:28px 0;gap:10px;}
