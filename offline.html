@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Offline - ProfitTrack</title>
+  <style>
+    :root{
+      --blue:#0A84FF; --green:#32D74B; --red:#FF453A;
+      --bg:#000; --text:#FFF; --sub:#8E8E93; --card:rgba(28,28,30,.92);
+      --border:rgba(255,255,255,.12);
+      --radius:24px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#F2F2F7; --text:#000; --sub:#8E8E93; --card:rgba(255,255,255,.92);
+        --border:rgba(0,0,0,.08);
+      }
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:24px 16px calc(env(safe-area-inset-bottom) + 24px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .card{
+      width:100%;
+      max-width:420px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:22px 18px;
+      box-shadow:0 8px 30px rgba(0,0,0,.18);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      text-align:center;
+    }
+    .icon{
+      font-size:44px;
+      margin-bottom:12px;
+      opacity:.95;
+    }
+    .title{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:-.5px;
+      margin-bottom:8px;
+    }
+    .msg{
+      font-size:14px;
+      color:var(--sub);
+      line-height:1.5;
+      margin-bottom:16px;
+    }
+    .btn{
+      display:inline-block;
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px 16px;
+      background:var(--blue);
+      color:#fff;
+      font-weight:700;
+      font-size:16px;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn:active{transform:scale(.99);opacity:.95;}
+    .hint{
+      font-size:12px;
+      color:var(--sub);
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-label="Pagina offline">
+    <div class="icon">📴</div>
+    <div class="title">Connessione assente</div>
+    <div class="msg">
+      ProfitTrack non riesce a raggiungere la rete.
+      Puoi riprovare appena la connessione torna disponibile.
+    </div>
+    <button class="btn" type="button" onclick="location.reload()" aria-label="Riprova connessione">Riprova</button>
+    <div class="hint">Se sei offline, potresti comunque vedere dati già salvati nell’app.</div>
+  </div>
+</body>
+</html>
+

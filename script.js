@@ -87,34 +87,64 @@ function openIDB() {
 }
 
 function idbGet(key) {
-  return new Promise((resolve, reject) => {
-    const tx  = idb.transaction('kv','readonly');
-    const req = tx.objectStore('kv').get(key);
-    req.onsuccess = () => resolve(req.result ?? null);
-    req.onerror   = e => reject(e.target.error);
+  return new Promise((resolve) => {
+    try {
+      if (!idb) return resolve(null);
+      const tx = idb.transaction('kv', 'readonly');
+      const req = tx.objectStore('kv').get(key);
+      req.onsuccess = () => resolve(req.result ?? null);
+      req.onerror = () => resolve(null);
+      tx.onerror = () => resolve(null);
+      tx.onabort = () => resolve(null);
+    } catch (e) {
+      console.warn('IDB read failed', e);
+      resolve(null);
+    }
   });
 }
 
 function idbSet(key, value) {
-  return new Promise((resolve, reject) => {
-    const tx  = idb.transaction('kv','readwrite');
-    const req = tx.objectStore('kv').put(value, key);
-    req.onsuccess = () => resolve(true);
-    req.onerror   = e => reject(e.target.error);
+  return new Promise((resolve) => {
+    try {
+      if (!idb) return resolve(false);
+      const tx = idb.transaction('kv', 'readwrite');
+      const req = tx.objectStore('kv').put(value, key);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => {
+        showSaveErrorToast('Salvataggio dati fallito.');
+        resolve(false);
+      };
+      tx.onerror = () => {
+        showSaveErrorToast('Salvataggio dati fallito.');
+        resolve(false);
+      };
+      tx.onabort = () => {
+        showSaveErrorToast('Salvataggio dati fallito.');
+        resolve(false);
+      };
+    } catch (e) {
+      console.warn('IDB write failed', e);
+      showSaveErrorToast('Salvataggio dati fallito.');
+      resolve(false);
+    }
   });
 }
 
 async function save() {
-  try { await idbSet('pt_db', db); } catch(e) { console.warn('IDB save failed', e); }
+  await idbSet('pt_db', db);
+  // idbSet gestisce già il feedback visivo.
 }
 async function saveSettings() { // Note: this shadows the UI function — see below
-  try { await idbSet('pt_settings', gSettings); } catch(e) {}
+  await idbSet('pt_settings', gSettings);
+  // idbSet gestisce già il feedback visivo.
 }
 async function saveRecurringIDB() {
-  try { await idbSet('pt_recurring', recurring); } catch(e) {}
+  await idbSet('pt_recurring', recurring);
+  // idbSet gestisce già il feedback visivo.
 }
 async function saveAccountsIDB() {
-  try { await idbSet('pt_accounts', accounts); } catch(e) {}
+  await idbSet('pt_accounts', accounts);
+  // idbSet gestisce già il feedback visivo.
 }
 
 // ─── SICUREZZA INPUT ─────────────────────────────────────────────────────────
@@ -185,7 +215,85 @@ function resetEntryAmountInput() {
   el.value = '';
 }
 
+function formatThousandItalian(intDigits) {
+  // Inserisce separatore migliaia '.' (es: 12345 -> 12.345)
+  const s = String(intDigits || '0').replace(/^0+/, '') || '0';
+  let out = '';
+  for (let i = 0; i < s.length; i++) {
+    const fromEnd = s.length - i;
+    out += s[i];
+    if (fromEnd > 1 && fromEnd % 3 === 1) out += '.';
+  }
+  return out;
+}
+
+function parseAmountInput(raw) {
+  // Converte un input "libero" in {intDigits, decDigits, hasDecimalSep}
+  // Normalizziamo nel formato UI: migliaia '.' e decimali ','
+  let s = String(raw ?? '');
+  s = s.replace(/\s+/g, '');
+  s = s.replace(/€|EUR/gi, '');
+  s = s.replace(/[^0-9.,]/g, '');
+  if (!s) return { intDigits: '', decDigits: '', trailingSep: false };
+
+  const lastComma = s.lastIndexOf(',');
+  const lastDot = s.lastIndexOf('.');
+
+  let decimalIndex = -1;
+  let decimalSep = null;
+  if (lastComma === -1 && lastDot === -1) {
+    decimalSep = null;
+  } else if (lastComma > lastDot) {
+    decimalIndex = lastComma;
+    decimalSep = ',';
+  } else {
+    decimalIndex = lastDot;
+    decimalSep = '.';
+  }
+
+  let intPart = s;
+  let decPart = '';
+  let trailingSep = false;
+
+  if (decimalSep) {
+    intPart = s.slice(0, decimalIndex);
+    decPart = s.slice(decimalIndex + 1);
+    trailingSep = decPart.length === 0;
+  }
+
+  const intDigits = (intPart || '').replace(/[^0-9]/g, '');
+  let decDigits = (decPart || '').replace(/[^0-9]/g, '');
+  if (decDigits.length > 2) decDigits = decDigits.slice(0, 2); // max 2 decimali
+
+  // Niente zeri multipli iniziali: "00012" -> "12" (ma "0" resta "0")
+  let normalizedInt = intDigits;
+  if (normalizedInt) normalizedInt = normalizedInt.replace(/^0+(?=\d)/, '');
+  if (!normalizedInt) normalizedInt = '0';
+
+  return { intDigits: normalizedInt, decDigits, trailingSep: Boolean(trailingSep) };
+}
+
+function formatAmountInputEl(inputEl) {
+  if (!inputEl) return;
+  const raw = inputEl.value;
+  const parsed = parseAmountInput(raw);
+  if (!raw) return;
+
+  const hasDecimal = parsed.decDigits.length > 0 || parsed.trailingSep;
+  const formattedInt = formatThousandItalian(parsed.intDigits);
+
+  // Se l'utente ha appena inserito il separatore decimale, manteniamolo
+  const formatted = hasDecimal
+    ? `${formattedInt},${parsed.decDigits || ''}`
+    : formattedInt;
+
+  if (inputEl.value !== formatted) inputEl.value = formatted;
+}
+
 function onEntryAmountInputChange() {
+  try {
+    formatAmountInputEl(document.getElementById('amountInput'));
+  } catch {}
   updateTimeDeterrent();
 }
 
@@ -202,7 +310,9 @@ function resetTransferAmountInput() {
 }
 
 function onTransferAmountInputChange() {
-  // placeholder: oggi non serve preview extra
+  try {
+    formatAmountInputEl(document.getElementById('transferAmountInput'));
+  } catch {}
 }
 
 let kbTrack = { active:false, handler:null, vvHandler:null };
@@ -273,12 +383,40 @@ function showDebugToast(msg) {
   } catch {}
 }
 
+function showSaveErrorToast(msg) {
+  try {
+    const el = document.getElementById('saveErrorToast');
+    if (!el) return;
+    const text = msg ? String(msg) : 'Salvataggio fallito.';
+    el.textContent = text;
+    el.style.display = 'block';
+    clearTimeout(showSaveErrorToast._t);
+    showSaveErrorToast._t = setTimeout(() => { el.style.display = 'none'; }, 3200);
+  } catch {}
+}
+
 window.addEventListener('error', (e) => {
   showDebugToast(e?.message || 'Errore JS');
 });
 window.addEventListener('unhandledrejection', (e) => {
   showDebugToast(e?.reason?.message || 'Errore promise');
 });
+
+function renderNetworkIndicator() {
+  const el = document.getElementById('netIndicator');
+  if (!el) return;
+  if (navigator.onLine) {
+    el.classList.remove('offline');
+    el.textContent = '';
+    el.style.display = 'none';
+  } else {
+    el.classList.add('offline');
+    el.textContent = 'Offline';
+    el.style.display = 'inline-flex';
+  }
+}
+window.addEventListener('online', renderNetworkIndicator);
+window.addEventListener('offline', renderNetworkIndicator);
 
 // ─── SERVICE WORKER ──────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -324,7 +462,14 @@ async function applyUpdate() {
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 window.onload = async () => {
-  await openIDB();
+  renderNetworkIndicator();
+  try {
+    await openIDB();
+  } catch (e) {
+    console.warn('IDB init failed', e);
+    showSaveErrorToast('Salvataggio offline non disponibile (IndexedDB).');
+    // Continua comunque: l'app può partire senza persistenza.
+  }
   // Load all data
   const [dbData, sets, rec, acc] = await Promise.all([
     idbGet('pt_db'), idbGet('pt_settings'), idbGet('pt_recurring'), idbGet('pt_accounts')
