@@ -5,7 +5,7 @@
   --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.06);
   --text:#FFF; --text2:#EBEBF5; --sub:#8E8E93; --sub2:#636366;
   --glass:rgba(28,28,30,.72); --glass2:rgba(44,44,46,.60); --blur:20px;
-  --nav-bg:rgba(10,10,12,.90); --tab-h:calc(60px + env(safe-area-inset-bottom));
+  --nav-bg:rgba(10,10,12,.90); --tab-h:calc(68px + max(env(safe-area-inset-bottom), 18px));
 }
 @media (prefers-color-scheme: light) {
   :root {
@@ -231,7 +231,8 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   backdrop-filter:blur(28px) saturate(1.3);-webkit-backdrop-filter:blur(28px) saturate(1.3);
   border-top:.5px solid var(--border);
   display:flex;justify-content:space-around;align-items:flex-end;
-  padding:8px 0 max(env(safe-area-inset-bottom), 12px);
+  /* safe-area-inset-bottom garantisce spazio per home indicator in PWA */
+  padding:10px 0 max(env(safe-area-inset-bottom), 18px);
   z-index:999;
 }
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;color:var(--sub);cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;transition:color .2s;}
@@ -246,56 +247,178 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 /* ─── MODAL ─── */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:599;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .modal-backdrop.active{opacity:1;pointer-events:all;}
-/* ─── MODAL — struttura a 3 zone fisse ─── */
+/* ══════════════════════════════════════════════════
+   MODAL INSERIMENTO — layout compatto, height:auto
+   Struttura verticale fissa, mai troncata su iOS
+══════════════════════════════════════════════════ */
+
+/* Sfondo scuro con blur */
+.modal-backdrop{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.60);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:599; opacity:0; pointer-events:none;
+  transition:opacity .3s ease;
+}
+.modal-backdrop.active{opacity:1;pointer-events:all;}
+
+/* Sheet: sale dal basso, altezza AUTOMATICA — il contenuto determina l'altezza */
 .modal-sheet{
-  position:fixed;bottom:0;left:0;width:100%;z-index:600;
+  position:fixed;
+  bottom:0; left:0; width:100%;
+  z-index:600;
   background:var(--card-bg);
-  border-top-left-radius:26px;border-top-right-radius:26px;
+  border-top-left-radius:28px; border-top-right-radius:28px;
+  /* NESSUN height/max-height fisso — auto è la chiave */
+  padding:0 0 calc(env(safe-area-inset-bottom) + 12px);
   transform:translateY(100%);
-  transition:transform .38s cubic-bezier(.32,1,.23,1);
-  box-shadow:0 -2px 0 rgba(255,255,255,.06) inset, 0 -16px 60px rgba(0,0,0,.40);
-  height:88vh; max-height:88vh;
-  display:flex; flex-direction:column; overflow:hidden;
+  transition:transform .36s cubic-bezier(.32,1,.23,1);
+  box-shadow:0 -1px 0 rgba(255,255,255,.08) inset,
+             0 -20px 60px rgba(0,0,0,.50);
+  /* Impedisce scroll interno — il layout è compatto per definizione */
+  overflow:hidden;
 }
 .modal-sheet.active{transform:translateY(0);}
 
-/* TOP: handle · close · toggle · importo */
-.modal-top{ flex-shrink:0; padding:12px 20px 0; }
-.modal-handle-row{
-  display:flex; align-items:center; justify-content:center;
-  position:relative; margin-bottom:14px;
+/* ── HEADER: handle centrato + X assoluto a destra ── */
+.modal-header{
+  position:relative;
+  display:flex; justify-content:center; align-items:center;
+  padding:14px 20px 10px;
 }
-.modal-handle{width:40px;height:5px;background:var(--sub2);border-radius:3px;}
-.modal-close-btn{
-  position:absolute; right:0; top:50%; transform:translateY(-50%);
+.modal-handle{
+  width:36px; height:4px;
+  background:var(--sub2); border-radius:2px;
+}
+.modal-x{
+  position:absolute; right:16px; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; border-radius:14px;
   background:var(--glass2); border:.5px solid var(--border);
-  color:var(--sub); font-size:15px; font-weight:700;
-  width:30px; height:30px; border-radius:15px;
+  color:var(--sub); font-size:14px; font-weight:700;
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; -webkit-tap-highlight-color:transparent;
-  transition:background .15s; font-family:inherit;
+  cursor:pointer; font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s, opacity .1s;
 }
-.modal-close-btn:active{background:rgba(142,142,147,.25);}
-.type-toggle{display:flex;background:var(--card-bg2);border-radius:12px;padding:3px;margin-bottom:10px;}
-.type-btn{flex:1;padding:8px;border:none;border-radius:10px;font-size:15px;font-weight:600;background:transparent;color:var(--sub);cursor:pointer;transition:background .2s,color .2s;font-family:inherit;-webkit-tap-highlight-color:transparent;}
-.type-btn.active{background:var(--card-bg);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.2);}
-.modal-amount-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;padding:0 4px;min-height:54px;}
-.modal-currency{font-size:34px;font-weight:300;color:var(--sub);line-height:1;flex-shrink:0;}
+.modal-x:active{opacity:.6;}
 
-/* MEZZO: categorie scrollabili */
-.modal-scroll{
-  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:4px 20px 6px; min-height:0;
+/* ── TOGGLE Uscita / Entrata ── */
+.type-toggle{
+  display:flex; background:var(--card-bg2);
+  border-radius:12px; padding:3px;
+  margin:0 16px 10px;
+}
+.type-btn{
+  flex:1; padding:9px; border:none; border-radius:10px;
+  font-size:15px; font-weight:600; background:transparent;
+  color:var(--sub); cursor:pointer; font-family:inherit;
+  transition:background .18s, color .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.type-btn.active{
+  background:var(--card-bg); color:var(--text);
+  box-shadow:0 1px 4px rgba(0,0,0,.22);
 }
 
-/* BOTTOM: numpad + conferma — sempre visibili */
-.modal-bottom{
-  flex-shrink:0;
-  padding:6px 16px calc(env(safe-area-inset-bottom) + 8px);
-  background:var(--card-bg);
-  border-top:.5px solid var(--border2);
+/* ── IMPORTO ── */
+.modal-amount-row{
+  display:flex; align-items:center; gap:6px;
+  padding:4px 20px 6px; min-height:58px;
+}
+.modal-currency{
+  font-size:32px; font-weight:300; color:var(--sub);
+  line-height:1; flex-shrink:0;
+}
+.modal-amount-display{
+  flex:1; font-size:52px; font-weight:700;
+  letter-spacing:-2px; color:var(--text);
+  line-height:1; overflow:hidden; white-space:nowrap;
 }
 
+/* ── CATEGORIE — scroll orizzontale a una riga ── */
+.cat-hscroll{
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:4px 16px 10px;
+  /* fade laterale */
+  -webkit-mask-image:linear-gradient(to right,transparent 0,black 20px,black calc(100% - 20px),transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0,black 20px,black calc(100% - 20px),transparent 100%);
+}
+.cat-hscroll::-webkit-scrollbar{display:none;}
+.cat-hlist{
+  display:flex; gap:8px;
+  width:max-content; /* forza riga singola */
+}
+
+/* Card categoria — verticale: emoji in alto, label in basso */
+.cat-card{
+  display:flex; flex-direction:column; align-items:center;
+  gap:4px; flex-shrink:0;
+  width:64px; padding:10px 6px;
+  border-radius:16px; border:1.5px solid var(--border);
+  background:var(--glass2);
+  cursor:pointer; font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s, border-color .15s, transform .1s;
+}
+.cat-card.active{
+  background:color-mix(in srgb,var(--cat-color) 18%,transparent);
+  border-color:var(--cat-color);
+}
+.cat-card:active{transform:scale(.92);}
+.cat-card-emoji{font-size:22px; line-height:1;}
+.cat-card-label{
+  font-size:10px; font-weight:600; color:var(--sub);
+  text-align:center; line-height:1.2;
+  overflow:hidden; max-width:100%;
+  white-space:nowrap; text-overflow:ellipsis;
+}
+.cat-card.active .cat-card-label{color:var(--cat-color);}
+
+/* ── META ROW: data · conto ── */
+.modal-meta-row{
+  display:flex; gap:8px; padding:0 16px 8px;
+}
+.meta-btn{
+  flex:1; display:flex; align-items:center; gap:6px;
+  background:var(--glass2); border:.5px solid var(--border);
+  border-radius:10px; padding:9px 12px;
+  color:var(--text2); font-size:13px; font-weight:500;
+  cursor:pointer; font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+  white-space:nowrap; overflow:hidden;
+}
+.meta-btn:active{background:var(--card-bg2);}
+.meta-btn svg{flex-shrink:0; stroke:var(--sub);}
+.meta-btn span{overflow:hidden; text-overflow:ellipsis;}
+
+/* ── NUMPAD 4×3 ── */
+.numpad{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:8px; padding:0 16px 8px;
+}
+.np-btn{
+  height:52px; border-radius:14px;
+  background:var(--glass2); border:.5px solid var(--border);
+  color:var(--text); font-size:22px; font-weight:500;
+  cursor:pointer; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .08s, transform .08s;
+  user-select:none; -webkit-user-select:none;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+}
+.np-btn:active{background:rgba(10,132,255,.18); transform:scale(.91);}
+.np-del{background:rgba(255,69,58,.08); border-color:rgba(255,69,58,.15);}
+.np-del:active{background:rgba(255,69,58,.20);}
+.np-del svg{stroke:var(--red);}
+
+/* ── CONFERMA ── */
+.modal-confirm-btn{
+  margin:0 16px; padding:15px;
+  font-size:17px;
+}
 
 /* ─── TIME DETERRENT ─── */
 .time-deterrent{font-size:13px;font-weight:600;text-align:center;padding:8px 12px;border-radius:10px;margin-bottom:12px;color:var(--sub);background:var(--glass2);}
@@ -473,14 +596,16 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 
 /* ─── ACCOUNT BAR (home) ─── */
 .account-bar {
-  max-width: 500px; margin: 10px auto 0;
+  max-width: 500px; margin: 8px auto 0;
   display: flex; align-items: center; gap: 8px;
-  padding: 0 16px;
+  padding: 0 12px 0 16px; /* padding-right ridotto: il + è già compact */
 }
 .account-scroll {
   flex: 1; display: flex; gap: 8px;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; padding-bottom: 2px; padding-right:8px;
+  scrollbar-width: none; padding-bottom: 2px;
+  /* spazio a destra per non tagliare l'ultimo chip prima del + */
+  padding-right: 4px;
 }
 .account-scroll::-webkit-scrollbar { display: none; }
 .acc-chip {

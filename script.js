@@ -512,11 +512,21 @@ function setModalType(type) {
   document.getElementById('timeDeterrent').style.display='none';
 }
 function buildCatGrid() {
-  const cats=modalType==='usc'?CATS_USC:CATS_INC;
-  document.getElementById('catGrid').innerHTML=cats.map(c=>`
-    <button class="cat-pill${c.id===selectedCat.id?' active':''}" style="--cat-color:${c.color}" onclick="selectModalCat('${c.id}')">
-      <span class="cat-pill-emoji">${c.emoji}</span><span>${c.label}</span>
+  const cats = modalType === 'usc' ? CATS_USC : CATS_INC;
+  // Popola la lista orizzontale (cat-hlist)
+  const container = document.getElementById('catGrid');
+  container.innerHTML = cats.map(c => `
+    <button class="cat-card${c.id === selectedCat.id ? ' active' : ''}"
+            style="--cat-color:${c.color}"
+            onclick="selectModalCat('${c.id}')">
+      <span class="cat-card-emoji">${c.emoji}</span>
+      <span class="cat-card-label">${c.label}</span>
     </button>`).join('');
+  // Scrolla fino alla categoria selezionata
+  requestAnimationFrame(() => {
+    const active = container.querySelector('.cat-card.active');
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
 }
 function selectModalCat(id) {
   selectedCat=(modalType==='usc'?CATS_USC:CATS_INC).find(c=>c.id===id)||CATS_USC[0];
