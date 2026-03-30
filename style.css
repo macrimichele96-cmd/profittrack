@@ -5,7 +5,10 @@
   --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.06);
   --text:#FFF; --text2:#EBEBF5; --sub:#8E8E93; --sub2:#636366;
   --glass:rgba(28,28,30,.72); --glass2:rgba(44,44,46,.60); --blur:20px;
-  --nav-bg:rgba(10,10,12,.90); --tab-h:calc(68px + max(env(safe-area-inset-bottom), 18px));
+  --nav-bg:rgba(10,10,12,.90);
+  --top-nav-h:56px;
+  --tab-h:calc(68px + env(safe-area-inset-bottom));
+  --kb-offset:0px;
 }
 @media (prefers-color-scheme: light) {
   :root {
@@ -25,7 +28,7 @@ html,body{
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
   overflow-x:hidden;overscroll-behavior:none;
 }
-body{padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:var(--tab-h);}
+body{padding-top:calc(var(--top-nav-h) + env(safe-area-inset-top));padding-bottom:var(--tab-h);}
 input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 
 /* ─── ONBOARDING ─── */
@@ -37,6 +40,36 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .onboarding-fields{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;text-align:left;}
 .field-group label{display:block;font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
 .onboarding-note{font-size:12px;color:var(--sub2);margin-top:14px;}
+
+/* Onboarding: picker conto stipendio */
+.onb-acc-picker{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:2px 0 8px;
+}
+.onb-acc-picker::-webkit-scrollbar{display:none;}
+.onb-acc-btn{
+  flex:0 0 auto;
+  background:var(--glass2);
+  border:.5px solid var(--border);
+  border-radius:18px;
+  padding:10px 14px;
+  color:var(--sub);
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s,border-color .15s,color .15s,transform .1s;
+}
+.onb-acc-btn.active{
+  background:rgba(10,132,255,.14);
+  border-color:var(--blue);
+  color:var(--blue);
+}
+.onb-acc-btn:active{transform:scale(.95);}
 
 /* ─── DAY PICKER ─── */
 .day-picker{display:flex;gap:6px;flex-wrap:wrap;}
@@ -51,6 +84,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   max-width:500px;margin:auto;padding:10px 12px;
   gap:4px;
   overflow:visible;
+  min-height:var(--top-nav-h);
 }
 .nav-arrow{background:none;border:none;color:var(--blue);font-size:28px;font-weight:300;line-height:1;cursor:pointer;padding:4px 10px;border-radius:8px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
 .nav-arrow:active{opacity:.5;}
@@ -76,6 +110,10 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .page{display:none;animation:pageIn .22s cubic-bezier(.4,0,.2,1);}
 .page.active{display:block;}
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
+
+.transfer-quick-row{
+  margin:8px 0 12px;
+}
 
 /* ─── HERO ─── */
 .hero-section{max-width:500px;margin:auto;padding:16px 16px 0;}
@@ -234,7 +272,8 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   border-top:.5px solid var(--border);
   display:flex;justify-content:space-around;align-items:flex-end;
   /* safe-area-inset-bottom garantisce spazio per home indicator in PWA */
-  padding:10px 0 max(env(safe-area-inset-bottom), 18px);
+  height:calc(68px + env(safe-area-inset-bottom));
+  padding:10px 0 env(safe-area-inset-bottom);
   z-index:999;
 }
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;color:var(--sub);cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;transition:color .2s;}
@@ -267,7 +306,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 /* Sheet: sale dal basso, altezza AUTOMATICA — il contenuto determina l'altezza */
 .modal-sheet{
   position:fixed;
-  bottom:0; left:0; width:100%;
+  bottom:var(--kb-offset, 0px); left:0; width:100%;
   z-index:600;
   background:rgba(28,28,30,.86);
   backdrop-filter: blur(20px) saturate(1.2);
@@ -279,8 +318,8 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   transition:transform .36s cubic-bezier(0.4,0,0.2,1);
   box-shadow:0 -1px 0 rgba(255,255,255,.08) inset,
              0 -20px 60px rgba(0,0,0,.50);
-  /* Impedisce scroll interno — il layout è compatto per definizione */
-  overflow:hidden;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 .modal-sheet.active{transform:translateY(0);}
 
@@ -337,6 +376,23 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   flex:1; font-size:52px; font-weight:700;
   letter-spacing:-2px; color:var(--text);
   line-height:1; overflow:hidden; white-space:nowrap;
+}
+
+/* Native iOS amount input (tastiera numerica del sistema) */
+.amount-native-input{
+  flex:1;
+  width:100%;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-family:inherit;
+  font-size:52px;
+  font-weight:700;
+  letter-spacing:-2px;
+  color:var(--text);
+  line-height:1;
+  padding:0 0 4px;
+  min-width:0;
 }
 
 /* ── CATEGORIE — scroll orizzontale a una riga ── */
