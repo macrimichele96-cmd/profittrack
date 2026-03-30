@@ -125,6 +125,17 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   padding:14px 16px;
 }
 
+.transfer-quick-card{
+  margin-top:8px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+}
+
+.transfer-quick-card .btn-secondary{
+  width:100%;
+}
+
 /* ─── HERO ─── */
 .hero-section{max-width:500px;margin:auto;padding:16px 16px 0;}
 .hero-card{

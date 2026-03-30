@@ -242,6 +242,15 @@ function stopKeyboardTracking() {
   document.documentElement.style.setProperty('--kb-offset', `0px`);
 }
 
+function focusInputAndScrollConfirm(inputId, confirmId) {
+  setTimeout(() => {
+    const input = document.getElementById(inputId);
+    input?.focus?.();
+    const btn = document.getElementById(confirmId);
+    btn?.scrollIntoView?.({ behavior: 'smooth', block: 'end' });
+  }, 80);
+}
+
 function tapToEditMovement(event, type, k, id) {
   if (swipeJustHappened) return;
   event?.preventDefault?.();
@@ -252,6 +261,24 @@ function tapToEditTransfer(event, k, id) {
   event?.preventDefault?.();
   openEditTransfer(k, id);
 }
+
+function showDebugToast(msg) {
+  try {
+    const el = document.getElementById('debugToast');
+    if (!el) return;
+    el.textContent = msg ? String(msg) : '';
+    el.style.display = 'block';
+    clearTimeout(showDebugToast._t);
+    showDebugToast._t = setTimeout(() => { el.style.display = 'none'; }, 2600);
+  } catch {}
+}
+
+window.addEventListener('error', (e) => {
+  showDebugToast(e?.message || 'Errore JS');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  showDebugToast(e?.reason?.message || 'Errore promise');
+});
 
 // ─── SERVICE WORKER ──────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -842,7 +869,7 @@ function openModal() {
   document.getElementById('modalSheet').classList.add('active');
   startKeyboardTracking();
   // focus sull'input: attiva la tastiera numerica nativa iOS
-  setTimeout(() => document.getElementById('amountInput')?.focus?.(), 50);
+  focusInputAndScrollConfirm('amountInput', 'modalConfirmBtn');
   // When a specific account is selected in the dashboard filter,
   // use it as the default account for the entry modal.
   const desiredAccountId = (filterAccountId !== 'all' && accounts.some(a => a.id === filterAccountId))
@@ -907,7 +934,7 @@ function openTransferModal(edit=false, k=null, id=null) {
   document.getElementById('transferModalBackdrop').classList.add('active');
   document.getElementById('transferModalSheet').classList.add('active');
   startKeyboardTracking();
-  setTimeout(() => document.getElementById('transferAmountInput')?.focus?.(), 60);
+  focusInputAndScrollConfirm('transferAmountInput', 'transferConfirmBtn');
 }
 
 function closeTransferModal() {
@@ -923,35 +950,40 @@ function openEditTransfer(k, id) {
 }
 
 function confirmTransfer() {
-  const imp = getTransferAmountValue();
-  if (!imp || imp <= 0) { shakeEl('transferAmountInput'); return; }
-  if (transferFromAccountId === transferToAccountId) { shakeEl('transferToSelectorBtn'); return; }
+  try {
+    const imp = getTransferAmountValue();
+    if (!imp || imp <= 0) { shakeEl('transferAmountInput'); return; }
+    if (transferFromAccountId === transferToAccountId) { shakeEl('transferToSelectorBtn'); return; }
 
-  if (viewMode === 'year') { closeTransferModal(); return; }
+    if (viewMode === 'year') { closeTransferModal(); return; }
 
-  const ts = transferDate.getTime();
-  const k = monthKey(transferDate.getFullYear(), transferDate.getMonth());
-  initMonthKey(k);
-  if (!db[k].transfers) db[k].transfers = [];
+    const ts = transferDate.getTime();
+    const k = monthKey(transferDate.getFullYear(), transferDate.getMonth());
+    initMonthKey(k);
+    if (!db[k].transfers) db[k].transfers = [];
 
-  if (transferEditContext?.k && transferEditContext?.id != null) {
-    const prevK = transferEditContext.k;
-    const prevArr = db[prevK]?.transfers || [];
-    const idx = prevArr.findIndex(t => t.id === transferEditContext.id);
-    if (idx >= 0) prevArr.splice(idx, 1);
+    if (transferEditContext?.k && transferEditContext?.id != null) {
+      const prevK = transferEditContext.k;
+      const prevArr = db[prevK]?.transfers || [];
+      const idx = prevArr.findIndex(t => t.id === transferEditContext.id);
+      if (idx >= 0) prevArr.splice(idx, 1);
+    }
+
+    const transfer = {
+      id: transferEditContext?.id ?? Date.now(),
+      ts,
+      imp,
+      fromAccountId: transferFromAccountId,
+      toAccountId: transferToAccountId,
+    };
+    db[k].transfers.push(transfer);
+
+    transferEditContext = null;
+    save().then(() => { closeTransferModal(); render(); });
+  } catch (e) {
+    showDebugToast(e?.message || String(e));
+    throw e;
   }
-
-  const transfer = {
-    id: transferEditContext?.id ?? Date.now(),
-    ts,
-    imp,
-    fromAccountId: transferFromAccountId,
-    toAccountId: transferToAccountId,
-  };
-  db[k].transfers.push(transfer);
-
-  transferEditContext = null;
-  save().then(() => { closeTransferModal(); render(); });
 }
 
 // ─── ENTRY EDITING (entrate/uscite + stipendio sintetico) ──────────────
@@ -1085,60 +1117,63 @@ function updateTimeDeterrent() {
 }
 
 async function confirmEntry() {
-  const imp=getEntryAmountValue();
-  if(!imp||imp<=0) { shakeEl('amountInput'); return; }
-  if(viewMode==='year') { closeModal(); return; }
-  const ts=modalDate.getTime();
-  const k=monthKey(modalDate.getFullYear(),modalDate.getMonth());
-  initMonthKey(k);
+  try {
+    const imp=getEntryAmountValue();
+    if(!imp||imp<=0) { shakeEl('amountInput'); return; }
+    if(viewMode==='year') { closeModal(); return; }
+    const ts=modalDate.getTime();
+    const k=monthKey(modalDate.getFullYear(),modalDate.getMonth());
+    initMonthKey(k);
 
-  // Edit: stipendio sintetico
-  if(editContext?.kind === 'salary') {
-    const prevK = editContext.prevK;
-    db[k].salary = imp;
-    db[k].salaryTs = ts;
-    db[k].salaryAccountId = selectedAccountId;
-    if(prevK && prevK !== k && db[prevK]?.salary != null) {
-      // Ripristina a valori globali/derivati se l'utente sposta la data.
-      delete db[prevK].salary;
-      delete db[prevK].salaryTs;
-      delete db[prevK].salaryAccountId;
+    // Edit: stipendio sintetico
+    if(editContext?.kind === 'salary') {
+      const prevK = editContext.prevK;
+      db[k].salary = imp;
+      db[k].salaryTs = ts;
+      db[k].salaryAccountId = selectedAccountId;
+      if(prevK && prevK !== k && db[prevK]?.salary != null) {
+        delete db[prevK].salary;
+        delete db[prevK].salaryTs;
+        delete db[prevK].salaryAccountId;
+      }
+      const curK = curMonthKey();
+      if(k === curK) {
+        gSettings.stip = imp;
+        gSettings.salaryAccountId = selectedAccountId;
+        await Promise.all([save(), idbSet('pt_settings', gSettings)]);
+      } else {
+        await save();
+      }
+      closeModal(); render();
+      return;
     }
-    // Se sta editando il mese corrente, aggiorna anche settings globali.
-    const curK = curMonthKey();
-    if(k === curK) {
-      gSettings.stip = imp;
-      gSettings.salaryAccountId = selectedAccountId;
-      await Promise.all([save(), idbSet('pt_settings', gSettings)]);
-    } else {
-      await save();
+
+    // Edit: entrata/uscita reale
+    if(editContext?.kind === 'entry') {
+      const prevK = editContext.prevK;
+      const prevType = editContext.prevType; // 'inc' | 'usc'
+      const prevArr = prevType === 'inc' ? (db[prevK]?.income || []) : (db[prevK]?.expenses || []);
+      const idx = prevArr.findIndex(i => i.id === editContext.id);
+      if(idx >= 0) prevArr.splice(idx, 1);
+
+      const entry = { id: editContext.id, ts, imp, cat:selectedCat.label, emoji:selectedCat.emoji, color:selectedCat.color, accountId:selectedAccountId };
+      if(modalType==='usc') db[k].expenses.push(entry);
+      else db[k].income.push(entry);
+
+      editContext = null;
+      await save(); closeModal(); render();
+      return;
     }
-    closeModal(); render();
-    return;
-  }
 
-  // Edit: entrata/uscita reale
-  if(editContext?.kind === 'entry') {
-    const prevK = editContext.prevK;
-    const prevType = editContext.prevType; // 'inc' | 'usc'
-    const prevArr = prevType === 'inc' ? (db[prevK]?.income || []) : (db[prevK]?.expenses || []);
-    const idx = prevArr.findIndex(i => i.id === editContext.id);
-    if(idx >= 0) prevArr.splice(idx, 1);
-
-    const entry = { id: editContext.id, ts, imp, cat:selectedCat.label, emoji:selectedCat.emoji, color:selectedCat.color, accountId:selectedAccountId };
+    // Nuovo movimento reale
+    const entry={id:Date.now(),ts,imp,cat:selectedCat.label,emoji:selectedCat.emoji,color:selectedCat.color,accountId:selectedAccountId};
     if(modalType==='usc') db[k].expenses.push(entry);
-    else db[k].income.push(entry);
-
-    editContext = null;
+    else                   db[k].income.push(entry);
     await save(); closeModal(); render();
-    return;
+  } catch (e) {
+    showDebugToast(e?.message || String(e));
+    throw e;
   }
-
-  // Nuovo movimento reale
-  const entry={id:Date.now(),ts,imp,cat:selectedCat.label,emoji:selectedCat.emoji,color:selectedCat.color,accountId:selectedAccountId};
-  if(modalType==='usc') db[k].expenses.push(entry);
-  else                   db[k].income.push(entry);
-  await save(); closeModal(); render();
 }
 
 // ─── RECURRING CAT GRID ──────────────────────────────────────────────────────
