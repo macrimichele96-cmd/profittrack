@@ -125,9 +125,32 @@ if ('serviceWorker' in navigator) {
     });
   }).catch(()=>{});
 }
-function applyUpdate() {
-  if (swRegistration?.waiting) swRegistration.waiting.postMessage({type:'SKIP_WAITING'});
-  window.location.reload();
+async function applyUpdate() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const waiting = swRegistration?.waiting || reg?.waiting;
+
+    if (waiting) {
+      waiting.postMessage({type:'SKIP_WAITING'});
+
+      // Ensures the new SW becomes the active controller before reloading.
+      await new Promise(resolve => {
+        const t = setTimeout(resolve, 3000);
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          clearTimeout(t);
+          resolve();
+        }, { once: true });
+      });
+    }
+  } catch (e) {
+    console.warn('applyUpdate failed', e);
+  }
+
+  // Cache-bust navigation (important on static hosting like GitHub Pages).
+  const url = new URL(window.location.href);
+  url.searchParams.set('v', String(Date.now()));
+  window.location.replace(url.toString());
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
@@ -297,10 +320,16 @@ function selectModalAccount(id) {
 }
 
 // ─── NUMPAD ──────────────────────────────────────────────────────────────────
+function hapticTap() {
+  try {
+    if ('vibrate' in navigator) navigator.vibrate(10);
+  } catch {}
+}
 function resetNumpad() {
   numpadValue='0'; numpadHasDecimal=false; updateAmountDisplay();
 }
 function numpadInput(char) {
+  hapticTap();
   if (char===',') {
     if (numpadHasDecimal) return;
     numpadHasDecimal=true;
@@ -322,6 +351,7 @@ function numpadInput(char) {
   updateTimeDeterrent();
 }
 function numpadDelete() {
+  hapticTap();
   if (numpadValue.length<=1) { numpadValue='0'; numpadHasDecimal=false; }
   else {
     const last=numpadValue[numpadValue.length-1];
@@ -489,27 +519,38 @@ function openModal() {
   buildCatGrid();
   document.getElementById('modalBackdrop').classList.add('active');
   document.getElementById('modalSheet').classList.add('active');
-  // Reset account to first
-  selectedAccountId=accounts[0]?.id||'main';
-  const acc=accounts[0]||{emoji:'🏦',name:'Principale'};
+  // When a specific account is selected in the dashboard filter,
+  // use it as the default account for the entry modal.
+  const desiredAccountId = (filterAccountId !== 'all' && accounts.some(a => a.id === filterAccountId))
+    ? filterAccountId
+    : (accounts[0]?.id||'main');
+  selectedAccountId = desiredAccountId;
+  const acc = accounts.find(a => a.id === selectedAccountId) || accounts[0] || {emoji:'🏦',name:'Principale'};
   document.getElementById('accountSelectorLabel').textContent=`${acc.emoji} ${acc.name}`;
   document.getElementById('timeDeterrent').style.display='none';
+  syncModalConfirmButton();
 }
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('active');
   document.getElementById('modalSheet').classList.remove('active');
 }
+
+function syncModalConfirmButton() {
+  const btn = document.getElementById('modalConfirmBtn');
+  if (!btn) return;
+  btn.textContent = 'Done';
+  btn.classList.remove('btn-green', 'btn-red');
+  btn.classList.add(modalType === 'inc' ? 'btn-green' : 'btn-red');
+}
 function setModalType(type) {
   modalType=type;
   document.getElementById('typeBtnUsc').classList.toggle('active',type==='usc');
   document.getElementById('typeBtnInc').classList.toggle('active',type==='inc');
-  const btn=document.getElementById('modalConfirmBtn');
-  btn.textContent=type==='usc'?'Aggiungi Uscita':'Aggiungi Entrata';
-  btn.className=`btn-primary modal-confirm-btn${type==='inc'?' btn-green':''}`;
   selectedCat=type==='usc'?CATS_USC[0]:CATS_INC[0];
   buildCatGrid();
   resetNumpad();
   document.getElementById('timeDeterrent').style.display='none';
+  syncModalConfirmButton();
 }
 function buildCatGrid() {
   const cats = modalType === 'usc' ? CATS_USC : CATS_INC;
@@ -629,14 +670,29 @@ function getAvgSettings() {
 function getMonthData(k) {
   const d=db[k]||{settings:null,income:[],expenses:[],appliedRec:[]};
   const s=getEffectiveSettings(k);
-  const extraInc=d.income.reduce((a,b)=>a+b.imp,0), uscite=d.expenses.reduce((a,b)=>a+b.imp,0);
-  return {stip:s.stip,extraInc,totInc:s.stip+extraInc,uscite,net:s.stip+extraInc-uscite,pagaH:s.pagaH,income:d.income,expenses:d.expenses};
+  const income=filterByAccount(d.income||[]);
+  const expenses=filterByAccount(d.expenses||[]);
+  const extraInc=income.reduce((a,b)=>a+b.imp,0);
+  const uscite=expenses.reduce((a,b)=>a+b.imp,0);
+  return {stip:s.stip,extraInc,totInc:s.stip+extraInc,uscite,net:s.stip+extraInc-uscite,pagaH:s.pagaH,income,expenses};
 }
 
 // Filter entries by account
 function filterByAccount(items) {
   if(filterAccountId==='all') return items;
   return items.filter(i=>(i.accountId||'main')===filterAccountId);
+}
+
+// Recurring detection (works with new `recurringId` and legacy entries).
+function isRecurringItemAppliedForFilter(k, r) {
+  const exps = db[k]?.expenses || [];
+  const scoped = filterByAccount(exps);
+  return scoped.some(e => {
+    if (!e?.isRec) return false;
+    if (e.recurringId != null) return e.recurringId === r.id;
+    // Legacy fallback: match by payload fields stored in recurring expense rows.
+    return e.nome === r.nome && e.cat === r.cat;
+  });
 }
 
 // ─── SETTINGS SAVE ───────────────────────────────────────────────────────────
@@ -672,12 +728,40 @@ async function deleteRecurring(id) {
 async function applyRecurring() {
   if(viewMode==='year') return;
   const k=curMonthKey(); initMonthKey(k);
+  // If the user is currently filtering by a specific account, apply the recurring
+  // expenses to that same account for consistency with the dashboard.
+  const targetAccountId = (filterAccountId !== 'all' && accounts.some(a => a.id === filterAccountId))
+    ? filterAccountId
+    : selectedAccountId;
+  selectedAccountId = targetAccountId;
+
   let added=0;
   recurring.forEach(r=>{
-    if(!db[k].appliedRec.includes(r.id)) {
-      db[k].expenses.push({id:Date.now()+Math.random(),ts:Date.now(),imp:r.imp,cat:r.cat,emoji:r.emoji||'📌',color:'#8E8E93',isRec:true,nome:r.nome,accountId:selectedAccountId});
-      db[k].appliedRec.push(r.id); added++;
-    }
+    const already = (db[k].expenses||[]).some(e => {
+      if(!e?.isRec) return false;
+      if ((e.accountId||'main') !== targetAccountId) return false;
+      if(e.recurringId != null) return e.recurringId === r.id;
+      // Legacy fallback (entries without recurringId).
+      return e.nome === r.nome && e.cat === r.cat;
+    });
+    if(already) return;
+
+    db[k].expenses.push({
+      id:Date.now()+Math.random(),
+      ts:Date.now(),
+      imp:r.imp,
+      cat:r.cat,
+      emoji:r.emoji||'📌',
+      color:'#8E8E93',
+      isRec:true,
+      nome:r.nome,
+      accountId:targetAccountId,
+      recurringId:r.id,
+    });
+
+    // Keep legacy `appliedRec` in sync (best-effort) for older datasets.
+    if(Array.isArray(db[k].appliedRec) && !db[k].appliedRec.includes(r.id)) db[k].appliedRec.push(r.id);
+    added++;
   });
   if(!added) return;
   await save(); render();
@@ -730,7 +814,7 @@ function calcolaSostenibilita() {
 // ─── DONUT CHART (SVG nativo) ─────────────────────────────────────────────────
 function renderDonutChart() {
   const k=curMonthKey();
-  const expenses=(db[k]?.expenses||[]);
+  const expenses=filterByAccount(db[k]?.expenses||[]);
   const svgEl=document.getElementById('donutSvg');
   const legend=document.getElementById('donutLegend');
   if(!svgEl||!legend) return;
@@ -794,7 +878,7 @@ function renderHistoryChart() {
     months.push({label:MONTH_NAMES[d.getMonth()],net:has?m.net:null,uscite:has?m.uscite:null});
   }
   const valid=months.filter(m=>m.net!==null);
-  if(!valid.length) { el.innerHTML=emptyState('I dati appariranno man mano che aggiungi mesi.'); if(leg)leg.innerHTML=''; return; }
+  if(!valid.length) { el.innerHTML=emptyStateNoMoves('I dati appariranno man mano che aggiungi mesi.'); if(leg)leg.innerHTML=''; return; }
   const allV=valid.flatMap(m=>[Math.abs(m.net),m.uscite]).filter(v=>v>0);
   const maxV=Math.max(...allV)*1.2||1;
   const W=300,H=120,bP=20,cH=H-bP-6,gW=W/12,bW=Math.floor(gW*.3),gap=2;
@@ -931,6 +1015,34 @@ function fmt(n) {
 }
 function fmtAmt(n) { const abs=Math.abs(n); return ((abs%1)>=0.005?abs.toFixed(2):abs.toFixed(0)); }
 function emptyState(msg) { return `<div class="empty-state-box"><div class="empty-icon">○</div><div class="empty-msg">${msg}</div></div>`; }
+
+// Empty state premium (icone sfumate + titolo + CTA)
+function emptyStateMovement(type) {
+  const isInc = type === 'inc';
+  const title = isInc ? 'Nessuna entrata' : 'Nessuna uscita';
+  const subtitle = 'Per questo conto, in questo periodo, non ci sono movimenti.';
+  const modalTypeToSet = isInc ? 'inc' : 'usc';
+  return `
+    <div class="empty-state-box">
+      <div class="empty-icon">○</div>
+      <div class="empty-title">${title}</div>
+      <div class="empty-msg">${subtitle}</div>
+      <button class="btn-primary empty-add-btn" onclick="openModal(); setModalType('${modalTypeToSet}')">Aggiungi ora</button>
+    </div>
+  `;
+}
+
+function emptyStateNoMoves(subtitle) {
+  const msg = subtitle || 'Ancora nessun movimento.';
+  return `
+    <div class="empty-state-box">
+      <div class="empty-icon">○</div>
+      <div class="empty-title">Nessun movimento</div>
+      <div class="empty-msg">${msg}</div>
+      <button class="btn-primary empty-add-btn" onclick="openModal()">Aggiungi ora</button>
+    </div>
+  `;
+}
 function formatTxDate(ts) {
   if(!ts) return '';
   const d=new Date(ts), today=new Date(), yesterday=new Date(today); yesterday.setDate(today.getDate()-1);
@@ -1018,7 +1130,7 @@ function render() {
     liveCalcPreview();
     const banner=document.getElementById('recurringApplyBanner');
     if(banner&&recurring.length) {
-      const notApplied=recurring.filter(r=>!(db[currentK].appliedRec||[]).includes(r.id));
+      const notApplied=recurring.filter(r=>!isRecurringItemAppliedForFilter(currentK,r));
       if(notApplied.length) { document.getElementById('recurringApplyText').textContent=`${notApplied.length} spese fisse non applicate`; banner.style.display='flex'; } else banner.style.display='none';
     } else if(banner) banner.style.display='none';
   } else {
@@ -1075,7 +1187,7 @@ function render() {
     const today=new Date(), isCurMon=today.getMonth()===currentView.getMonth()&&today.getFullYear()===currentView.getFullYear();
     if(isCurMon&&totInc>0) {
       const totFixed=recurring.reduce((a,r)=>a+r.imp,0);
-      const appliedFixed=recurring.filter(r=>(db[currentK].appliedRec||[]).includes(r.id)).reduce((a,r)=>a+r.imp,0);
+      const appliedFixed=filterByAccount((db[currentK].expenses||[]).filter(e=>e.isRec)).reduce((a,b)=>a+b.imp,0);
       const realAvailable=net-(totFixed-appliedFixed);
       ssCard.style.display='block';
       document.getElementById('safeSpendAmt').textContent=`€${fmt(Math.max(0,realAvailable))}`;
@@ -1102,7 +1214,7 @@ function render() {
   // Badge impostazioni
   const badge=document.getElementById('settingsBadge');
   if(badge&&viewMode==='month'&&currentK) {
-    const n=recurring.filter(r=>!(db[currentK].appliedRec||[]).includes(r.id)).length;
+    const n=recurring.filter(r=>!isRecurringItemAppliedForFilter(currentK,r)).length;
     badge.style.display=n?'block':'none'; badge.textContent=n||'';
   }
 
@@ -1114,13 +1226,13 @@ function render() {
   const rtEl=document.getElementById('recentTitle');
   if(rtEl) rtEl.textContent=viewMode==='day'?'Movimenti del giorno':'Recenti';
   const rl=document.getElementById('recentList');
-  if(rl) rl.innerHTML=recent.length?recent.map(e=>renderRow(e,e._type,e.monthKey)).join(''):emptyState('Ancora nessun movimento.<br>Premi <strong>+</strong> per aggiungerne uno.');
+  if(rl) rl.innerHTML=recent.length?recent.map(e=>renderRow(e,e._type,e.monthKey)).join(''):emptyStateNoMoves('Ancora nessun movimento. Aggiungi ora la tua prima entrata o uscita.');
 
   // Movimenti
   if(document.getElementById('page-movimenti').classList.contains('active')) {
     const mKey=currentK||curMonthKey();
     const makeGrouped=(items,type)=>{
-      if(!items.length) return emptyState(type==='inc'?'Nessuna entrata':'Nessuna uscita');
+      if(!items.length) return emptyStateMovement(type);
       return groupByDate(items.map(i=>({...i,_type:type}))).map(g=>`<div class="date-separator">${g.label}</div>${g.items.map(i=>renderRow(i,type,mKey)).join('')}`).join('');
     };
     document.getElementById('incomeList').innerHTML=makeGrouped(allIncome,'inc');

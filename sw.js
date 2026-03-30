@@ -1,4 +1,5 @@
-const CACHE_NAME = 'profittrack-v2';
+const CACHE_NAME = 'profittrack-v3';
+const INDEX_URL = './index.html';
 const ASSETS = [
   './',
   './index.html',
@@ -25,9 +26,30 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch: cache-first strategy
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  const isNavigation = e.request.mode === 'navigate'
+    || e.request.destination === 'document'
+    || e.request.url.endsWith('/index.html');
+
+  // For navigation requests use a network-first approach with a cached fallback.
+  if (isNavigation) {
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(INDEX_URL, clone)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(() => caches.match(INDEX_URL))
+    );
+    return;
+  }
+
+  // Default: cache-first strategy for static assets.
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -44,5 +66,8 @@ self.addEventListener('fetch', e => {
 
 // Message: skipWaiting when app sends SKIP_WAITING
 self.addEventListener('message', e => {
-  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (e.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    self.clients.claim();
+  }
 });
