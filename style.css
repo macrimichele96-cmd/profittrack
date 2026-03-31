@@ -80,16 +80,13 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   display:none;
   animation:pageIn .22s cubic-bezier(.4,0,.2,1);
   padding-top: calc(var(--top-nav-h) + env(safe-area-inset-top) + 20px);
-  /* FIX: padding-bottom calcolato sull'altezza della tab-bar per evitare spazio vuoto */
   padding-bottom: calc(var(--tab-h) + 16px);
 }
 .page.active{display:block;}
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
-/* Evita doppio padding-bottom (eredita da .page, lo azzeriamo qui) */
 .page-scroll{
   padding-bottom: 0;
 }
-/* Rimuove margini inferiori extra dall'ultima card */
 .glass-card:last-child{
   margin-bottom: 0;
 }
@@ -193,8 +190,8 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .fab:active{transform:scale(.92);box-shadow:0 2px 10px rgba(10,132,255,.3);}
 
 /* ════════════════════════════════════════════
-   TAB BAR — Edge-to-Edge (iOS PWA) – FIX 2
-   Nessuno spazio nero in basso, background esteso fino al fondo.
+   TAB BAR — EDGE-TO-EDGE CON SAFE-AREA INCLUSIVA
+   Ora lo sfondo copre anche l'area della gesture home
 ════════════════════════════════════════════ */
 .tab-bar{
   position:fixed;
@@ -208,12 +205,13 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   display:flex;
   justify-content:space-around;
   align-items:flex-start;
-  padding:10px 0 0;
-  margin:0;          /* assicura nessun margine esterno */
+  /* FIX: padding-bottom estende la barra per coprire la safe-area */
+  padding:10px 0 env(safe-area-inset-bottom);
+  margin:0;
   z-index:1000;
 }
 
-/* Tab items: il padding-bottom gestisce la safe-area */
+/* Tab items: non serve padding-bottom extra perché già gestito dalla barra */
 .tab-item{
   flex:1;
   display:flex;
@@ -223,7 +221,7 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   position:relative;
   color:var(--sub);
   cursor:pointer;
-  padding:0 4px calc(env(safe-area-inset-bottom) + 12px);
+  padding:0 4px 12px;
   -webkit-tap-highlight-color:transparent;
   transition:color .2s;
 }
