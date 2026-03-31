@@ -35,8 +35,8 @@ let db          = {};
 let gSettings   = { stip:0, oreGiorno:8, pagaH:0, restDays:[0,6], salaryAccountId:'main' };
 let recurring   = [];
 let accounts    = [{ id:'main', name:'Principale', emoji:'🏦' }];
-let selectedAccountId = 'main'; // account selezionato nel modal
-let filterAccountId   = 'all';  // filtro nella home ('all' o id)
+let selectedAccountId = 'main';
+let filterAccountId   = 'all';
 
 let currentView   = new Date();
 let viewMode      = 'month';
@@ -46,25 +46,20 @@ let currentRecCat = CATS_USC[0];
 let calendarOpen  = false;
 let swRegistration = null;
 
-// Picker/modal contexts
-let accountPickerContext = 'modal'; // 'modal' | 'salary' | 'transferFrom' | 'transferTo'
-let datePickerContext = 'entry';   // 'entry' | 'transfer'
+let accountPickerContext = 'modal';
+let datePickerContext = 'entry';
 let transferDate = new Date();
 let transferFromAccountId = 'main';
 let transferToAccountId = null;
 let onbSalaryAccountId = 'main';
 let accountInitTargetId = null;
 
-// Edit contexts
-let editContext = null;           // { kind:'entry'|'salary', prevK, id, prevType }
-let transferEditContext = null;  // { k, id }
+let editContext = null;
+let transferEditContext = null;
 let swipeJustHappened = false;
 
-// Numpad state
 let numpadValue = '0';
 let numpadHasDecimal = false;
-
-// Modal date (default oggi)
 let modalDate = new Date();
 
 // ─── INDEXEDDB ───────────────────────────────────────────────────────────────
@@ -132,19 +127,43 @@ function idbSet(key, value) {
 
 async function save() {
   await idbSet('pt_db', db);
-  // idbSet gestisce già il feedback visivo.
 }
-async function saveSettings() { // Note: this shadows the UI function — see below
+async function saveSettings() {
   await idbSet('pt_settings', gSettings);
-  // idbSet gestisce già il feedback visivo.
 }
 async function saveRecurringIDB() {
   await idbSet('pt_recurring', recurring);
-  // idbSet gestisce già il feedback visivo.
 }
 async function saveAccountsIDB() {
   await idbSet('pt_accounts', accounts);
-  // idbSet gestisce già il feedback visivo.
+}
+
+// ─── SALDI CONTI (calcolo su tutti i mesi) ──────────────────────────────────
+function computeAccountBalances() {
+  const balances = {};
+  accounts.forEach(acc => { balances[acc.id] = 0; });
+
+  for (const k in db) {
+    const month = db[k];
+    (month.income || []).forEach(inc => {
+      const accId = inc.accountId || 'main';
+      if (balances[accId] !== undefined) balances[accId] += inc.imp;
+    });
+    (month.expenses || []).forEach(exp => {
+      const accId = exp.accountId || 'main';
+      if (balances[accId] !== undefined) balances[accId] -= exp.imp;
+    });
+    (month.transfers || []).forEach(tr => {
+      if (balances[tr.fromAccountId] !== undefined) balances[tr.fromAccountId] -= tr.imp;
+      if (balances[tr.toAccountId] !== undefined)   balances[tr.toAccountId] += tr.imp;
+    });
+  }
+  return balances;
+}
+
+function getAccountBalance(accountId) {
+  const balances = computeAccountBalances();
+  return balances[accountId] || 0;
 }
 
 // ─── SICUREZZA INPUT ─────────────────────────────────────────────────────────
@@ -153,12 +172,9 @@ function sanitizeAmount(val) {
   let s = String(val).trim();
   s = s.replace(/\s+/g,'');
   s = s.replace(/€|EUR/gi,'');
-  // Gestisce formati "1.800" (thousands) e "1.800,50" (thousands + decimal)
   if (s.includes('.') && s.includes(',')) {
-    // "." migliaia, "," decimale
     s = s.replace(/\./g,'').replace(',', '.');
   } else {
-    // "." migliaia (se sembra migliaia), oppure decimale
     s = s.replace(/\.(?=\d{3}(?:\D|$))/g,'');
     if (s.includes(',')) s = s.replace(',', '.');
   }
@@ -172,12 +188,10 @@ function getAccountById(id) {
 }
 
 function getSalaryAccountForMonth(k) {
-  // Per-mese override (se presente), altrimenti global settings.
   return db[k]?.salaryAccountId || gSettings.salaryAccountId || 'main';
 }
 
 function getSalaryTsForMonth(k) {
-  // Visualizzato nei movimenti; default: 1° del mese.
   if (db[k]?.salaryTs) return db[k].salaryTs;
   const [y, m] = k.split('-').map(Number);
   const d = new Date(y, m, 1, 12, 0, 0);
@@ -189,7 +203,6 @@ function getSalaryItemForMonth(k) {
   if (!salary) return null;
   const salaryAcc = getSalaryAccountForMonth(k);
   const salaryTs = getSalaryTsForMonth(k);
-  // Uso `id = salaryTs` per rendere il row riconoscibile in edit.
   const cat = CATS_INC[0];
   return {
     id: salaryTs,
@@ -216,7 +229,6 @@ function resetEntryAmountInput() {
 }
 
 function formatThousandItalian(intDigits) {
-  // Inserisce separatore migliaia '.' (es: 12345 -> 12.345)
   const s = String(intDigits || '0').replace(/^0+/, '') || '0';
   let out = '';
   for (let i = 0; i < s.length; i++) {
@@ -228,8 +240,6 @@ function formatThousandItalian(intDigits) {
 }
 
 function parseAmountInput(raw) {
-  // Converte un input "libero" in {intDigits, decDigits, hasDecimalSep}
-  // Normalizziamo nel formato UI: migliaia '.' e decimali ','
   let s = String(raw ?? '');
   s = s.replace(/\s+/g, '');
   s = s.replace(/€|EUR/gi, '');
@@ -263,9 +273,8 @@ function parseAmountInput(raw) {
 
   const intDigits = (intPart || '').replace(/[^0-9]/g, '');
   let decDigits = (decPart || '').replace(/[^0-9]/g, '');
-  if (decDigits.length > 2) decDigits = decDigits.slice(0, 2); // max 2 decimali
+  if (decDigits.length > 2) decDigits = decDigits.slice(0, 2);
 
-  // Niente zeri multipli iniziali: "00012" -> "12" (ma "0" resta "0")
   let normalizedInt = intDigits;
   if (normalizedInt) normalizedInt = normalizedInt.replace(/^0+(?=\d)/, '');
   if (!normalizedInt) normalizedInt = '0';
@@ -281,8 +290,6 @@ function formatAmountInputEl(inputEl) {
 
   const hasDecimal = parsed.decDigits.length > 0 || parsed.trailingSep;
   const formattedInt = formatThousandItalian(parsed.intDigits);
-
-  // Se l'utente ha appena inserito il separatore decimale, manteniamolo
   const formatted = hasDecimal
     ? `${formattedInt},${parsed.decDigits || ''}`
     : formattedInt;
@@ -317,13 +324,11 @@ function onTransferAmountInputChange() {
 
 let kbTrack = { active:false, handler:null, vvHandler:null };
 function setKeyboardOffset() {
-  // iOS: quando la tastiera appare, visualViewport.height diminuisce.
   if (!window.visualViewport) return;
   const vv = window.visualViewport;
   const diff = Math.max(0, window.innerHeight - vv.height);
   document.documentElement.style.setProperty('--kb-offset', `${diff}px`);
 
-  // Assicura che il bottone "Done" resti visibile e tappabile
   if (diff > 30) {
     const entrySheet = document.getElementById('modalSheet');
     if (entrySheet && entrySheet.classList.contains('active')) {
@@ -441,7 +446,6 @@ async function applyUpdate() {
     if (waiting) {
       waiting.postMessage({type:'SKIP_WAITING'});
 
-      // Ensures the new SW becomes the active controller before reloading.
       await new Promise(resolve => {
         const t = setTimeout(resolve, 3000);
         navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -454,7 +458,6 @@ async function applyUpdate() {
     console.warn('applyUpdate failed', e);
   }
 
-  // Cache-bust navigation (important on static hosting like GitHub Pages).
   const url = new URL(window.location.href);
   url.searchParams.set('v', String(Date.now()));
   window.location.replace(url.toString());
@@ -468,9 +471,7 @@ window.onload = async () => {
   } catch (e) {
     console.warn('IDB init failed', e);
     showSaveErrorToast('Salvataggio offline non disponibile (IndexedDB).');
-    // Continua comunque: l'app può partire senza persistenza.
   }
-  // Load all data
   const [dbData, sets, rec, acc] = await Promise.all([
     idbGet('pt_db'), idbGet('pt_settings'), idbGet('pt_recurring'), idbGet('pt_accounts')
   ]);
@@ -480,7 +481,6 @@ window.onload = async () => {
   if (rec)      recurring  = rec;
   if (acc)      accounts   = acc;
 
-  // Legacy migration from localStorage
   if (!dbData && localStorage.getItem('pt_db')) {
     try { db = JSON.parse(localStorage.getItem('pt_db')||'{}'); await save(); } catch{}
   }
@@ -691,7 +691,6 @@ async function saveAccountInitial() {
   const prevK = acc.initK || curMonthKey();
   initMonthKey(prevK);
 
-  // Remove old init entry if any
   if (acc.initEntryId != null) {
     db[prevK].income = (db[prevK].income || []).filter(i => i.id !== acc.initEntryId);
     acc.initEntryId = null;
@@ -763,7 +762,6 @@ function selectAccountFromPicker(id) {
     if (viewMode === 'month') {
       const k = curMonthKey();
       initMonthKey(k);
-      // Applichiamo subito il conto per il mese corrente (preview).
       db[k].salaryAccountId = id;
     }
     idbSet('pt_settings', gSettings).catch(()=>{});
@@ -771,64 +769,63 @@ function selectAccountFromPicker(id) {
   } else if (accountPickerContext === 'transferFrom') {
     transferFromAccountId = id;
     const acc = getAccountById(id);
-    const lab = document.getElementById('transferFromSelectorLabel');
-    if (lab) lab.textContent = `${acc.emoji} ${acc.name}`;
+    const balance = getAccountBalance(id);
+    document.getElementById('transferFromSelectorLabel').innerHTML = `${acc.emoji} ${acc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(balance)})</span>`;
   } else if (accountPickerContext === 'transferTo') {
     transferToAccountId = id;
     const acc = getAccountById(id);
-    const lab = document.getElementById('transferToSelectorLabel');
-    if (lab) lab.textContent = `${acc.emoji} ${acc.name}`;
+    const balance = getAccountBalance(id);
+    document.getElementById('transferToSelectorLabel').innerHTML = `${acc.emoji} ${acc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(balance)})</span>`;
   }
   closeAccountPicker();
 }
 
-// ─── NUMPAD ──────────────────────────────────────────────────────────────────
-function hapticTap() {
-  try {
-    if ('vibrate' in navigator) navigator.vibrate(10);
-  } catch {}
+// ─── NUOVO SELEZIONE CONTI PER TRASFERIMENTO (CARD CON SALDO) ────────────────
+function openTransferAccountPicker(direction) {
+  accountPickerContext = direction === 'from' ? 'transferFrom' : 'transferTo';
+  const balances = computeAccountBalances();
+  const container = document.getElementById('transferAccountPickerList');
+  if (!container) return;
+
+  container.innerHTML = accounts.map(acc => {
+    const balance = balances[acc.id] || 0;
+    const balanceStr = balance >= 0 ? `€${fmt(balance)}` : `-€${fmt(Math.abs(balance))}`;
+    const isSelected = (direction === 'from' && transferFromAccountId === acc.id) ||
+                       (direction === 'to' && transferToAccountId === acc.id);
+    return `
+      <div class="transfer-acc-card ${isSelected ? 'active' : ''}" data-accid="${acc.id}" onclick="selectTransferAccount('${direction}', '${acc.id}')">
+        <div class="transfer-acc-emoji">${acc.emoji}</div>
+        <div class="transfer-acc-info">
+          <div class="transfer-acc-name">${acc.name}</div>
+          <div class="transfer-acc-balance">${balanceStr}</div>
+        </div>
+        ${isSelected ? '<div class="checkmark">✓</div>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('transferAccountPickerBackdrop').classList.add('active');
+  document.getElementById('transferAccountPickerSheet').classList.add('active');
 }
-function resetNumpad() {
-  numpadValue='0'; numpadHasDecimal=false; updateAmountDisplay();
-}
-function numpadInput(char) {
-  hapticTap();
-  if (char===',') {
-    if (numpadHasDecimal) return;
-    numpadHasDecimal=true;
-    if (numpadValue==='0') numpadValue='0,';
-    else numpadValue+=',';
+
+function selectTransferAccount(direction, accountId) {
+  if (direction === 'from') {
+    transferFromAccountId = accountId;
+    const acc = getAccountById(accountId);
+    const balance = getAccountBalance(accountId);
+    document.getElementById('transferFromSelectorLabel').innerHTML = `${acc.emoji} ${acc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(balance)})</span>`;
   } else {
-    // Limit decimal places to 2
-    if (numpadHasDecimal) {
-      const parts=numpadValue.split(',');
-      if (parts[1]&&parts[1].length>=2) return;
-    }
-    if (numpadValue==='0' && char!==',') numpadValue=char;
-    else numpadValue+=char;
-    // Cap at 999999
-    const raw=sanitizeAmount(numpadValue);
-    if (raw>999999) return;
+    transferToAccountId = accountId;
+    const acc = getAccountById(accountId);
+    const balance = getAccountBalance(accountId);
+    document.getElementById('transferToSelectorLabel').innerHTML = `${acc.emoji} ${acc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(balance)})</span>`;
   }
-  updateAmountDisplay();
-  updateTimeDeterrent();
+  closeTransferAccountPicker();
 }
-function numpadDelete() {
-  hapticTap();
-  if (numpadValue.length<=1) { numpadValue='0'; numpadHasDecimal=false; }
-  else {
-    const last=numpadValue[numpadValue.length-1];
-    if (last===',') numpadHasDecimal=false;
-    numpadValue=numpadValue.slice(0,-1);
-  }
-  updateAmountDisplay();
-  updateTimeDeterrent();
-}
-function updateAmountDisplay() {
-  document.getElementById('amountDisplay').textContent = numpadValue==='0'?'0':numpadValue;
-}
-function getNumpadAmount() {
-  return sanitizeAmount(numpadValue);
+
+function closeTransferAccountPicker() {
+  document.getElementById('transferAccountPickerBackdrop').classList.remove('active');
+  document.getElementById('transferAccountPickerSheet').classList.remove('active');
 }
 
 // ─── DATE PICKER (modal) ─────────────────────────────────────────────────────
@@ -850,7 +847,6 @@ function updateTransferDateSelectorLabel() {
 }
 function openDatePicker() {
   datePickerContext = 'entry';
-  // Set native input to current modalDate
   const y=modalDate.getFullYear();
   const m=String(modalDate.getMonth()+1).padStart(2,'0');
   const d=String(modalDate.getDate()).padStart(2,'0');
@@ -1000,8 +996,7 @@ function liveCalcPreview() {
 
 // ─── MODAL ───────────────────────────────────────────────────────────────────
 function openModal() {
-  editContext = null; // reset modalità edit
-  // Ripristina UI in modalità inserimento
+  editContext = null;
   const tt = document.querySelector('.type-toggle');
   if (tt) tt.style.display = '';
   const ch = document.getElementById('catHScroll');
@@ -1013,10 +1008,7 @@ function openModal() {
   document.getElementById('modalBackdrop').classList.add('active');
   document.getElementById('modalSheet').classList.add('active');
   startKeyboardTracking();
-  // focus sull'input: attiva la tastiera numerica nativa iOS
   focusInputAndScrollConfirm('amountInput', 'modalConfirmBtn');
-  // When a specific account is selected in the dashboard filter,
-  // use it as the default account for the entry modal.
   const desiredAccountId = (filterAccountId !== 'all' && accounts.some(a => a.id === filterAccountId))
     ? filterAccountId
     : (accounts[0]?.id||'main');
@@ -1031,7 +1023,6 @@ function closeModal() {
   document.getElementById('modalSheet').classList.remove('active');
   stopKeyboardTracking();
   editContext = null;
-  // Ripristino UI inserimento
   const tt = document.querySelector('.type-toggle');
   if (tt) tt.style.display = '';
   const ch = document.getElementById('catHScroll');
@@ -1045,7 +1036,6 @@ function openTransferModal(edit=false, k=null, id=null) {
     return;
   }
 
-  // Modifica
   if (edit && k) {
     transferEditContext = { k, id };
     const t = (db[k]?.transfers || []).find(x => x.id === id);
@@ -1070,10 +1060,10 @@ function openTransferModal(edit=false, k=null, id=null) {
 
   const fromAcc = getAccountById(transferFromAccountId);
   const toAcc = getAccountById(transferToAccountId);
-  const fromLab = document.getElementById('transferFromSelectorLabel');
-  const toLab = document.getElementById('transferToSelectorLabel');
-  if (fromLab) fromLab.textContent = `${fromAcc.emoji} ${fromAcc.name}`;
-  if (toLab) toLab.textContent = `${toAcc.emoji} ${toAcc.name}`;
+  const fromBalance = getAccountBalance(transferFromAccountId);
+  const toBalance = getAccountBalance(transferToAccountId);
+  document.getElementById('transferFromSelectorLabel').innerHTML = `${fromAcc.emoji} ${fromAcc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(fromBalance)})</span>`;
+  document.getElementById('transferToSelectorLabel').innerHTML = `${toAcc.emoji} ${toAcc.name} <span style="font-size:12px;opacity:0.7;">(€${fmt(toBalance)})</span>`;
   updateTransferDateSelectorLabel();
 
   document.getElementById('transferModalBackdrop').classList.add('active');
@@ -1094,12 +1084,16 @@ function openEditTransfer(k, id) {
   openTransferModal(true, k, id);
 }
 
-function confirmTransfer() {
+// ─── CONFERMA TRASFERIMENTO (LOGICA CORRETTA) ───────────────────────────
+async function confirmTransfer() {
   try {
     const imp = getTransferAmountValue();
     if (!imp || imp <= 0) { shakeEl('transferAmountInput'); return; }
-    if (transferFromAccountId === transferToAccountId) { shakeEl('transferToSelectorBtn'); return; }
-
+    if (transferFromAccountId === transferToAccountId) {
+      shakeEl('transferToSelectorBtn');
+      showSaveErrorToast('Il conto di origine e destinazione devono essere diversi.');
+      return;
+    }
     if (viewMode === 'year') { closeTransferModal(); return; }
 
     const ts = transferDate.getTime();
@@ -1107,15 +1101,28 @@ function confirmTransfer() {
     initMonthKey(k);
     if (!db[k].transfers) db[k].transfers = [];
 
+    // Rimuovi vecchio trasferimento se in modifica
     if (transferEditContext?.k && transferEditContext?.id != null) {
       const prevK = transferEditContext.k;
       const prevArr = db[prevK]?.transfers || [];
       const idx = prevArr.findIndex(t => t.id === transferEditContext.id);
-      if (idx >= 0) prevArr.splice(idx, 1);
+      if (idx >= 0) {
+        const oldTr = prevArr[idx];
+        // Rimuovi le vecchie voci contabili
+        if (db[prevK].expenses) {
+          db[prevK].expenses = db[prevK].expenses.filter(e => !(e.isTransfer && e.transferId === oldTr.id));
+        }
+        if (db[prevK].income) {
+          db[prevK].income = db[prevK].income.filter(i => !(i.isTransfer && i.transferId === oldTr.id));
+        }
+        prevArr.splice(idx, 1);
+      }
     }
 
+    // Crea nuovo trasferimento
+    const transferId = transferEditContext?.id ?? Date.now();
     const transfer = {
-      id: transferEditContext?.id ?? Date.now(),
+      id: transferId,
       ts,
       imp,
       fromAccountId: transferFromAccountId,
@@ -1123,8 +1130,40 @@ function confirmTransfer() {
     };
     db[k].transfers.push(transfer);
 
+    // Registra le due voci contabili
+    const expenseEntry = {
+      id: Date.now() + Math.random(),
+      ts,
+      imp,
+      cat: 'Trasferimento',
+      emoji: '🔄',
+      color: '#BF5AF2',
+      accountId: transferFromAccountId,
+      isTransfer: true,
+      transferId: transferId,
+      isExpenseTransfer: true
+    };
+    const incomeEntry = {
+      id: Date.now() + Math.random(),
+      ts,
+      imp,
+      cat: 'Trasferimento',
+      emoji: '🔄',
+      color: '#32D74B',
+      accountId: transferToAccountId,
+      isTransfer: true,
+      transferId: transferId,
+      isIncomeTransfer: true
+    };
+    if (!db[k].expenses) db[k].expenses = [];
+    if (!db[k].income) db[k].income = [];
+    db[k].expenses.push(expenseEntry);
+    db[k].income.push(incomeEntry);
+
     transferEditContext = null;
-    save().then(() => { closeTransferModal(); render(); });
+    await save();
+    closeTransferModal();
+    render();
   } catch (e) {
     showDebugToast(e?.message || String(e));
     throw e;
@@ -1133,7 +1172,6 @@ function confirmTransfer() {
 
 // ─── ENTRY EDITING (entrate/uscite + stipendio sintetico) ──────────────
 function openEditEntry(type, k, id) {
-  // Stipendio sintetico: id = salaryTs per quel mese.
   if (type === 'inc') {
     const salaryTs = getSalaryTsForMonth(k);
     if (id === salaryTs && getSalaryForMonth(k) > 0) {
@@ -1151,7 +1189,6 @@ function openEditEntry(type, k, id) {
     || (type === 'inc' ? CATS_INC[0] : CATS_USC[0]);
 
   openModal();
-  // openModal non setta le classi active del toggle: le forziamo qui.
   document.getElementById('typeBtnUsc').classList.toggle('active', type === 'usc');
   document.getElementById('typeBtnInc').classList.toggle('active', type === 'inc');
 
@@ -1166,9 +1203,7 @@ function openEditEntry(type, k, id) {
   if (impEl) impEl.value = String(item.imp ?? 0);
   updateTimeDeterrent();
 
-  // Categoria
   selectedCat = (type === 'usc' ? CATS_USC : CATS_INC).find(c => c.label === item.cat) || selectedCat;
-  // Aggiorna grid con categoria selezionata.
   buildCatGrid();
 
   editContext = { kind:'entry', prevK:k, id, prevType:type };
@@ -1181,10 +1216,9 @@ function openEditSalary(k) {
   const salaryAcc = getSalaryAccountForMonth(k);
 
   modalType = 'inc';
-  selectedCat = CATS_INC[0]; // "Stipendio"
+  selectedCat = CATS_INC[0];
 
   openModal();
-  // Nasconde toggle e categorie: stipendio è sempre una entrata.
   const tt = document.querySelector('.type-toggle');
   if (tt) tt.style.display = 'none';
   const ch = document.getElementById('catHScroll');
@@ -1208,7 +1242,7 @@ function openEditSalary(k) {
 function syncModalConfirmButton() {
   const btn = document.getElementById('modalConfirmBtn');
   if (!btn) return;
-  btn.textContent = 'Done';
+  btn.textContent = 'Fatto';
   btn.classList.remove('btn-green', 'btn-red');
   btn.classList.add(modalType === 'inc' ? 'btn-green' : 'btn-red');
 }
@@ -1226,7 +1260,6 @@ function setModalType(type) {
 }
 function buildCatGrid() {
   const cats = modalType === 'usc' ? CATS_USC : CATS_INC;
-  // Popola la lista orizzontale (cat-hlist)
   const container = document.getElementById('catGrid');
   container.innerHTML = cats.map(c => `
     <button class="cat-card${c.id === selectedCat.id ? ' active' : ''}"
@@ -1235,7 +1268,6 @@ function buildCatGrid() {
       <span class="cat-card-emoji">${c.emoji}</span>
       <span class="cat-card-label">${c.label}</span>
     </button>`).join('');
-  // Scrolla fino alla categoria selezionata
   requestAnimationFrame(() => {
     const active = container.querySelector('.cat-card.active');
     if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
@@ -1270,7 +1302,6 @@ async function confirmEntry() {
     const k=monthKey(modalDate.getFullYear(),modalDate.getMonth());
     initMonthKey(k);
 
-    // Edit: stipendio sintetico
     if(editContext?.kind === 'salary') {
       const prevK = editContext.prevK;
       db[k].salary = imp;
@@ -1293,10 +1324,9 @@ async function confirmEntry() {
       return;
     }
 
-    // Edit: entrata/uscita reale
     if(editContext?.kind === 'entry') {
       const prevK = editContext.prevK;
-      const prevType = editContext.prevType; // 'inc' | 'usc'
+      const prevType = editContext.prevType;
       const prevArr = prevType === 'inc' ? (db[prevK]?.income || []) : (db[prevK]?.expenses || []);
       const idx = prevArr.findIndex(i => i.id === editContext.id);
       if(idx >= 0) prevArr.splice(idx, 1);
@@ -1310,7 +1340,6 @@ async function confirmEntry() {
       return;
     }
 
-    // Nuovo movimento reale
     const entry={id:Date.now(),ts,imp,cat:selectedCat.label,emoji:selectedCat.emoji,color:selectedCat.color,accountId:selectedAccountId};
     if(modalType==='usc') db[k].expenses.push(entry);
     else                   db[k].income.push(entry);
@@ -1399,26 +1428,23 @@ function getMonthData(k) {
   return {stip:s.stip,extraInc,totInc:s.stip+extraInc,uscite,net:s.stip+extraInc-uscite,pagaH:s.pagaH,income,expenses};
 }
 
-// Filter entries by account
 function filterByAccount(items) {
   if(filterAccountId==='all') return items;
   return items.filter(i=>(i.accountId||'main')===filterAccountId);
 }
 
-// Recurring detection (works with new `recurringId` and legacy entries).
 function isRecurringItemAppliedForFilter(k, r) {
   const exps = db[k]?.expenses || [];
   const scoped = filterByAccount(exps);
   return scoped.some(e => {
     if (!e?.isRec) return false;
     if (e.recurringId != null) return e.recurringId === r.id;
-    // Legacy fallback: match by payload fields stored in recurring expense rows.
     return e.nome === r.nome && e.cat === r.cat;
   });
 }
 
 // ─── SETTINGS SAVE ───────────────────────────────────────────────────────────
-async function saveSettings() {  // UI function
+async function saveSettings() {
   if(viewMode==='year') { alert("Passa alla vista mensile."); return; }
   const stip=sanitizeAmount(document.getElementById('set_stip').value);
   const oreG=sanitizeAmount(document.getElementById('set_ore').value);
@@ -1451,8 +1477,6 @@ async function deleteRecurring(id) {
 async function applyRecurring() {
   if(viewMode==='year') return;
   const k=curMonthKey(); initMonthKey(k);
-  // If the user is currently filtering by a specific account, apply the recurring
-  // expenses to that same account for consistency with the dashboard.
   const targetAccountId = (filterAccountId !== 'all' && accounts.some(a => a.id === filterAccountId))
     ? filterAccountId
     : selectedAccountId;
@@ -1464,7 +1488,6 @@ async function applyRecurring() {
       if(!e?.isRec) return false;
       if ((e.accountId||'main') !== targetAccountId) return false;
       if(e.recurringId != null) return e.recurringId === r.id;
-      // Legacy fallback (entries without recurringId).
       return e.nome === r.nome && e.cat === r.cat;
     });
     if(already) return;
@@ -1482,7 +1505,6 @@ async function applyRecurring() {
       recurringId:r.id,
     });
 
-    // Keep legacy `appliedRec` in sync (best-effort) for older datasets.
     if(Array.isArray(db[k].appliedRec) && !db[k].appliedRec.includes(r.id)) db[k].appliedRec.push(r.id);
     added++;
   });
@@ -1552,7 +1574,6 @@ function renderDonutChart() {
   const legend=document.getElementById('donutLegend');
   if(!svgEl||!legend) return;
 
-  // Aggregate by category
   const totals={};
   expenses.forEach(e=>{
     if(!totals[e.cat]) totals[e.cat]={val:0,color:e.color,emoji:e.emoji};
@@ -1582,13 +1603,11 @@ function renderDonutChart() {
     angle=ea;
   });
 
-  // Center text
   paths+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" fill="var(--sub)" font-size="10" font-family="-apple-system,sans-serif" font-weight="600">USCITE</text>`;
   paths+=`<text x="${cx}" y="${cy+10}" text-anchor="middle" fill="var(--text)" font-size="13" font-family="-apple-system,sans-serif" font-weight="700">€${fmt(total)}</text>`;
 
   svgEl.innerHTML=paths;
 
-  // Legend
   legend.innerHTML=entries.slice(0,6).map(([cat,{val,color,emoji}])=>`
     <div class="donut-leg-row">
       <span class="donut-dot" style="background:${color}"></span>
@@ -1657,7 +1676,6 @@ function renderPie(expenses) {
 // ─── EXPORT CSV ──────────────────────────────────────────────────────────────
 async function exportCSV() {
   let csv='Data,Tipo,Categoria,Importo,Conto\n';
-  // Load all from IDB
   const data=await idbGet('pt_db')||db;
   Object.keys(data).forEach(k=>{
     (data[k].income||[]).forEach(i=>{
@@ -1757,7 +1775,6 @@ function fmt(n) {
 function fmtAmt(n) { const abs=Math.abs(n); return ((abs%1)>=0.005?abs.toFixed(2):abs.toFixed(0)); }
 function emptyState(msg) { return `<div class="empty-state-box"><div class="empty-icon">○</div><div class="empty-msg">${msg}</div></div>`; }
 
-// Empty state premium (icone sfumate + titolo + CTA)
 function emptyStateMovement(type) {
   const isInc = type === 'inc';
   const title = isInc ? 'Nessuna entrata' : 'Nessuna uscita';

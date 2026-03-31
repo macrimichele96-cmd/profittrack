@@ -157,7 +157,6 @@
   <div id="page-movimenti" class="page">
     <div class="page-scroll">
       <div class="glass-card transfer-quick-card">
-        <!-- Purple: distinct semantic color for transfers -->
         <button class="btn-secondary" onclick="openTransferModal(false)">↔ Trasferisci</button>
       </div>
       <div class="glass-card" id="pieSection" style="display:none;">
@@ -346,10 +345,8 @@
     </div>
   </div>
 
-  <!-- TAB BAR — SF Symbols style icons, 1.5px stroke, same optical weight -->
+  <!-- TAB BAR -->
   <div class="tab-bar">
-
-    <!-- Riepilogo: house.fill -->
     <div class="tab-item active" onclick="showPage('page-home',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -358,8 +355,6 @@
       </div>
       <span>Riepilogo</span>
     </div>
-
-    <!-- Movimenti: list.bullet -->
     <div class="tab-item" onclick="showPage('page-movimenti',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -373,8 +368,6 @@
       </div>
       <span>Movimenti</span>
     </div>
-
-    <!-- Analisi: chart.line.uptrend.xyaxis -->
     <div class="tab-item" onclick="showPage('page-analisi',this)">
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -384,8 +377,6 @@
       </div>
       <span>Analisi</span>
     </div>
-
-    <!-- Impostazioni: slider.horizontal.3 -->
     <div class="tab-item" onclick="showPage('page-settings',this)">
       <div class="tab-icon-wrap">
         <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
@@ -448,7 +439,7 @@
     </button>
   </div>
 
-  <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Done</button>
+  <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Fatto</button>
 
 </div>
 
@@ -541,27 +532,39 @@
     <input id="transferAmountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onTransferAmountInputChange()">
   </div>
 
-  <div class="modal-meta-row" style="flex-direction:column;gap:8px;padding-bottom:4px;">
-    <button class="meta-btn" id="transferFromSelectorBtn" onclick="openAccountPicker('transferFrom')" type="button" aria-label="Seleziona conto di partenza" style="width:100%;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      <span style="color:var(--sub);font-size:11px;flex-shrink:0;">Da</span>
-      <span id="transferFromSelectorLabel"></span>
-    </button>
-    <button class="meta-btn" id="transferToSelectorBtn" onclick="openAccountPicker('transferTo')" type="button" aria-label="Seleziona conto di arrivo" style="width:100%;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      <span style="color:var(--sub);font-size:11px;flex-shrink:0;">A</span>
-      <span id="transferToSelectorLabel"></span>
-    </button>
+  <!-- NUOVO: selezione conti con card grandi -->
+  <div class="transfer-account-selector">
+    <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
+      <div class="transfer-account-label">Da</div>
+      <div class="transfer-account-value" id="transferFromSelectorLabel">🏦 Principale</div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="transfer-account-row" onclick="openTransferAccountPicker('to')">
+      <div class="transfer-account-label">A</div>
+      <div class="transfer-account-value" id="transferToSelectorLabel">💳 Secondario</div>
+      <div class="chevron">›</div>
+    </div>
   </div>
 
   <div class="modal-meta-row" style="padding-top:0;">
-    <button class="meta-btn" id="transferDateSelectorBtn" onclick="openTransferDatePicker()" type="button" aria-label="Seleziona data trasferimento">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span id="transferDateSelectorLabel"></span>
+    <button class="meta-btn" id="transferDateSelectorBtn" onclick="openTransferDatePicker()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="20" height="16" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      <span id="transferDateSelectorLabel">Oggi</span>
     </button>
   </div>
 
   <button class="btn-primary modal-confirm-btn" id="transferConfirmBtn" onclick="confirmTransfer()" style="background:linear-gradient(160deg,#CC66FF 0%,#A535E8 100%);">Trasferisci</button>
+</div>
+
+<!-- Transfer Account Picker Sheet (nuovo) -->
+<div class="sheet-backdrop" id="transferAccountPickerBackdrop" onclick="closeTransferAccountPicker()"></div>
+<div class="bottom-sheet" id="transferAccountPickerSheet">
+  <div class="modal-handle"></div>
+  <div class="bottom-sheet-title">Scegli un conto</div>
+  <div id="transferAccountPickerList" class="transfer-acc-list"></div>
 </div>
 
 <!-- Debug toasts -->
