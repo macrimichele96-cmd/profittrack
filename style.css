@@ -23,7 +23,10 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{
-  height:100%;background:var(--bg);color:var(--text);
+  height:100%;
+  min-height:100dvh;
+  background:var(--bg);
+  color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
   overflow-x:hidden;overscroll-behavior:none;
@@ -78,11 +81,21 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .page{
   display:none;
   animation:pageIn .22s cubic-bezier(.4,0,.2,1);
-  /* FIX 1: padding-top dinamico per evitare sovrapposizione con la top nav */
   padding-top: calc(var(--top-nav-h) + env(safe-area-inset-top) + 20px);
+  /* FIX: padding-bottom corretto per evitare spazio vuoto eccessivo sopra la tab-bar */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
 }
 .page.active{display:block;}
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
+/* Le pagine che usano .page-scroll ereditano il padding-bottom da .page,
+   ma evitiamo doppio padding annullando quello di .page-scroll */
+.page-scroll{
+  padding-bottom: 0;
+}
+/* Rimuove margini inferiori extra dall'ultimo elemento di ogni card */
+.glass-card:last-child{
+  margin-bottom: 0;
+}
 .transfer-quick-card{margin-top:8px;padding:14px 16px;display:flex;align-items:center;}
 
 /* Transfer button: purple — distinct from income (green) and expenses (red) */
