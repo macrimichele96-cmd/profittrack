@@ -32,8 +32,6 @@ html,body{
   overflow-x:hidden;overscroll-behavior:none;
 }
 body{
-  /* Rimuovo padding-top e padding-bottom: la gestione dello spazio
-     per la top-nav è ora affidata a .page, e la tab-bar è fissa */
   padding:0;
 }
 input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
@@ -82,17 +80,16 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   display:none;
   animation:pageIn .22s cubic-bezier(.4,0,.2,1);
   padding-top: calc(var(--top-nav-h) + env(safe-area-inset-top) + 20px);
-  /* FIX: padding-bottom corretto per evitare spazio vuoto eccessivo sopra la tab-bar */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+  /* FIX: padding-bottom calcolato sull'altezza della tab-bar per evitare spazio vuoto */
+  padding-bottom: calc(var(--tab-h) + 16px);
 }
 .page.active{display:block;}
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
-/* Le pagine che usano .page-scroll ereditano il padding-bottom da .page,
-   ma evitiamo doppio padding annullando quello di .page-scroll */
+/* Evita doppio padding-bottom (eredita da .page, lo azzeriamo qui) */
 .page-scroll{
   padding-bottom: 0;
 }
-/* Rimuove margini inferiori extra dall'ultimo elemento di ogni card */
+/* Rimuove margini inferiori extra dall'ultima card */
 .glass-card:last-child{
   margin-bottom: 0;
 }
