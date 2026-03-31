@@ -28,7 +28,11 @@ html,body{
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
   overflow-x:hidden;overscroll-behavior:none;
 }
-body{padding-top:calc(var(--top-nav-h) + env(safe-area-inset-top));padding-bottom:var(--tab-h);}
+body{
+  /* Rimuovo padding-top e padding-bottom: la gestione dello spazio
+     per la top-nav è ora affidata a .page, e la tab-bar è fissa */
+  padding:0;
+}
 input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 
 /* ─── ONBOARDING ─── */
@@ -71,7 +75,12 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 }
 
 /* ─── PAGES ─── */
-.page{display:none;animation:pageIn .22s cubic-bezier(.4,0,.2,1);}
+.page{
+  display:none;
+  animation:pageIn .22s cubic-bezier(.4,0,.2,1);
+  /* FIX 1: padding-top dinamico per evitare sovrapposizione con la top nav */
+  padding-top: calc(var(--top-nav-h) + env(safe-area-inset-top) + 20px);
+}
 .page.active{display:block;}
 .page-scroll{max-width:500px;margin:auto;padding:16px 16px 0;}
 .transfer-quick-card{margin-top:8px;padding:14px 16px;display:flex;align-items:center;}
@@ -174,28 +183,39 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
 .fab:active{transform:scale(.92);box-shadow:0 2px 10px rgba(10,132,255,.3);}
 
 /* ════════════════════════════════════════════
-   TAB BAR — Edge-to-Edge (iOS PWA)
-   Background color floods to the physical bottom.
-   Safe area padding lives on each .tab-item only.
+   TAB BAR — Edge-to-Edge (iOS PWA) – FIX 2
+   Nessuno spazio nero in basso, background esteso fino al fondo.
 ════════════════════════════════════════════ */
 .tab-bar{
-  position:fixed;bottom:0;left:0;width:100%;
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
   background:var(--nav-bg);
   backdrop-filter:blur(28px) saturate(1.3);
   -webkit-backdrop-filter:blur(28px) saturate(1.3);
   border-top:.5px solid var(--border);
-  display:flex;justify-content:space-around;align-items:flex-start;
-  /* No fixed height — auto: background extends to physical bottom */
+  display:flex;
+  justify-content:space-around;
+  align-items:flex-start;
   padding:10px 0 0;
-  z-index:999;
+  margin:0;          /* assicura nessun margine esterno */
+  z-index:1000;
 }
 
-/* Tab items own the safe area bottom padding — keeps tap targets above home indicator */
+/* Tab items: il padding-bottom gestisce la safe-area */
 .tab-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  position:relative;color:var(--sub);cursor:pointer;
-  padding:0 4px calc(env(safe-area-inset-bottom) + 8px);
-  -webkit-tap-highlight-color:transparent;transition:color .2s;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  position:relative;
+  color:var(--sub);
+  cursor:pointer;
+  padding:0 4px calc(env(safe-area-inset-bottom) + 12px);
+  -webkit-tap-highlight-color:transparent;
+  transition:color .2s;
 }
 .tab-item.active{color:var(--blue);}
 .tab-icon-wrap{padding:5px 14px;border-radius:12px;transition:background .2s;display:flex;align-items:center;justify-content:center;margin-bottom:2px;}
