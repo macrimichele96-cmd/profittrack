@@ -1208,7 +1208,7 @@ function openEditSalary(k) {
 function syncModalConfirmButton() {
   const btn = document.getElementById('modalConfirmBtn');
   if (!btn) return;
-  btn.textContent = 'Aggiungi';
+  btn.textContent = 'Done';
   btn.classList.remove('btn-green', 'btn-red');
   btn.classList.add(modalType === 'inc' ? 'btn-green' : 'btn-red');
 }
