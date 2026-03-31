@@ -322,6 +322,22 @@ function onTransferAmountInputChange() {
   } catch {}
 }
 
+// ─── FORMATTAZIONE NUMERICA SU TUTTI GLI INPUT ─────────────────────────────
+function initNumberFormatting() {
+  const numericInputs = [
+    'ob_stip', 'ob_ore', 'set_stip', 'set_ore', 'set_extra',
+    'newAccountInit', 'accountInitAmount', 'det_prezzo', 'obj_target', 'obj_anni'
+  ];
+  numericInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        formatAmountInputEl(this);
+      });
+    }
+  });
+}
+
 let kbTrack = { active:false, handler:null, vvHandler:null };
 function setKeyboardOffset() {
   if (!window.visualViewport) return;
@@ -540,6 +556,7 @@ function bootApp() {
   renderHistoryChart();
   renderAvgBox();
   renderDonutChart();
+  initNumberFormatting(); // <-- applica formattazione numerica
   const p = new URLSearchParams(window.location.search);
   if (p.get('action')==='expense') { openModal(); setModalType('usc'); }
   if (p.get('action')==='income')  { openModal(); setModalType('inc'); }
