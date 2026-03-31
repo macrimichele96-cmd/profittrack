@@ -331,6 +331,11 @@ function initNumberFormatting() {
   numericInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
+      // Converti type="number" in type="text" per permettere la formattazione
+      if (el.type === 'number') {
+        el.type = 'text';
+        el.inputMode = 'decimal';
+      }
       el.addEventListener('input', function() {
         formatAmountInputEl(this);
       });
@@ -556,10 +561,10 @@ function bootApp() {
   renderHistoryChart();
   renderAvgBox();
   renderDonutChart();
-  initNumberFormatting(); // <-- applica formattazione numerica
+  initNumberFormatting(); // applica formattazione numerica
   const p = new URLSearchParams(window.location.search);
-  if (p.get('action')==='expense') { openModal(); setModalType('usc'); }
-  if (p.get('action')==='income')  { openModal(); setModalType('inc'); }
+  if (p.get('action')==='expense') { openModalWithHistory(); setModalType('usc'); }
+  if (p.get('action')==='income')  { openModalWithHistory(); setModalType('inc'); }
 }
 
 async function completeOnboarding() {
@@ -1011,6 +1016,14 @@ function liveCalcPreview() {
   el.innerHTML=html; el.style.display='block';
 }
 
+// ─── HISTORY API ─────────────────────────────────────────────────────────────
+function pushModalState(modalName) {
+  history.pushState({ modal: modalName }, '', window.location.href);
+}
+function replaceModalState() {
+  history.replaceState({ modal: null }, '', window.location.href);
+}
+
 // ─── MODAL ───────────────────────────────────────────────────────────────────
 function openModal() {
   editContext = null;
@@ -1034,6 +1047,11 @@ function openModal() {
   document.getElementById('accountSelectorLabel').textContent=`${acc.emoji} ${acc.name}`;
   document.getElementById('timeDeterrent').style.display='none';
   syncModalConfirmButton();
+
+  pushModalState('entry');
+}
+function openModalWithHistory() {
+  openModal(); // già pusha lo stato
 }
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('active');
@@ -1044,6 +1062,7 @@ function closeModal() {
   if (tt) tt.style.display = '';
   const ch = document.getElementById('catHScroll');
   if (ch) ch.style.display = '';
+  replaceModalState();
 }
 
 // ─── TRANSFER MODAL ─────────────────────────────────────────────────────
@@ -1087,6 +1106,8 @@ function openTransferModal(edit=false, k=null, id=null) {
   document.getElementById('transferModalSheet').classList.add('active');
   startKeyboardTracking();
   focusInputAndScrollConfirm('transferAmountInput', 'transferConfirmBtn');
+
+  pushModalState('transfer');
 }
 
 function closeTransferModal() {
@@ -1095,13 +1116,14 @@ function closeTransferModal() {
   stopKeyboardTracking();
   transferEditContext = null;
   resetTransferAmountInput();
+  replaceModalState();
 }
 
 function openEditTransfer(k, id) {
   openTransferModal(true, k, id);
 }
 
-// ─── CONFERMA TRASFERIMENTO (LOGICA CORRETTA) ───────────────────────────
+// ─── CONFERMA TRASFERIMENTO (LOGICA CORRETTA - NESSUNA VOCE FITTIZIA) ──────
 async function confirmTransfer() {
   try {
     const imp = getTransferAmountValue();
@@ -1124,19 +1146,11 @@ async function confirmTransfer() {
       const prevArr = db[prevK]?.transfers || [];
       const idx = prevArr.findIndex(t => t.id === transferEditContext.id);
       if (idx >= 0) {
-        const oldTr = prevArr[idx];
-        // Rimuovi le vecchie voci contabili
-        if (db[prevK].expenses) {
-          db[prevK].expenses = db[prevK].expenses.filter(e => !(e.isTransfer && e.transferId === oldTr.id));
-        }
-        if (db[prevK].income) {
-          db[prevK].income = db[prevK].income.filter(i => !(i.isTransfer && i.transferId === oldTr.id));
-        }
         prevArr.splice(idx, 1);
       }
     }
 
-    // Crea nuovo trasferimento
+    // Crea nuovo trasferimento (senza creare voci in income/expenses)
     const transferId = transferEditContext?.id ?? Date.now();
     const transfer = {
       id: transferId,
@@ -1146,36 +1160,6 @@ async function confirmTransfer() {
       toAccountId: transferToAccountId,
     };
     db[k].transfers.push(transfer);
-
-    // Registra le due voci contabili
-    const expenseEntry = {
-      id: Date.now() + Math.random(),
-      ts,
-      imp,
-      cat: 'Trasferimento',
-      emoji: '🔄',
-      color: '#BF5AF2',
-      accountId: transferFromAccountId,
-      isTransfer: true,
-      transferId: transferId,
-      isExpenseTransfer: true
-    };
-    const incomeEntry = {
-      id: Date.now() + Math.random(),
-      ts,
-      imp,
-      cat: 'Trasferimento',
-      emoji: '🔄',
-      color: '#32D74B',
-      accountId: transferToAccountId,
-      isTransfer: true,
-      transferId: transferId,
-      isIncomeTransfer: true
-    };
-    if (!db[k].expenses) db[k].expenses = [];
-    if (!db[k].income) db[k].income = [];
-    db[k].expenses.push(expenseEntry);
-    db[k].income.push(incomeEntry);
 
     transferEditContext = null;
     await save();
@@ -2084,3 +2068,22 @@ function render() {
     renderHistoryChart(); renderAvgBox(); renderDonutChart();
   }
 }
+
+// ─── HISTORY POPSTATE HANDLER ────────────────────────────────────────────────
+window.addEventListener('popstate', (event) => {
+  const modalEntry = document.getElementById('modalSheet');
+  const modalTransfer = document.getElementById('transferModalSheet');
+  const isEntryOpen = modalEntry && modalEntry.classList.contains('active');
+  const isTransferOpen = modalTransfer && modalTransfer.classList.contains('active');
+
+  if (isEntryOpen) {
+    closeModal();
+    // Dopo la chiusura, lo stato è già stato sostituito da closeModal()
+    // Impediamo ulteriori navigazioni
+    event.preventDefault();
+  } else if (isTransferOpen) {
+    closeTransferModal();
+    event.preventDefault();
+  }
+  // Se nessuna modale aperta, il browser gestisce il back normalmente
+});

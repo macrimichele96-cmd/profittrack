@@ -26,7 +26,7 @@
         <label>Stipendio mensile netto</label>
         <div class="amount-input-wrap">
           <span class="currency-sym">€</span>
-          <input id="ob_stip" type="number" inputmode="decimal" placeholder="1800">
+          <input id="ob_stip" type="text" inputmode="decimal" placeholder="1800">
         </div>
       </div>
         <div class="field-group">
@@ -37,7 +37,7 @@
         <label>Ore lavorate al giorno</label>
         <div class="amount-input-wrap">
           <span class="currency-sym" style="font-size:15px;">h</span>
-          <input id="ob_ore" type="number" inputmode="decimal" placeholder="8">
+          <input id="ob_ore" type="text" inputmode="decimal" placeholder="8">
         </div>
       </div>
       <div class="field-group">
@@ -217,7 +217,7 @@
           <p class="analysis-desc">Quanto lavoro vale questo acquisto?</p>
           <div class="amount-input-wrap" style="margin:10px 0;">
             <span class="currency-sym">€</span>
-            <input id="det_prezzo" type="number" inputmode="decimal" placeholder="Prezzo tentazione">
+            <input id="det_prezzo" type="text" inputmode="decimal" placeholder="Prezzo tentazione">
           </div>
           <button class="btn-secondary btn-orange-tint" onclick="validaAcquisto()">Ne vale la pena?</button>
           <div id="detOut" class="analysis-result orange-result" style="display:none;"></div>
@@ -228,11 +228,11 @@
           <p class="analysis-desc">Quanto devi mettere da parte ogni mese?</p>
           <div class="amount-input-wrap" style="margin:10px 0 8px;">
             <span class="currency-sym">€</span>
-            <input id="obj_target" type="number" inputmode="decimal" placeholder="Cifra da raggiungere">
+            <input id="obj_target" type="text" inputmode="decimal" placeholder="Cifra da raggiungere">
           </div>
           <div class="amount-input-wrap" style="margin-bottom:10px;">
             <span class="currency-sym" style="font-size:14px;">anni</span>
-            <input id="obj_anni" type="number" inputmode="decimal" placeholder="In quanti anni">
+            <input id="obj_anni" type="text" inputmode="decimal" placeholder="In quanti anni">
           </div>
           <button class="btn-secondary btn-green-tint" onclick="calcolaSostenibilita()">Calcola</button>
           <div id="objOut" class="analysis-result green-result" style="display:none;"></div>
@@ -260,7 +260,7 @@
           <label>Stipendio ricevuto questo mese</label>
           <div class="amount-input-wrap">
             <span class="currency-sym">€</span>
-            <input id="set_stip" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+            <input id="set_stip" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
         <div class="settings-field">
@@ -274,7 +274,7 @@
           <label>Ore lavorate al giorno</label>
           <div class="amount-input-wrap">
             <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_ore" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+            <input id="set_ore" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
         <div class="settings-field">
@@ -296,7 +296,7 @@
         <div id="overtimeField" style="display:none;">
           <div class="amount-input-wrap" style="margin-top:8px;">
             <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_extra" type="number" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+            <input id="set_extra" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
           </div>
         </div>
         <div id="calcPreview" class="calc-preview"></div>
@@ -318,7 +318,7 @@
             <span class="rec-cat-chevron">▾</span>
           </button>
           <input id="rec_nota" placeholder="Nome" style="flex:1;min-width:0;">
-          <input id="rec_imp" type="number" inputmode="decimal" placeholder="€" style="width:64px;flex-shrink:0;">
+          <input id="rec_imp" type="text" inputmode="decimal" placeholder="€" style="width:64px;flex-shrink:0;">
           <button class="icon-btn-add" onclick="saveRecurring()">+</button>
         </div>
         <div id="recurringList"></div>
@@ -475,7 +475,7 @@
     <label>Importo iniziale (opzionale)</label>
     <div class="amount-input-wrap">
       <span class="currency-sym">€</span>
-      <input id="newAccountInit" type="number" inputmode="decimal" placeholder="0" style="font-size:16px;">
+      <input id="newAccountInit" type="text" inputmode="decimal" placeholder="0" style="font-size:16px;">
     </div>
   </div>
   <div class="account-emoji-pick" id="accountEmojiPick">
@@ -513,7 +513,7 @@
     <label>Importo</label>
     <div class="amount-input-wrap">
       <span class="currency-sym">€</span>
-      <input id="accountInitAmount" type="number" inputmode="decimal" placeholder="0" style="font-size:16px;">
+      <input id="accountInitAmount" type="text" inputmode="decimal" placeholder="0" style="font-size:16px;">
     </div>
   </div>
   <button class="btn-primary" onclick="saveAccountInitial()">Salva</button>
