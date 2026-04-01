@@ -170,6 +170,7 @@ function getAccountBalance(accountId) {
 function sanitizeAmount(val) {
   if (typeof val === 'number') return isNaN(val)||val<0 ? 0 : Math.round(val*100)/100;
   let s = String(val).trim();
+  if (s === '') return 0;
   s = s.replace(/\s+/g,'');
   s = s.replace(/€|EUR/gi,'');
   if (s.includes('.') && s.includes(',')) {
@@ -331,7 +332,6 @@ function initNumberFormatting() {
   numericInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      // Converti type="number" in type="text" per permettere la formattazione
       if (el.type === 'number') {
         el.type = 'text';
         el.inputMode = 'decimal';
@@ -1081,7 +1081,10 @@ function openTransferModal(edit=false, k=null, id=null) {
     transferToAccountId = t.toAccountId;
     resetTransferAmountInput();
     const impEl = document.getElementById('transferAmountInput');
-    if (impEl) impEl.value = String(t.imp);
+    if (impEl) {
+      impEl.value = String(t.imp);
+      formatAmountInputEl(impEl); // formatta subito
+    }
   } else {
     transferEditContext = null;
     transferDate = new Date();
@@ -1201,7 +1204,10 @@ function openEditEntry(type, k, id) {
   document.getElementById('accountSelectorLabel').textContent = `${acc.emoji} ${acc.name}`;
 
   const impEl = document.getElementById('amountInput');
-  if (impEl) impEl.value = String(item.imp ?? 0);
+  if (impEl) {
+    impEl.value = String(item.imp ?? 0);
+    formatAmountInputEl(impEl); // formatta subito
+  }
   updateTimeDeterrent();
 
   selectedCat = (type === 'usc' ? CATS_USC : CATS_INC).find(c => c.label === item.cat) || selectedCat;
@@ -1233,12 +1239,14 @@ function openEditSalary(k) {
   document.getElementById('accountSelectorLabel').textContent = `${acc.emoji} ${acc.name}`;
 
   const impEl = document.getElementById('amountInput');
-  if (impEl) impEl.value = String(salary);
+  if (impEl) {
+    impEl.value = String(salary);
+    formatAmountInputEl(impEl);
+  }
   updateTimeDeterrent();
 
   editContext = { kind:'salary', prevK:k, id:salaryTs };
 }
-
 
 function syncModalConfirmButton() {
   const btn = document.getElementById('modalConfirmBtn');
