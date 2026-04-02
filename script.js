@@ -298,10 +298,9 @@ function formatAmountInputEl(inputEl) {
   if (inputEl.value !== formatted) inputEl.value = formatted;
 }
 
+// ─── EVENTI INPUT (senza formattazione live) ────────────────────────────────
 function onEntryAmountInputChange() {
-  try {
-    formatAmountInputEl(document.getElementById('amountInput'));
-  } catch {}
+  // solo update deterrent, non formattare durante la digitazione
   updateTimeDeterrent();
 }
 
@@ -318,17 +317,18 @@ function resetTransferAmountInput() {
 }
 
 function onTransferAmountInputChange() {
-  try {
-    formatAmountInputEl(document.getElementById('transferAmountInput'));
-  } catch {}
+  // non formattare durante la digitazione
 }
 
-// ─── FORMATTAZIONE NUMERICA SU TUTTI GLI INPUT ─────────────────────────────
+// ─── FORMATTAZIONE NUMERICA SU TUTTI GLI INPUT (solo al blur) ─────────────
 function initNumberFormatting() {
   const numericInputs = [
     'ob_stip', 'ob_ore', 'set_stip', 'set_ore', 'set_extra',
     'newAccountInit', 'accountInitAmount', 'det_prezzo', 'obj_target', 'obj_anni'
   ];
+  function formatBlurHandler(e) {
+    formatAmountInputEl(e.target);
+  }
   numericInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -336,11 +336,21 @@ function initNumberFormatting() {
         el.type = 'text';
         el.inputMode = 'decimal';
       }
-      el.addEventListener('input', function() {
-        formatAmountInputEl(this);
-      });
+      el.removeEventListener('blur', formatBlurHandler);
+      el.addEventListener('blur', formatBlurHandler);
     }
   });
+  // Per gli input delle modali
+  const modalAmount = document.getElementById('amountInput');
+  const transferAmount = document.getElementById('transferAmountInput');
+  if (modalAmount) {
+    modalAmount.removeEventListener('blur', formatBlurHandler);
+    modalAmount.addEventListener('blur', formatBlurHandler);
+  }
+  if (transferAmount) {
+    transferAmount.removeEventListener('blur', formatBlurHandler);
+    transferAmount.addEventListener('blur', formatBlurHandler);
+  }
 }
 
 let kbTrack = { active:false, handler:null, vvHandler:null };
@@ -418,6 +428,17 @@ function showSaveErrorToast(msg) {
     el.style.display = 'block';
     clearTimeout(showSaveErrorToast._t);
     showSaveErrorToast._t = setTimeout(() => { el.style.display = 'none'; }, 3200);
+  } catch {}
+}
+
+function showSuccessToast(msg) {
+  try {
+    const el = document.getElementById('debugToast');
+    if (!el) return;
+    el.textContent = msg || '✅ Operazione completata';
+    el.style.display = 'block';
+    clearTimeout(showSuccessToast._t);
+    showSuccessToast._t = setTimeout(() => { el.style.display = 'none'; }, 2000);
   } catch {}
 }
 
@@ -561,7 +582,7 @@ function bootApp() {
   renderHistoryChart();
   renderAvgBox();
   renderDonutChart();
-  initNumberFormatting(); // applica formattazione numerica
+  initNumberFormatting();
   const p = new URLSearchParams(window.location.search);
   if (p.get('action')==='expense') { openModalWithHistory(); setModalType('usc'); }
   if (p.get('action')==='income')  { openModalWithHistory(); setModalType('inc'); }
@@ -608,6 +629,20 @@ function renderAccountBar() {
       `<button class="acc-chip${filterAccountId===a.id?' active':''}" onclick="setFilterAccount('${a.id}')">${a.emoji} ${a.name}</button>`
     )
   ].join('');
+  // Aggiungi pulsante reset filtro
+  const bar = document.getElementById('accountBar');
+  let resetBtn = bar.querySelector('.reset-filter-btn');
+  if (!resetBtn) {
+    resetBtn = document.createElement('button');
+    resetBtn.className = 'reset-filter-btn';
+    resetBtn.innerHTML = '⟳';
+    resetBtn.title = 'Mostra tutti i conti';
+    resetBtn.onclick = () => setFilterAccount('all');
+    bar.appendChild(resetBtn);
+  }
+}
+function resetFilter() {
+  setFilterAccount('all');
 }
 function renderAccountsList() {
   const el = document.getElementById('accountsList'); if(!el) return;
@@ -625,9 +660,15 @@ function setFilterAccount(id) {
   filterAccountId=id; renderAccountBar(); render();
 }
 function deleteAccount(id) {
-  accounts=accounts.filter(a=>a.id!==id);
-  if(filterAccountId===id) filterAccountId='all';
-  saveAccountsIDB(); renderAccountBar(); renderAccountsList(); render();
+  if (id === 'main') return;
+  if (confirm('Eliminare questo conto? Le transazioni associate rimarranno ma senza conto.')) {
+    accounts = accounts.filter(a => a.id !== id);
+    if (filterAccountId === id) filterAccountId = 'all';
+    saveAccountsIDB();
+    renderAccountBar();
+    renderAccountsList();
+    render();
+  }
 }
 let selectedAccountEmoji = '🏦';
 function openAccountSheet() {
@@ -681,6 +722,7 @@ async function saveNewAccount() {
   await Promise.all([save(), saveAccountsIDB()]);
   closeAccountSheet();
   renderAccountBar(); renderAccountsList(); render();
+  showSuccessToast('Conto creato');
 }
 
 // ─── Account initial amount sheet ─────────────────────────────────────
@@ -746,6 +788,7 @@ async function saveAccountInitial() {
   renderAccountBar();
   renderAccountsList();
   render();
+  showSuccessToast('Saldo iniziale aggiornato');
 }
 
 // Account picker (riutilizzato per modal: entry/salary/transfer)
@@ -1168,6 +1211,7 @@ async function confirmTransfer() {
     await save();
     closeTransferModal();
     render();
+    showSuccessToast('Trasferimento completato');
   } catch (e) {
     showDebugToast(e?.message || String(e));
     throw e;
@@ -1330,6 +1374,7 @@ async function confirmEntry() {
         await save();
       }
       closeModal(); render();
+      showSuccessToast('Stipendio aggiornato');
       return;
     }
 
@@ -1346,6 +1391,7 @@ async function confirmEntry() {
 
       editContext = null;
       await save(); closeModal(); render();
+      showSuccessToast('Movimento aggiornato');
       return;
     }
 
@@ -1353,6 +1399,7 @@ async function confirmEntry() {
     if(modalType==='usc') db[k].expenses.push(entry);
     else                   db[k].income.push(entry);
     await save(); closeModal(); render();
+    showSuccessToast('Movimento aggiunto');
   } catch (e) {
     showDebugToast(e?.message || String(e));
     throw e;
@@ -1468,6 +1515,7 @@ async function saveSettings() {
   db[k].settings={stip:getSalaryForMonth(k),oreGiorno:oreG,restDays,ore:getOreForMonth(k),oreExtra,pagaH:getPagaHForMonth(k)};
   await Promise.all([save(), idbSet('pt_settings',gSettings)]);
   liveCalcPreview(); render(); renderAvgBox();
+  showSuccessToast('Impostazioni salvate');
 }
 
 // ─── RECURRING ───────────────────────────────────────────────────────────────
@@ -1479,9 +1527,16 @@ async function saveRecurring() {
   await saveRecurringIDB();
   document.getElementById('rec_imp').value=''; document.getElementById('rec_nota').value='';
   renderRecurringList(); render();
+  showSuccessToast('Spesa fissa aggiunta');
 }
 async function deleteRecurring(id) {
-  recurring=recurring.filter(r=>r.id!==id); await saveRecurringIDB(); renderRecurringList(); render();
+  if (confirm('Eliminare questa spesa fissa?')) {
+    recurring = recurring.filter(r => r.id !== id);
+    await saveRecurringIDB();
+    renderRecurringList();
+    render();
+    showSuccessToast('Spesa fissa eliminata');
+  }
 }
 async function applyRecurring() {
   if(viewMode==='year') return;
@@ -1519,6 +1574,7 @@ async function applyRecurring() {
   });
   if(!added) return;
   await save(); render();
+  showSuccessToast('Spese fisse applicate');
 }
 function renderRecurringList() {
   const el=document.getElementById('recurringList'); if(!el) return;
@@ -1702,6 +1758,7 @@ async function exportCSV() {
   const url=URL.createObjectURL(blob);
   const a=Object.assign(document.createElement('a'),{href:url,download:`ProfitTrack_${new Date().toISOString().slice(0,10)}.csv`});
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  showSuccessToast('CSV esportato');
 }
 async function exportBackup() {
   const data={db:await idbGet('pt_db')||db,settings:gSettings,recurring,accounts};
@@ -1710,6 +1767,7 @@ async function exportBackup() {
     download:`ProfitTrack_Backup_${new Date().toISOString().slice(0,10)}.json`
   });
   document.body.appendChild(a); a.click(); a.remove();
+  showSuccessToast('Backup esportato');
 }
 function importBackup(event) {
   const file=event.target.files[0]; if(!file) return;
@@ -1722,7 +1780,7 @@ function importBackup(event) {
       if(imp.recurring) { recurring=imp.recurring; await saveRecurringIDB(); }
       if(imp.accounts)  { accounts=imp.accounts; await saveAccountsIDB(); }
       render(); renderHistoryChart();
-      alert(`✅ Backup importato.`);
+      showSuccessToast('Backup importato');
     } catch { alert('❌ File non valido.'); }
   };
   reader.readAsText(file); event.target.value='';
@@ -2086,12 +2144,9 @@ window.addEventListener('popstate', (event) => {
 
   if (isEntryOpen) {
     closeModal();
-    // Dopo la chiusura, lo stato è già stato sostituito da closeModal()
-    // Impediamo ulteriori navigazioni
     event.preventDefault();
   } else if (isTransferOpen) {
     closeTransferModal();
     event.preventDefault();
   }
-  // Se nessuna modale aperta, il browser gestisce il back normalmente
 });
