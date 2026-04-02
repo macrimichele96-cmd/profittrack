@@ -1497,22 +1497,40 @@ function getEffectiveSettings(k) {
   return {stip,oreGiorno:wp.oreGiorno,restDays:wp.restDays,ore,oreExtra:wp.oreExtra||0,pagaH:getPagaHForMonth(k)};
 }
 function getAvgSettings() {
-  const keys=Object.keys(db).filter(k=>db[k]?.salary!=null&&db[k].salary>0);
-  if(!keys.length) return {stip:gSettings.stip||0,pagaH:gSettings.pagaH||0,oreGiorno:gSettings.oreGiorno||8,count:0};
-  const stips=keys.map(k=>getSalaryForMonth(k));
-  const pagaHs=keys.map(k=>getPagaHForMonth(k)).filter(p=>p>0);
-  const oreGs=keys.map(k=>getWorkParams(k).oreGiorno||8);
-  return {stip:stips.reduce((a,b)=>a+b,0)/stips.length,pagaH:pagaHs.length?pagaHs.reduce((a,b)=>a+b,0)/pagaHs.length:0,oreGiorno:oreGs.reduce((a,b)=>a+b,0)/oreGs.length,count:keys.length};
+  const allSalaryIncomes = [];
+  Object.keys(db).forEach(k => {
+    const inc = (db[k].income || []).filter(i => i.cat === 'Stipendio' && !i.isInit);
+    inc.forEach(i => allSalaryIncomes.push({ k, ...i }));
+  });
+  
+  if (!allSalaryIncomes.length) {
+    return {stip:gSettings.stip||0,pagaH:gSettings.pagaH||0,oreGiorno:gSettings.oreGiorno||8,count:0};
+  }
+  
+  const stips = allSalaryIncomes.map(i => i.imp);
+  const pagaHs = allSalaryIncomes.map(i => {
+    const orePrec = getOreForMonth(prevKey(i.k));
+    return orePrec > 0 ? i.imp / orePrec : 0;
+  }).filter(p => p > 0);
+  const oreGs = allSalaryIncomes.map(i => getWorkParams(i.k).oreGiorno || 8);
+  
+  return {
+    stip: stips.reduce((a,b)=>a+b,0)/stips.length,
+    pagaH: pagaHs.length ? pagaHs.reduce((a,b)=>a+b,0)/pagaHs.length : 0,
+    oreGiorno: oreGs.reduce((a,b)=>a+b,0)/oreGs.length,
+    count: allSalaryIncomes.length
+  };
 }
 function getMonthData(k) {
   const d=db[k]||{settings:null,income:[],expenses:[],appliedRec:[]};
   const s=getEffectiveSettings(k);
   // Escludi i saldi iniziali dalle entrate e quindi dal flusso netto
+  // Lo stipendio è trattato come normale transazione in income (cat: 'Stipendio')
   const income = filterByAccount(d.income || []).filter(i => !i.isInit);
   const expenses = filterByAccount(d.expenses || []);
   const extraInc=income.reduce((a,b)=>a+b.imp,0);
   const uscite=expenses.reduce((a,b)=>a+b.imp,0);
-  return {stip:s.stip,extraInc,totInc:s.stip+extraInc,uscite,net:s.stip+extraInc-uscite,pagaH:s.pagaH,income,expenses};
+  return {stip:s.stip,extraInc,totInc:extraInc,uscite,net:extraInc-uscite,pagaH:s.pagaH,income,expenses};
 }
 
 function filterByAccount(items) {
@@ -1999,12 +2017,9 @@ function render() {
     dateStr=`${MONTH_FULL[currentView.getMonth()]} ${currentView.getFullYear()}`;
     const salary=getSalaryForMonth(currentK); pagaH=getPagaHForMonth(currentK);
     const wp=getWorkParams(currentK);
-    const salaryItem=getSalaryItemForMonth(currentK);
     // Escludi i saldi iniziali dalle entrate del mese
+    // Lo stipendio è già presente come transazione normale in income (cat: 'Stipendio')
     allIncome=filterByAccount((db[currentK].income||[]).filter(i=>!i.isInit)).map(i=>({...i,monthKey:currentK}));
-    if(salaryItem && (filterAccountId==='all' || salaryItem.accountId===filterAccountId)) {
-      allIncome.push({...salaryItem, monthKey:currentK});
-    }
     allExpenses=filterByAccount(db[currentK].expenses||[]).map(e=>({...e,monthKey:currentK}));
     totInc=allIncome.reduce((a,b)=>a+b.imp,0);
     totUsc=allExpenses.reduce((a,b)=>a+b.imp,0); net=totInc-totUsc;
@@ -2038,11 +2053,9 @@ function render() {
     Object.keys(db).forEach(k=>{
       if(!k.startsWith(year)) return;
       // Escludi i saldi iniziali anche nel totale annuale
+      // Lo stipendio è già presente come transazione normale in income (cat: 'Stipendio')
       const inc=filterByAccount((db[k].income||[]).filter(i=>!i.isInit));
       const exp=filterByAccount(db[k].expenses||[]);
-      const salary=getSalaryForMonth(k);
-      const salaryAcc=getSalaryAccountForMonth(k);
-      if(filterAccountId==='all' || salaryAcc===filterAccountId) totInc+=salary;
       totInc+=inc.reduce((a,b)=>a+b.imp,0);
       totUsc+=exp.reduce((a,b)=>a+b.imp,0);
       inc.forEach(i=>allIncome.push({...i,monthKey:k}));
@@ -2062,6 +2075,20 @@ function render() {
   document.getElementById('heroAmount').textContent=`${net<0?'−':''}€${fmt(net)}`;
   document.getElementById('heroAmount').style.color=net>=0?'var(--green)':'var(--red)';
   document.getElementById('heroLabel').textContent=viewMode==='day'?'Saldo Giornaliero':'Flusso Netto';
+  
+  // Account Balance Display
+  const balanceEl = document.getElementById('accountBalanceDisplay');
+  if (balanceEl) {
+    const targetAcc = filterAccountId === 'all' 
+      ? accounts.reduce((sum, a) => sum + getAccountBalance(a.id), 0)
+      : getAccountBalance(filterAccountId);
+    const accObj = filterAccountId === 'all' ? null : getAccountById(filterAccountId);
+    const accLabel = accObj ? `${accObj.emoji} ${accObj.name}` : 'Tutti i conti';
+    const isPositive = targetAcc >= 0;
+    balanceEl.innerHTML = `<span class="balance-acc-name">${accLabel}</span> <span class="balance-amount" style="color:${isPositive?'var(--green)':'var(--red)'}">${isPositive?'':'−'}€${fmt(Math.abs(targetAcc))}</span>`;
+    balanceEl.style.display = 'flex';
+  }
+  
   const heroSub=document.getElementById('heroSub');
   if(pagaH>0&&viewMode!=='year') { heroSub.textContent=`€${pagaH.toFixed(2)} / ora`; heroSub.style.display='block'; } else heroSub.style.display='none';
   const heroTrend=document.getElementById('heroTrend');

@@ -114,6 +114,9 @@ input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appear
   .hero-card::before{background:radial-gradient(ellipse at 20% 0%,rgba(0,122,255,.05) 0%,transparent 60%);}
 }
 .hero-label{font-size:12px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.account-balance-display{font-size:14px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.account-balance-display .balance-acc-name{opacity:.85;font-size:13px;}
+.account-balance-display .balance-amount{font-weight:700;font-size:15px;}
 .hero-amount{font-size:52px;font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:4px;transition:color .3s;}
 @media (min-height:750px){.hero-amount{font-size:58px;}}
 .hero-sub{font-size:14px;color:var(--sub);margin-bottom:6px;}
