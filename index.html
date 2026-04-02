@@ -15,46 +15,98 @@
 </head>
 <body>
 
-<!-- ══ ONBOARDING ══ -->
+<!-- ══ ONBOARDING (Multi-Step) ══ -->
 <div id="onboarding" class="onboarding-overlay" style="display:none;">
+  <div class="onboarding-progress">
+    <div class="progress-dot active" data-step="1"></div>
+    <div class="progress-line"></div>
+    <div class="progress-dot" data-step="2"></div>
+    <div class="progress-line"></div>
+    <div class="progress-dot" data-step="3"></div>
+  </div>
   <div class="onboarding-card">
-    <div class="onboarding-icon">💰</div>
-    <h1 class="onboarding-title">ProfitTrack</h1>
-    <p class="onboarding-sub">Tieni traccia di entrate e uscite.<br>Scopri quanto vale davvero il tuo tempo.</p>
-    <div class="onboarding-fields">
-      <div class="field-group">
-        <label>Stipendio mensile netto</label>
-        <div class="amount-input-wrap">
-          <span class="currency-sym">€</span>
-          <input id="ob_stip" type="text" inputmode="decimal" placeholder="1800">
+    <!-- Step 1: Benvenuto -->
+    <div class="onboarding-step" id="ob-step-1">
+      <div class="onboarding-icon">💰</div>
+      <h1 class="onboarding-title">ProfitTrack</h1>
+      <p class="onboarding-sub">Tieni traccia di entrate e uscite.<br>Scopri quanto vale davvero il tuo tempo.</p>
+      <div class="onboarding-feature">
+        <div class="feature-icon">⏱</div>
+        <div class="feature-text">
+          <strong>Il Costo in Ore</strong>
+          <p>Ogni acquisto viene tradotto in ore di lavoro.</p>
         </div>
       </div>
-        <div class="field-group">
-          <label>Conto stipendio</label>
-          <div id="onbAccPicker" class="onb-acc-picker"></div>
-        </div>
-      <div class="field-group">
-        <label>Ore lavorate al giorno</label>
-        <div class="amount-input-wrap">
-          <span class="currency-sym" style="font-size:15px;">h</span>
-          <input id="ob_ore" type="text" inputmode="decimal" placeholder="8">
+      <div class="onboarding-feature">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">
+          <strong>Analisi Intelligente</strong>
+          <p>Visualizza il tuo flusso di cassa mensile.</p>
         </div>
       </div>
-      <div class="field-group">
-        <label>Giorni di riposo settimanali</label>
-        <div class="day-picker" id="ob_days">
-          <button class="day-btn" data-day="1">Lun</button>
-          <button class="day-btn" data-day="2">Mar</button>
-          <button class="day-btn" data-day="3">Mer</button>
-          <button class="day-btn" data-day="4">Gio</button>
-          <button class="day-btn" data-day="5">Ven</button>
-          <button class="day-btn active" data-day="6">Sab</button>
-          <button class="day-btn active" data-day="0">Dom</button>
-        </div>
-      </div>
+      <button class="btn-primary" onclick="nextOnboardingStep()">Iniziamo <span>→</span></button>
     </div>
-    <button class="btn-primary" onclick="completeOnboarding()">Inizia →</button>
-    <p class="onboarding-note">Potrai modificare tutto da Impostazioni.</p>
+    <!-- Step 2: Stipendio -->
+    <div class="onboarding-step" id="ob-step-2" style="display:none;">
+      <button class="ob-back-btn" onclick="prevOnboardingStep()">‹ Indietro</button>
+      <div class="onboarding-icon">💼</div>
+      <h1 class="onboarding-title">Il tuo Stipendio</h1>
+      <p class="onboarding-sub">Inserisci le tue informazioni lavorative.</p>
+      <div class="onboarding-fields">
+        <div class="field-group">
+          <label>Stipendio mensile netto</label>
+          <div class="amount-input-wrap">
+            <span class="currency-sym">€</span>
+            <input id="ob_stip" type="text" inputmode="decimal" placeholder="1800">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Ore lavorate al giorno</label>
+          <div class="amount-input-wrap">
+            <span class="currency-sym" style="font-size:15px;">h</span>
+            <input id="ob_ore" type="text" inputmode="decimal" placeholder="8">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Giorni di riposo</label>
+          <div class="day-picker" id="ob_days">
+            <button class="day-btn" data-day="1">Lun</button>
+            <button class="day-btn" data-day="2">Mar</button>
+            <button class="day-btn" data-day="3">Mer</button>
+            <button class="day-btn" data-day="4">Gio</button>
+            <button class="day-btn" data-day="5">Ven</button>
+            <button class="day-btn active" data-day="6">Sab</button>
+            <button class="day-btn active" data-day="0">Dom</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="nextOnboardingStep()">Continua <span>→</span></button>
+    </div>
+    <!-- Step 3: Primo Conto -->
+    <div class="onboarding-step" id="ob-step-3" style="display:none;">
+      <button class="ob-back-btn" onclick="prevOnboardingStep()">‹ Indietro</button>
+      <div class="onboarding-icon">🏦</div>
+      <h1 class="onboarding-title">Crea il tuo Conto</h1>
+      <p class="onboarding-sub">Aggiungi il tuo primo conto per iniziare.</p>
+      <div class="onboarding-fields">
+        <div class="field-group">
+          <label>Nome del conto</label>
+          <div class="amount-input-wrap">
+            <input id="ob_account_name" type="text" placeholder="Banca, Contanti..." style="font-size:16px;">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Icona</label>
+          <div class="account-emoji-pick" id="onbEmojiPick">
+            <button class="ae-btn active" data-emoji="🏦" onclick="selectOnbAccountEmoji(this)">🏦</button>
+            <button class="ae-btn" data-emoji="💳" onclick="selectOnbAccountEmoji(this)">💳</button>
+            <button class="ae-btn" data-emoji="💵" onclick="selectOnbAccountEmoji(this)">💵</button>
+            <button class="ae-btn" data-emoji="💰" onclick="selectOnbAccountEmoji(this)">💰</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="completeOnboarding()">Completa Setup <span>→</span></button>
+    </div>
   </div>
 </div>
 
@@ -97,7 +149,7 @@
       <div class="hero-card">
         <div class="hero-label" id="heroLabel">Flusso Netto</div>
         <div id="accountBalanceDisplay" class="account-balance-display"></div>
-        <div class="hero-amount" id="heroAmount">€0</div>
+        <div class="hero-amount privacy-amount" id="heroAmount" data-original="€0">€0</div>
         <div class="hero-sub" id="heroSub"></div>
         <div class="hero-trend" id="heroTrend" style="display:none;"></div>
         <div class="hero-bar-wrap">
@@ -111,7 +163,7 @@
       <div class="stat-chip">
         <span class="stat-chip-icon" style="color:var(--green)">↑</span>
         <div>
-          <div class="stat-chip-val" id="statIn" style="color:var(--green)">€0</div>
+          <div class="stat-chip-val privacy-amount" id="statIn" data-original="€0" style="color:var(--green)">€0</div>
           <div class="stat-chip-lab">Entrate</div>
         </div>
       </div>
@@ -119,7 +171,7 @@
       <div class="stat-chip">
         <span class="stat-chip-icon" style="color:var(--red)">↓</span>
         <div>
-          <div class="stat-chip-val" id="statOut" style="color:var(--red)">€0</div>
+          <div class="stat-chip-val privacy-amount" id="statOut" data-original="€0" style="color:var(--red)">€0</div>
           <div class="stat-chip-lab">Uscite</div>
         </div>
       </div>
@@ -127,7 +179,7 @@
       <div class="stat-chip" id="chipOra" style="display:none;">
         <span class="stat-chip-icon" style="color:var(--orange)">⏱</span>
         <div>
-          <div class="stat-chip-val" id="statOra" style="color:var(--orange)">€0</div>
+          <div class="stat-chip-val privacy-amount" id="statOra" data-original="€0" style="color:var(--orange)">€0</div>
           <div class="stat-chip-lab">Tua Ora</div>
         </div>
       </div>
@@ -135,7 +187,7 @@
 
     <div id="safeSpendCard" class="safe-spend-card" style="display:none;">
       <div class="safe-spend-label">💡 Disponibilità Reale</div>
-      <div class="safe-spend-amount" id="safeSpendAmt">€0</div>
+      <div class="safe-spend-amount privacy-amount" id="safeSpendAmt" data-original="€0">€0</div>
       <div class="safe-spend-sub" id="safeSpendSub"></div>
     </div>
 
@@ -156,6 +208,10 @@
 
   <!-- ═══ MOVIMENTI ═══ -->
   <div id="page-movimenti" class="page">
+    <div class="search-bar-wrap">
+      <input type="search" id="movementSearch" placeholder="Cerca movimento..." autocomplete="off">
+      <button id="clearSearch" class="clear-search-btn" onclick="clearMovementSearch()" style="display:none;">✕</button>
+    </div>
     <div class="page-scroll">
       <div class="glass-card transfer-quick-card">
         <button class="btn-secondary" onclick="openTransferModal(false)">↔ Trasferisci</button>
@@ -220,7 +276,7 @@
             <span class="currency-sym">€</span>
             <input id="det_prezzo" type="text" inputmode="decimal" placeholder="Prezzo tentazione">
           </div>
-          <button class="btn-secondary btn-orange-tint" onclick="validaAcquisto()">Ne vale la pena?</button>
+          <button class="btn-secondary btn-orange-tint" onclick="valutaAcquisto()">Ne vale la pena?</button>
           <div id="detOut" class="analysis-result orange-result" style="display:none;"></div>
         </div>
         <div class="section-divider"></div>
@@ -245,6 +301,15 @@
   <!-- ═══ IMPOSTAZIONI ═══ -->
   <div id="page-settings" class="page">
     <div class="page-scroll">
+
+      <!-- Privacy -->
+      <div class="glass-card">
+        <div class="card-title">Privacy</div>
+        <div class="settings-toggle-row" onclick="togglePrivacyMode()">
+          <span>Nascondi Saldi</span>
+          <div id="privacyToggle" class="toggle-switch"></div>
+        </div>
+      </div>
 
       <!-- Conti -->
       <div class="glass-card">
@@ -533,7 +598,6 @@
     <input id="transferAmountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onTransferAmountInputChange()">
   </div>
 
-  <!-- NUOVO: selezione conti con card grandi -->
   <div class="transfer-account-selector">
     <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
       <div class="transfer-account-label">Da</div>
@@ -560,7 +624,7 @@
   <button class="btn-primary modal-confirm-btn" id="transferConfirmBtn" onclick="confirmTransfer()" style="background:linear-gradient(160deg,#CC66FF 0%,#A535E8 100%);">Trasferisci</button>
 </div>
 
-<!-- Transfer Account Picker Sheet (nuovo) -->
+<!-- Transfer Account Picker Sheet -->
 <div class="sheet-backdrop" id="transferAccountPickerBackdrop" onclick="closeTransferAccountPicker()"></div>
 <div class="bottom-sheet" id="transferAccountPickerSheet">
   <div class="modal-handle"></div>
