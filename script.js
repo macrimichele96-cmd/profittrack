@@ -300,7 +300,6 @@ function formatAmountInputEl(inputEl) {
 
 // ─── EVENTI INPUT (senza formattazione live) ────────────────────────────────
 function onEntryAmountInputChange() {
-  // solo update deterrent, non formattare durante la digitazione
   updateTimeDeterrent();
 }
 
@@ -316,9 +315,7 @@ function resetTransferAmountInput() {
   el.value = '';
 }
 
-function onTransferAmountInputChange() {
-  // non formattare durante la digitazione
-}
+function onTransferAmountInputChange() {}
 
 // ─── FORMATTAZIONE NUMERICA SU TUTTI GLI INPUT (solo al blur) ─────────────
 function initNumberFormatting() {
@@ -340,7 +337,6 @@ function initNumberFormatting() {
       el.addEventListener('blur', formatBlurHandler);
     }
   });
-  // Per gli input delle modali
   const modalAmount = document.getElementById('amountInput');
   const transferAmount = document.getElementById('transferAmountInput');
   if (modalAmount) {
@@ -629,7 +625,6 @@ function renderAccountBar() {
       `<button class="acc-chip${filterAccountId===a.id?' active':''}" onclick="setFilterAccount('${a.id}')">${a.emoji} ${a.name}</button>`
     )
   ].join('');
-  // Aggiungi pulsante reset filtro
   const bar = document.getElementById('accountBar');
   let resetBtn = bar.querySelector('.reset-filter-btn');
   if (!resetBtn) {
@@ -1094,7 +1089,7 @@ function openModal() {
   pushModalState('entry');
 }
 function openModalWithHistory() {
-  openModal(); // già pusha lo stato
+  openModal();
 }
 function closeModal() {
   document.getElementById('modalBackdrop').classList.remove('active');
@@ -1126,7 +1121,7 @@ function openTransferModal(edit=false, k=null, id=null) {
     const impEl = document.getElementById('transferAmountInput');
     if (impEl) {
       impEl.value = String(t.imp);
-      formatAmountInputEl(impEl); // formatta subito
+      formatAmountInputEl(impEl);
     }
   } else {
     transferEditContext = null;
@@ -1169,7 +1164,7 @@ function openEditTransfer(k, id) {
   openTransferModal(true, k, id);
 }
 
-// ─── CONFERMA TRASFERIMENTO (LOGICA CORRETTA - NESSUNA VOCE FITTIZIA) ──────
+// ─── CONFERMA TRASFERIMENTO (LOGICA CORRETTA) ──────────────────────────────
 async function confirmTransfer() {
   try {
     const imp = getTransferAmountValue();
@@ -1186,7 +1181,6 @@ async function confirmTransfer() {
     initMonthKey(k);
     if (!db[k].transfers) db[k].transfers = [];
 
-    // Rimuovi vecchio trasferimento se in modifica
     if (transferEditContext?.k && transferEditContext?.id != null) {
       const prevK = transferEditContext.k;
       const prevArr = db[prevK]?.transfers || [];
@@ -1196,7 +1190,6 @@ async function confirmTransfer() {
       }
     }
 
-    // Crea nuovo trasferimento (senza creare voci in income/expenses)
     const transferId = transferEditContext?.id ?? Date.now();
     const transfer = {
       id: transferId,
@@ -1250,7 +1243,7 @@ function openEditEntry(type, k, id) {
   const impEl = document.getElementById('amountInput');
   if (impEl) {
     impEl.value = String(item.imp ?? 0);
-    formatAmountInputEl(impEl); // formatta subito
+    formatAmountInputEl(impEl);
   }
   updateTimeDeterrent();
 
@@ -1327,8 +1320,18 @@ function buildCatGrid() {
   });
 }
 function selectModalCat(id) {
-  selectedCat=(modalType==='usc'?CATS_USC:CATS_INC).find(c=>c.id===id)||CATS_USC[0];
+  selectedCat = (modalType==='usc'?CATS_USC:CATS_INC).find(c=>c.id===id)||CATS_USC[0];
   buildCatGrid();
+  // AUTOCOMPILA STIPENDIO: se entrata e categoria stipendio e non in modifica e campo vuoto
+  if (modalType === 'inc' && selectedCat.id === 'stipendio' && !editContext) {
+    const stip = gSettings.stip || 0;
+    const impEl = document.getElementById('amountInput');
+    if (impEl && stip > 0 && (!impEl.value || parseAmountInput(impEl.value).intDigits === '0')) {
+      impEl.value = String(stip);
+      formatAmountInputEl(impEl);
+      updateTimeDeterrent();
+    }
+  }
 }
 
 // ─── TIME DETERRENT ──────────────────────────────────────────────────────────
@@ -1389,6 +1392,19 @@ async function confirmEntry() {
       if(modalType==='usc') db[k].expenses.push(entry);
       else db[k].income.push(entry);
 
+      // Se è un'entrata stipendio, aggiorna db[k].salary e ricalcola paga oraria
+      if (modalType === 'inc' && selectedCat.id === 'stipendio') {
+        db[k].salary = imp;
+        db[k].salaryTs = ts;
+        db[k].salaryAccountId = selectedAccountId;
+        const curK = curMonthKey();
+        if (k === curK) {
+          gSettings.stip = imp;
+          gSettings.salaryAccountId = selectedAccountId;
+          await idbSet('pt_settings', gSettings);
+        }
+      }
+
       editContext = null;
       await save(); closeModal(); render();
       showSuccessToast('Movimento aggiornato');
@@ -1397,7 +1413,21 @@ async function confirmEntry() {
 
     const entry={id:Date.now(),ts,imp,cat:selectedCat.label,emoji:selectedCat.emoji,color:selectedCat.color,accountId:selectedAccountId};
     if(modalType==='usc') db[k].expenses.push(entry);
-    else                   db[k].income.push(entry);
+    else {
+      db[k].income.push(entry);
+      // Se è un'entrata stipendio, aggiorna db[k].salary e ricalcola paga oraria
+      if (selectedCat.id === 'stipendio') {
+        db[k].salary = imp;
+        db[k].salaryTs = ts;
+        db[k].salaryAccountId = selectedAccountId;
+        const curK = curMonthKey();
+        if (k === curK) {
+          gSettings.stip = imp;
+          gSettings.salaryAccountId = selectedAccountId;
+          await idbSet('pt_settings', gSettings);
+        }
+      }
+    }
     await save(); closeModal(); render();
     showSuccessToast('Movimento aggiunto');
   } catch (e) {
@@ -1477,8 +1507,9 @@ function getAvgSettings() {
 function getMonthData(k) {
   const d=db[k]||{settings:null,income:[],expenses:[],appliedRec:[]};
   const s=getEffectiveSettings(k);
-  const income=filterByAccount(d.income||[]);
-  const expenses=filterByAccount(d.expenses||[]);
+  // Escludi i saldi iniziali dalle entrate e quindi dal flusso netto
+  const income = filterByAccount(d.income || []).filter(i => !i.isInit);
+  const expenses = filterByAccount(d.expenses || []);
   const extraInc=income.reduce((a,b)=>a+b.imp,0);
   const uscite=expenses.reduce((a,b)=>a+b.imp,0);
   return {stip:s.stip,extraInc,totInc:s.stip+extraInc,uscite,net:s.stip+extraInc-uscite,pagaH:s.pagaH,income,expenses};
@@ -1951,8 +1982,9 @@ function render() {
     currentK=monthKey(y,m); initMonthKey(currentK);
     pagaH=getPagaHForMonth(currentK);
     const tsS=new Date(y,m,d,0,0,0).getTime(), tsE=new Date(y,m,d,23,59,59).getTime();
-    allIncome=filterByAccount((db[currentK].income||[]).filter(i=>{const ts=i.ts||i.id;return ts>=tsS&&ts<=tsE;})).map(i=>({...i,monthKey:currentK}));
-    allExpenses=filterByAccount((db[currentK].expenses||[]).filter(e=>{const ts=e.ts||e.id;return ts>=tsS&&ts<=tsE;})).map(e=>({...e,monthKey:currentK}));
+    // Escludi i saldi iniziali dalle entrate del giorno
+    allIncome=filterByAccount((db[currentK].income||[]).filter(i=>!i.isInit && (i.ts||i.id)>=tsS && (i.ts||i.id)<=tsE)).map(i=>({...i,monthKey:currentK}));
+    allExpenses=filterByAccount((db[currentK].expenses||[]).filter(e=>(e.ts||e.id)>=tsS && (e.ts||e.id)<=tsE)).map(e=>({...e,monthKey:currentK}));
     totInc=allIncome.reduce((a,b)=>a+b.imp,0);
     totUsc=allExpenses.reduce((a,b)=>a+b.imp,0); net=totInc-totUsc;
     const wp=getWorkParams(currentK),rs=wp.restDays||[0,6],isWork=isWorkDay(currentView,rs);
@@ -1968,7 +2000,8 @@ function render() {
     const salary=getSalaryForMonth(currentK); pagaH=getPagaHForMonth(currentK);
     const wp=getWorkParams(currentK);
     const salaryItem=getSalaryItemForMonth(currentK);
-    allIncome=filterByAccount(db[currentK].income||[]).map(i=>({...i,monthKey:currentK}));
+    // Escludi i saldi iniziali dalle entrate del mese
+    allIncome=filterByAccount((db[currentK].income||[]).filter(i=>!i.isInit)).map(i=>({...i,monthKey:currentK}));
     if(salaryItem && (filterAccountId==='all' || salaryItem.accountId===filterAccountId)) {
       allIncome.push({...salaryItem, monthKey:currentK});
     }
@@ -2004,7 +2037,9 @@ function render() {
     document.getElementById('dayWorkedCard').style.display='none';
     Object.keys(db).forEach(k=>{
       if(!k.startsWith(year)) return;
-      const inc=filterByAccount(db[k].income||[]),exp=filterByAccount(db[k].expenses||[]);
+      // Escludi i saldi iniziali anche nel totale annuale
+      const inc=filterByAccount((db[k].income||[]).filter(i=>!i.isInit));
+      const exp=filterByAccount(db[k].expenses||[]);
       const salary=getSalaryForMonth(k);
       const salaryAcc=getSalaryAccountForMonth(k);
       if(filterAccountId==='all' || salaryAcc===filterAccountId) totInc+=salary;
