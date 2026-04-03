@@ -24,6 +24,7 @@
     <div class="progress-line"></div>
     <div class="progress-dot" data-step="3"></div>
   </div>
+
   <div class="onboarding-card">
     <!-- Step 1: Benvenuto -->
     <div class="onboarding-step" id="ob-step-1">
@@ -46,69 +47,94 @@
       </div>
       <button class="btn-primary" onclick="nextOnboardingStep()">Iniziamo <span>→</span></button>
     </div>
-    <!-- Step 2: Stipendio -->
+
+    <!-- Step 2: Stipendio — Inset Grouped form -->
     <div class="onboarding-step" id="ob-step-2" style="display:none;">
       <button class="ob-back-btn" onclick="prevOnboardingStep()">‹ Indietro</button>
       <div class="onboarding-icon">💼</div>
       <h1 class="onboarding-title">Il tuo Stipendio</h1>
       <p class="onboarding-sub">Inserisci le tue informazioni lavorative.</p>
+
       <div class="onboarding-fields">
-        <div class="field-group">
-          <label>Stipendio mensile netto</label>
-          <div class="amount-input-wrap">
-            <span class="currency-sym">€</span>
-            <input id="ob_stip" type="text" inputmode="decimal" placeholder="1800">
+        <!-- Inset Grouped Section: stipendio + ore -->
+        <div class="ig-group-wrap">
+          <div class="ig-section">
+            <!-- Row: stipendio -->
+            <div class="ig-cell">
+              <span class="ig-cell-currency">€</span>
+              <input id="ob_stip" class="ig-cell-input ig-cell-input-right"
+                     type="text" inputmode="decimal" placeholder="1800">
+              <span class="ig-cell-label" style="flex:none;font-size:14px;color:var(--sub);padding:0 0 0 8px;">/ mese</span>
+            </div>
+            <div class="ig-cell">
+              <span class="ig-cell-label">Ore lavorate / giorno</span>
+              <input id="ob_ore" class="ig-cell-input ig-cell-input-right"
+                     type="text" inputmode="decimal" placeholder="8"
+                     style="width:60px;flex:none;">
+              <span style="font-size:14px;color:var(--sub);margin-left:4px;">h</span>
+            </div>
           </div>
         </div>
-        <div class="field-group">
-          <label>Ore lavorate al giorno</label>
-          <div class="amount-input-wrap">
-            <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="ob_ore" type="text" inputmode="decimal" placeholder="8">
-          </div>
-        </div>
-        <div class="field-group">
-          <label>Giorni di riposo</label>
-          <div class="day-picker" id="ob_days">
-            <button class="day-btn" data-day="1">Lun</button>
-            <button class="day-btn" data-day="2">Mar</button>
-            <button class="day-btn" data-day="3">Mer</button>
-            <button class="day-btn" data-day="4">Gio</button>
-            <button class="day-btn" data-day="5">Ven</button>
-            <button class="day-btn active" data-day="6">Sab</button>
-            <button class="day-btn active" data-day="0">Dom</button>
+
+        <!-- Inset Grouped Section: giorni riposo -->
+        <div class="ig-group-wrap">
+          <div class="ig-group-header">Giorni di riposo</div>
+          <div class="ig-section">
+            <div class="ig-cell" style="padding-top:10px;padding-bottom:10px;">
+              <div class="day-picker" id="ob_days" style="width:100%;">
+                <button class="day-btn" data-day="1">Lun</button>
+                <button class="day-btn" data-day="2">Mar</button>
+                <button class="day-btn" data-day="3">Mer</button>
+                <button class="day-btn" data-day="4">Gio</button>
+                <button class="day-btn" data-day="5">Ven</button>
+                <button class="day-btn active" data-day="6">Sab</button>
+                <button class="day-btn active" data-day="0">Dom</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <button class="btn-primary" onclick="nextOnboardingStep()">Continua <span>→</span></button>
     </div>
-    <!-- Step 3: Primo Conto -->
+
+    <!-- Step 3: Primo Conto — Inset Grouped form -->
     <div class="onboarding-step" id="ob-step-3" style="display:none;">
       <button class="ob-back-btn" onclick="prevOnboardingStep()">‹ Indietro</button>
       <div class="onboarding-icon">🏦</div>
       <h1 class="onboarding-title">Crea il tuo Conto</h1>
       <p class="onboarding-sub">Aggiungi il tuo primo conto per iniziare.</p>
+
       <div class="onboarding-fields">
-        <div class="field-group">
-          <label>Nome del conto</label>
-          <div class="amount-input-wrap">
-            <input id="ob_account_name" type="text" placeholder="Banca, Contanti..." style="font-size:16px;">
+        <div class="ig-group-wrap">
+          <div class="ig-section">
+            <div class="ig-cell">
+              <span class="ig-cell-label" style="flex:none;margin-right:8px;">Nome</span>
+              <input id="ob_account_name" class="ig-cell-input ig-cell-input-right"
+                     type="text" placeholder="Banca, Contanti…">
+            </div>
           </div>
         </div>
-        <div class="field-group">
-          <label>Icona</label>
-          <div class="account-emoji-pick" id="onbEmojiPick">
-            <button class="ae-btn active" data-emoji="🏦" onclick="selectOnbAccountEmoji(this)">🏦</button>
-            <button class="ae-btn" data-emoji="💳" onclick="selectOnbAccountEmoji(this)">💳</button>
-            <button class="ae-btn" data-emoji="💵" onclick="selectOnbAccountEmoji(this)">💵</button>
-            <button class="ae-btn" data-emoji="💰" onclick="selectOnbAccountEmoji(this)">💰</button>
+
+        <div class="ig-group-wrap">
+          <div class="ig-group-header">Icona conto</div>
+          <div class="ig-section">
+            <div class="ig-cell" style="padding-top:8px;padding-bottom:8px;">
+              <div class="account-emoji-pick" id="onbEmojiPick" style="padding:0;margin:0;flex:1;">
+                <button class="ae-btn active" data-emoji="🏦" onclick="selectOnbAccountEmoji(this)">🏦</button>
+                <button class="ae-btn" data-emoji="💳" onclick="selectOnbAccountEmoji(this)">💳</button>
+                <button class="ae-btn" data-emoji="💵" onclick="selectOnbAccountEmoji(this)">💵</button>
+                <button class="ae-btn" data-emoji="💰" onclick="selectOnbAccountEmoji(this)">💰</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <button class="btn-primary" onclick="completeOnboarding()">Completa Setup <span>→</span></button>
     </div>
   </div>
-</div>
+</div><!-- /onboarding -->
 
 <!-- ══ APP ══ -->
 <div id="app" style="display:none;">
@@ -116,21 +142,21 @@
   <!-- TOP NAV -->
   <div class="top-nav">
     <div class="top-nav-inner">
-      <button class="nav-arrow" onclick="changeDate(-1)">‹</button>
+      <button class="nav-arrow" onclick="changeDate(-1)" aria-label="Periodo precedente">‹</button>
       <div class="date-pill" onclick="handleDatePillTap()">
         <span id="dateLabel"></span>
         <span id="viewBadge" class="view-badge"></span>
       </div>
       <span id="netIndicator" class="net-indicator" aria-live="polite" aria-label="Stato rete"></span>
       <button id="calPickerBtn" class="cal-picker-btn" onclick="toggleCalendar()" style="display:none;" aria-label="Apri calendario">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="3"/>
           <line x1="16" y1="2" x2="16" y2="6"/>
           <line x1="8" y1="2" x2="8" y2="6"/>
           <line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
       </button>
-      <button class="nav-arrow" onclick="changeDate(1)">›</button>
+      <button class="nav-arrow" onclick="changeDate(1)" aria-label="Periodo successivo">›</button>
     </div>
     <div class="cal-backdrop" id="calBackdrop" onclick="closeCalendar()"></div>
     <div class="day-calendar" id="dayCalendar"></div>
@@ -142,7 +168,7 @@
     <!-- Account selector bar -->
     <div class="account-bar" id="accountBar">
       <div class="account-scroll" id="accountScroll"></div>
-      <button class="account-add-btn" onclick="openAccountSheet()">+</button>
+      <button class="account-add-btn" onclick="openAccountSheet()" aria-label="Aggiungi conto">+</button>
     </div>
 
     <div class="hero-section">
@@ -202,18 +228,21 @@
     <div class="recent-list"><div class="recent-card" id="recentList"></div></div>
 
     <button class="fab" onclick="openModal()" aria-label="Aggiungi movimento">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
     </button>
   </div>
 
   <!-- ═══ MOVIMENTI ═══ -->
   <div id="page-movimenti" class="page">
-    <div class="search-bar-wrap">
-      <input type="search" id="movementSearch" placeholder="Cerca movimento..." autocomplete="off">
-      <button id="clearSearch" class="clear-search-btn" onclick="clearMovementSearch()" style="display:none;">✕</button>
+    <div class="search-bar-wrap" style="max-width:500px;margin:0 auto 12px;padding:0 16px;">
+      <input type="search" id="movementSearch" placeholder="Cerca movimento…" autocomplete="off">
+      <button id="clearSearch" class="clear-search-btn" onclick="clearMovementSearch()" style="display:none;" aria-label="Cancella ricerca">✕</button>
     </div>
     <div class="page-scroll">
-      <div class="glass-card transfer-quick-card">
+      <div class="transfer-quick-card">
         <button class="btn-secondary" onclick="openTransferModal(false)">↔ Trasferisci</button>
       </div>
       <div class="glass-card" id="pieSection" style="display:none;">
@@ -237,7 +266,6 @@
         </div>
         <div id="expenseList"></div>
       </div>
-
       <div class="glass-card">
         <div class="card-title-row">
           <span class="card-title">Trasferimenti</span>
@@ -247,7 +275,10 @@
       </div>
     </div>
     <button class="fab" onclick="openModal()" aria-label="Aggiungi movimento">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
     </button>
   </div>
 
@@ -269,6 +300,7 @@
       <div class="glass-card">
         <div class="card-title">Analisi Finanziaria</div>
         <div id="avgInfoBox" class="avg-box"></div>
+
         <div class="analysis-section">
           <div class="analysis-label">🛍 Deterrente Acquisto</div>
           <p class="analysis-desc">Quanto lavoro vale questo acquisto?</p>
@@ -279,7 +311,9 @@
           <button class="btn-secondary btn-orange-tint" onclick="valutaAcquisto()">Ne vale la pena?</button>
           <div id="detOut" class="analysis-result orange-result" style="display:none;"></div>
         </div>
+
         <div class="section-divider"></div>
+
         <div class="analysis-section">
           <div class="analysis-label">🎯 Obiettivo di Risparmio</div>
           <p class="analysis-desc">Quanto devi mettere da parte ogni mese?</p>
@@ -302,110 +336,154 @@
   <div id="page-settings" class="page">
     <div class="page-scroll">
 
-      <!-- Privacy -->
-      <div class="glass-card">
-        <div class="card-title">Privacy</div>
-        <div class="settings-toggle-row" onclick="togglePrivacyMode()">
-          <span>Nascondi Saldi</span>
-          <div id="privacyToggle" class="toggle-switch"></div>
+      <!-- Privacy — Inset Grouped -->
+      <div class="ig-group-wrap">
+        <div class="ig-section">
+          <div class="settings-toggle-row ig-cell ig-interactive" onclick="togglePrivacyMode()">
+            <span class="ig-cell-label">Nascondi Saldi</span>
+            <div id="privacyToggle" class="toggle-switch"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Conti -->
-      <div class="glass-card">
-        <div class="card-title">Conti</div>
-        <div id="accountsList"></div>
-        <button class="btn-secondary" style="margin-top:10px;background:rgba(10,132,255,.1);color:var(--blue);" onclick="openAccountSheet()">+ Nuovo Conto</button>
+      <!-- Conti — Inset Grouped -->
+      <div class="ig-group-wrap">
+        <div class="ig-group-header">Conti</div>
+        <div class="ig-section">
+          <div id="accountsList"></div>
+          <div class="ig-cell ig-cell-action ig-interactive" onclick="openAccountSheet()">
+            + Nuovo Conto
+          </div>
+        </div>
       </div>
 
-      <!-- Parametri -->
-      <div class="glass-card" id="settingsCard">
-        <div class="card-title">Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span></div>
-        <div class="salary-info-row" id="salaryInfoRow"></div>
-        <div class="settings-field">
-          <label>Stipendio ricevuto questo mese</label>
-          <div class="amount-input-wrap">
-            <span class="currency-sym">€</span>
-            <input id="set_stip" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+      <!-- Parametri — Inset Grouped -->
+      <div class="ig-group-wrap" id="settingsCard">
+        <div class="ig-group-header">
+          Parametri <span id="settingsMonthLabel" style="color:var(--blue);font-weight:600;"></span>
+        </div>
+        <div class="ig-section">
+          <!-- Salary info banner (shown dynamically) -->
+          <div class="salary-info-row" id="salaryInfoRow" style="display:none;"></div>
+
+          <!-- Stipendio questo mese -->
+          <div class="ig-cell">
+            <span class="ig-cell-label">Stipendio del mese</span>
+            <span class="ig-cell-currency">€</span>
+            <input id="set_stip" class="ig-cell-input ig-cell-input-right"
+                   style="width:80px;flex:none;"
+                   type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+          </div>
+
+          <!-- Conto stipendio -->
+          <div class="ig-cell ig-interactive" style="min-height:44px;">
+            <span class="ig-cell-label">Conto stipendio</span>
+            <button class="meta-btn" type="button" onclick="openAccountPicker('salary')" id="salaryAccountSelectorBtn"
+                    style="flex:none;width:auto;min-height:32px;padding:6px 10px;font-size:14px;border-radius:8px;background:var(--fill3);border:none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              <span id="salaryAccountSelectorLabel"></span>
+            </button>
+          </div>
+
+          <!-- Ore al giorno -->
+          <div class="ig-cell">
+            <span class="ig-cell-label">Ore / giorno</span>
+            <input id="set_ore" class="ig-cell-input ig-cell-input-right"
+                   style="width:60px;flex:none;"
+                   type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+            <span style="font-size:14px;color:var(--sub);margin-left:4px;">h</span>
+          </div>
+
+          <!-- Giorni riposo -->
+          <div class="ig-cell" style="flex-direction:column;align-items:flex-start;padding-top:10px;padding-bottom:10px;">
+            <span style="font-size:17px;color:var(--text);margin-bottom:10px;">Giorni di riposo</span>
+            <div class="day-picker" id="set_days" style="width:100%;">
+              <button class="day-btn" data-day="1" onclick="toggleDayBtn(this)">Lun</button>
+              <button class="day-btn" data-day="2" onclick="toggleDayBtn(this)">Mar</button>
+              <button class="day-btn" data-day="3" onclick="toggleDayBtn(this)">Mer</button>
+              <button class="day-btn" data-day="4" onclick="toggleDayBtn(this)">Gio</button>
+              <button class="day-btn" data-day="5" onclick="toggleDayBtn(this)">Ven</button>
+              <button class="day-btn" data-day="6" onclick="toggleDayBtn(this)">Sab</button>
+              <button class="day-btn" data-day="0" onclick="toggleDayBtn(this)">Dom</button>
+            </div>
+          </div>
+
+          <!-- Straordinari (toggle row) -->
+          <div class="overtime-row ig-interactive" onclick="toggleOvertime()">
+            <span>Straordinari questo mese</span>
+            <span id="overtimeChevron" style="color:var(--blue);font-size:20px;transition:transform .2s;">+</span>
+          </div>
+          <div id="overtimeField" style="display:none;">
+            <div class="ig-cell">
+              <span class="ig-cell-label">Ore extra</span>
+              <input id="set_extra" class="ig-cell-input ig-cell-input-right"
+                     style="width:60px;flex:none;"
+                     type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
+              <span style="font-size:14px;color:var(--sub);margin-left:4px;">h</span>
+            </div>
           </div>
         </div>
-        <div class="settings-field">
-          <label>Conto stipendio</label>
-          <button class="meta-btn" type="button" onclick="openAccountPicker('salary')" id="salaryAccountSelectorBtn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-            <span id="salaryAccountSelectorLabel"></span>
-          </button>
-        </div>
-        <div class="settings-field">
-          <label>Ore lavorate al giorno</label>
-          <div class="amount-input-wrap">
-            <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_ore" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
-          </div>
-        </div>
-        <div class="settings-field">
-          <label>Giorni di riposo settimanali</label>
-          <div class="day-picker" id="set_days">
-            <button class="day-btn" data-day="1" onclick="toggleDayBtn(this)">Lun</button>
-            <button class="day-btn" data-day="2" onclick="toggleDayBtn(this)">Mar</button>
-            <button class="day-btn" data-day="3" onclick="toggleDayBtn(this)">Mer</button>
-            <button class="day-btn" data-day="4" onclick="toggleDayBtn(this)">Gio</button>
-            <button class="day-btn" data-day="5" onclick="toggleDayBtn(this)">Ven</button>
-            <button class="day-btn" data-day="6" onclick="toggleDayBtn(this)">Sab</button>
-            <button class="day-btn" data-day="0" onclick="toggleDayBtn(this)">Dom</button>
-          </div>
-        </div>
-        <div class="overtime-row" onclick="toggleOvertime()">
-          <span>Straordinari questo mese (ore extra)</span>
-          <span id="overtimeChevron" style="color:var(--blue);">+</span>
-        </div>
-        <div id="overtimeField" style="display:none;">
-          <div class="amount-input-wrap" style="margin-top:8px;">
-            <span class="currency-sym" style="font-size:15px;">h</span>
-            <input id="set_extra" type="text" inputmode="decimal" placeholder="0" oninput="liveCalcPreview()">
-          </div>
-        </div>
+
+        <!-- Calc preview (outside section, below it) -->
         <div id="calcPreview" class="calc-preview"></div>
-        <button class="btn-primary" onclick="saveSettings()">Salva</button>
+
+        <!-- Save button -->
+        <div style="padding:12px 16px 0;">
+          <button class="btn-primary" onclick="saveSettings()">Salva</button>
+        </div>
       </div>
 
-      <!-- Spese Fisse -->
-      <div class="glass-card">
-        <div class="card-title">Spese Fisse</div>
-        <p class="card-desc">Aggiungili una volta e applicali ogni mese con un tap.</p>
-        <div id="recurringApplyBanner" style="display:none;" class="apply-banner">
-          <span id="recurringApplyText"></span>
-          <button class="pill-btn" onclick="applyRecurring()">Applica</button>
+      <!-- Spese Fisse — Inset Grouped -->
+      <div class="ig-group-wrap">
+        <div class="ig-group-header">Spese Fisse</div>
+        <div class="ig-group-footer" style="padding-bottom:8px;">Aggiungile una volta e applicale ogni mese con un tap.</div>
+        <div class="ig-section">
+          <!-- Apply banner (shown dynamically) -->
+          <div id="recurringApplyBanner" style="display:none;" class="apply-banner">
+            <span id="recurringApplyText"></span>
+            <button class="pill-btn" onclick="applyRecurring()">Applica</button>
+          </div>
+
+          <!-- Add recurring row -->
+          <div class="add-recurring-row">
+            <button class="rec-cat-btn" onclick="openRecCatSheet()">
+              <span id="rec_emoji">🏠</span>
+              <span id="rec_label">Affitto</span>
+              <span class="rec-cat-chevron">▾</span>
+            </button>
+            <input id="rec_nota" placeholder="Nome">
+            <input id="rec_imp" type="text" inputmode="decimal" placeholder="€"
+                   style="width:64px;flex-shrink:0;text-align:right;">
+            <button class="icon-btn-add" onclick="saveRecurring()" aria-label="Aggiungi spesa fissa">+</button>
+          </div>
+
+          <!-- List populated by JS -->
+          <div id="recurringList"></div>
         </div>
-        <div class="add-recurring-row">
-          <button class="rec-cat-btn" onclick="openRecCatSheet()">
-            <span id="rec_emoji">🏠</span>
-            <span id="rec_label">Affitto</span>
-            <span class="rec-cat-chevron">▾</span>
+      </div>
+
+      <!-- Dati — Inset Grouped -->
+      <div class="ig-group-wrap">
+        <div class="ig-group-header">Dati</div>
+        <div class="ig-section">
+          <button class="settings-row-btn" onclick="exportCSV()">
+            <span>Esporta CSV</span>
+            <span class="row-chevron">›</span>
           </button>
-          <input id="rec_nota" placeholder="Nome" style="flex:1;min-width:0;">
-          <input id="rec_imp" type="text" inputmode="decimal" placeholder="€" style="width:64px;flex-shrink:0;">
-          <button class="icon-btn-add" onclick="saveRecurring()">+</button>
+          <button class="settings-row-btn" onclick="exportBackup()">
+            <span>Esporta Backup JSON</span>
+            <span class="row-chevron">›</span>
+          </button>
+          <label class="settings-row-btn" style="cursor:pointer;">
+            <span>Importa Backup JSON</span>
+            <span class="row-chevron">›</span>
+            <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
+          </label>
+          <button class="settings-row-btn danger-btn" onclick="resetData()">
+            <span>Cancella tutti i dati</span>
+            <span class="row-chevron" style="color:var(--red);">›</span>
+          </button>
         </div>
-        <div id="recurringList"></div>
-      </div>
-
-      <!-- Dati -->
-      <div class="glass-card">
-        <div class="card-title">Dati</div>
-        <button class="settings-row-btn" onclick="exportCSV()">
-          <span>Esporta CSV</span><span class="row-chevron">›</span>
-        </button>
-        <button class="settings-row-btn" onclick="exportBackup()">
-          <span>Esporta Backup JSON</span><span class="row-chevron">›</span>
-        </button>
-        <label class="settings-row-btn" style="cursor:pointer;">
-          <span>Importa Backup JSON</span><span class="row-chevron">›</span>
-          <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
-        </label>
-        <button class="settings-row-btn danger-btn" onclick="resetData()">
-          <span>Cancella tutti i dati</span><span class="row-chevron" style="color:var(--red);">›</span>
-        </button>
       </div>
 
     </div>
@@ -413,17 +491,17 @@
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <div class="tab-item active" onclick="showPage('page-home',this)">
+    <div class="tab-item active" onclick="showPage('page-home',this)" role="button" aria-label="Riepilogo">
       <div class="tab-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H15v-5.5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1V21H4a1 1 0 0 1-1-1V10.5z"/>
         </svg>
       </div>
       <span>Riepilogo</span>
     </div>
-    <div class="tab-item" onclick="showPage('page-movimenti',this)">
+    <div class="tab-item" onclick="showPage('page-movimenti',this)" role="button" aria-label="Movimenti">
       <div class="tab-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <line x1="9" y1="6" x2="20" y2="6"/>
           <line x1="9" y1="12" x2="20" y2="12"/>
           <line x1="9" y1="18" x2="20" y2="18"/>
@@ -434,19 +512,19 @@
       </div>
       <span>Movimenti</span>
     </div>
-    <div class="tab-item" onclick="showPage('page-analisi',this)">
+    <div class="tab-item" onclick="showPage('page-analisi',this)" role="button" aria-label="Analisi">
       <div class="tab-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 17 8 11 13 14.5 20 6"/>
           <polyline points="16 6 20 6 20 10"/>
         </svg>
       </div>
       <span>Analisi</span>
     </div>
-    <div class="tab-item" onclick="showPage('page-settings',this)">
+    <div class="tab-item" onclick="showPage('page-settings',this)" role="button" aria-label="Impostazioni">
       <div class="tab-icon-wrap">
         <span id="settingsBadge" class="tab-badge" style="display:none;"></span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <line x1="4" y1="6" x2="20" y2="6"/>
           <line x1="4" y1="12" x2="20" y2="12"/>
           <line x1="4" y1="18" x2="20" y2="18"/>
@@ -463,12 +541,13 @@
 
 <!-- ══════════════════════ MODALS ══════════════════════════ -->
 
+<!-- Entry modal -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
 <div class="modal-sheet" id="modalSheet">
 
   <div class="modal-header">
     <div class="modal-handle"></div>
-    <button class="modal-x" onclick="closeModal()">✕</button>
+    <button class="modal-x" onclick="closeModal()" aria-label="Chiudi">✕</button>
   </div>
 
   <div class="type-toggle">
@@ -488,7 +567,7 @@
 
   <div class="modal-meta-row">
     <button class="meta-btn" id="dateSelectorBtn" onclick="openDatePicker()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
         <rect x="3" y="4" width="18" height="18" rx="2"/>
         <line x1="16" y1="2" x2="16" y2="6"/>
         <line x1="8" y1="2" x2="8" y2="6"/>
@@ -497,7 +576,7 @@
       <span id="dateSelectorLabel">Oggi</span>
     </button>
     <button class="meta-btn" id="accountSelectorBtn" onclick="openAccountPicker('modal')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
         <rect x="2" y="5" width="20" height="14" rx="2"/>
         <line x1="2" y1="10" x2="22" y2="10"/>
       </svg>
@@ -512,85 +591,108 @@
 <!-- Date picker sheet -->
 <div class="sheet-backdrop" id="datePickerBackdrop" onclick="closeDatePicker()"></div>
 <div class="bottom-sheet" id="datePickerSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Seleziona Data</div>
   <input type="date" id="datePickerInput" class="date-native-input">
-  <button class="btn-primary" style="margin-top:16px;" onclick="confirmDatePick()">Conferma</button>
+  <div style="padding:12px 16px 0;">
+    <button class="btn-primary" onclick="confirmDatePick()">Conferma</button>
+  </div>
 </div>
 
 <!-- Account picker sheet -->
 <div class="sheet-backdrop" id="accountPickerBackdrop" onclick="closeAccountPicker()"></div>
 <div class="bottom-sheet" id="accountPickerSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Seleziona Conto</div>
+  <!-- JS renders .ig-section inside via accountPickerList -->
   <div id="accountPickerList"></div>
 </div>
 
-<!-- Account creation sheet -->
+<!-- Account creation sheet — Inset Grouped -->
 <div class="sheet-backdrop" id="accountSheetBackdrop" onclick="closeAccountSheet()"></div>
 <div class="bottom-sheet" id="accountSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Nuovo Conto</div>
-  <div class="settings-field">
-    <label>Nome del conto</label>
-    <div class="amount-input-wrap">
-      <input id="newAccountName" placeholder="es. Banca, Contanti..." style="font-size:16px;">
+
+  <div class="ig-group-wrap" style="margin-bottom:16px;">
+    <div class="ig-section">
+      <div class="ig-cell">
+        <span class="ig-cell-label" style="flex:none;margin-right:8px;">Nome</span>
+        <input id="newAccountName" class="ig-cell-input ig-cell-input-right"
+               placeholder="es. Banca, Contanti…">
+      </div>
+      <div class="ig-cell">
+        <span class="ig-cell-label">Importo iniziale</span>
+        <span class="ig-cell-currency">€</span>
+        <input id="newAccountInit" class="ig-cell-input ig-cell-input-right"
+               style="width:80px;flex:none;"
+               type="text" inputmode="decimal" placeholder="0">
+      </div>
     </div>
   </div>
-  <div class="settings-field">
-    <label>Importo iniziale (opzionale)</label>
-    <div class="amount-input-wrap">
-      <span class="currency-sym">€</span>
-      <input id="newAccountInit" type="text" inputmode="decimal" placeholder="0" style="font-size:16px;">
+
+  <div class="ig-group-wrap" style="margin-bottom:16px;">
+    <div class="ig-group-header">Icona conto</div>
+    <div class="ig-section">
+      <div class="ig-cell" style="padding-top:8px;padding-bottom:8px;">
+        <div class="account-emoji-pick" id="accountEmojiPick" style="padding:0;margin:0;flex:1;">
+          <button class="ae-btn active" data-emoji="🏦" onclick="selectAccountEmoji(this)" aria-label="Banca">🏦</button>
+          <button class="ae-btn" data-emoji="💳" onclick="selectAccountEmoji(this)" aria-label="Carta">💳</button>
+          <button class="ae-btn" data-emoji="💵" onclick="selectAccountEmoji(this)" aria-label="Contanti">💵</button>
+          <button class="ae-btn" data-emoji="💰" onclick="selectAccountEmoji(this)" aria-label="Soldi">💰</button>
+          <button class="ae-btn" data-emoji="📱" onclick="selectAccountEmoji(this)" aria-label="Telefono">📱</button>
+          <button class="ae-btn" data-emoji="🪙" onclick="selectAccountEmoji(this)" aria-label="Moneta">🪙</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="account-emoji-pick" id="accountEmojiPick">
-    <button class="ae-btn active" data-emoji="🏦" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto banca">🏦</button>
-    <button class="ae-btn" data-emoji="💳" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto carta">💳</button>
-    <button class="ae-btn" data-emoji="💵" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto contanti">💵</button>
-    <button class="ae-btn" data-emoji="💰" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto soldi">💰</button>
-    <button class="ae-btn" data-emoji="📱" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto telefono">📱</button>
-    <button class="ae-btn" data-emoji="🪙" onclick="selectAccountEmoji(this)" aria-label="Scegli emoji conto moneta">🪙</button>
+
+  <div style="padding:0 16px;">
+    <button class="btn-primary" onclick="saveNewAccount()">Crea Conto</button>
   </div>
-  <button class="btn-primary" onclick="saveNewAccount()">Crea Conto</button>
 </div>
 
 <!-- Recurring category sheet -->
 <div class="sheet-backdrop" id="recCatBackdrop" onclick="closeRecCatSheet()"></div>
 <div class="bottom-sheet" id="recCatSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Categoria Spesa Fissa</div>
   <div class="rec-cat-grid" id="recCatGrid"></div>
 </div>
 
-<!-- Account initial amount sheet -->
+<!-- Account initial amount sheet — Inset Grouped -->
 <div class="sheet-backdrop" id="accountInitBackdrop" onclick="closeAccountInitSheet()"></div>
 <div class="bottom-sheet" id="accountInitSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Importo iniziale</div>
-  <div class="settings-field">
-    <label>Conto</label>
-    <div class="amount-input-wrap">
-      <span class="currency-sym" style="font-size:18px;">👛</span>
-      <span id="accountInitLabel" style="font-weight:700;color:var(--text);"></span>
+
+  <div class="ig-group-wrap" style="margin-bottom:16px;">
+    <div class="ig-section">
+      <div class="ig-cell">
+        <span style="font-size:22px;margin-right:10px;">👛</span>
+        <span id="accountInitLabel" class="ig-cell-label" style="font-weight:700;"></span>
+      </div>
+      <div class="ig-cell">
+        <span class="ig-cell-label">Importo</span>
+        <span class="ig-cell-currency">€</span>
+        <input id="accountInitAmount" class="ig-cell-input ig-cell-input-right"
+               style="width:80px;flex:none;"
+               type="text" inputmode="decimal" placeholder="0">
+      </div>
     </div>
   </div>
-  <div class="settings-field">
-    <label>Importo</label>
-    <div class="amount-input-wrap">
-      <span class="currency-sym">€</span>
-      <input id="accountInitAmount" type="text" inputmode="decimal" placeholder="0" style="font-size:16px;">
-    </div>
+
+  <div style="padding:0 16px;">
+    <button class="btn-primary" onclick="saveAccountInitial()">Salva</button>
   </div>
-  <button class="btn-primary" onclick="saveAccountInitial()">Salva</button>
 </div>
 
-<!-- ══ Transfer modal ══ -->
+<!-- Transfer modal -->
 <div class="modal-backdrop" id="transferModalBackdrop" onclick="closeTransferModal()"></div>
 <div class="modal-sheet" id="transferModalSheet">
   <div class="modal-header">
     <div class="modal-handle"></div>
-    <button class="modal-x" onclick="closeTransferModal()">✕</button>
+    <button class="modal-x" onclick="closeTransferModal()" aria-label="Chiudi">✕</button>
   </div>
 
   <div class="modal-amount-row">
@@ -598,22 +700,25 @@
     <input id="transferAmountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onTransferAmountInputChange()">
   </div>
 
-  <div class="transfer-account-selector">
-    <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
-      <div class="transfer-account-label">Da</div>
-      <div class="transfer-account-value" id="transferFromSelectorLabel">🏦 Principale</div>
-      <div class="chevron">›</div>
-    </div>
-    <div class="transfer-account-row" onclick="openTransferAccountPicker('to')">
-      <div class="transfer-account-label">A</div>
-      <div class="transfer-account-value" id="transferToSelectorLabel">💳 Secondario</div>
-      <div class="chevron">›</div>
+  <!-- Transfer account selector — Inset Grouped -->
+  <div class="ig-group-wrap" style="margin-bottom:8px;">
+    <div class="ig-section" style="margin:0 16px;">
+      <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
+        <div class="transfer-account-label">Da</div>
+        <div class="transfer-account-value" id="transferFromSelectorLabel">🏦 Principale</div>
+        <div class="chevron"></div>
+      </div>
+      <div class="transfer-account-row" onclick="openTransferAccountPicker('to')">
+        <div class="transfer-account-label">A</div>
+        <div class="transfer-account-value" id="transferToSelectorLabel">💳 Secondario</div>
+        <div class="chevron"></div>
+      </div>
     </div>
   </div>
 
   <div class="modal-meta-row" style="padding-top:0;">
     <button class="meta-btn" id="transferDateSelectorBtn" onclick="openTransferDatePicker()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
         <rect x="3" y="4" width="20" height="16" rx="2"/>
         <line x1="2" y1="10" x2="22" y2="10"/>
       </svg>
@@ -621,20 +726,25 @@
     </button>
   </div>
 
-  <button class="btn-primary modal-confirm-btn" id="transferConfirmBtn" onclick="confirmTransfer()" style="background:linear-gradient(160deg,#CC66FF 0%,#A535E8 100%);">Trasferisci</button>
+  <button class="btn-primary modal-confirm-btn" id="transferConfirmBtn" onclick="confirmTransfer()"
+          style="background:var(--purple);">Trasferisci</button>
 </div>
 
 <!-- Transfer Account Picker Sheet -->
 <div class="sheet-backdrop" id="transferAccountPickerBackdrop" onclick="closeTransferAccountPicker()"></div>
 <div class="bottom-sheet" id="transferAccountPickerSheet">
-  <div class="modal-handle"></div>
+  <div class="modal-handle" style="margin-bottom:4px;"></div>
   <div class="bottom-sheet-title">Scegli un conto</div>
   <div id="transferAccountPickerList" class="transfer-acc-list"></div>
 </div>
 
-<!-- Debug toasts -->
-<div id="debugToast" style="position:fixed;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:20000;display:none;background:rgba(0,0,0,.75);color:#fff;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 12px;border-radius:14px;max-width:92vw;font-size:12px;line-height:1.3;"></div>
-<div id="saveErrorToast" style="position:fixed;top:calc(8px + env(safe-area-inset-top));right:16px;z-index:20000;display:none;background:rgba(255,69,58,.18);border:1px solid rgba(255,69,58,.35);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 12px;border-radius:14px;max-width:75vw;font-size:12px;line-height:1.3;text-align:right;" aria-live="polite"></div>
+<!-- System toasts -->
+<div id="debugToast"
+     style="position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:20000;display:none;background:rgba(0,0,0,.78);color:#fff;border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);padding:10px 14px;border-radius:14px;max-width:92vw;font-size:12px;line-height:1.4;"></div>
+<div id="saveErrorToast"
+     style="position:fixed;top:calc(10px + env(safe-area-inset-top));right:16px;z-index:20000;display:none;background:rgba(255,69,58,.16);border:1px solid rgba(255,69,58,.32);color:#fff;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);padding:10px 14px;border-radius:14px;max-width:75vw;font-size:12px;line-height:1.3;text-align:right;"
+     aria-live="polite"></div>
+
 <script src="script.js"></script>
 </body>
 </html>
