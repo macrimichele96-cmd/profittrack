@@ -63,18 +63,18 @@ let numpadValue = '0';
 let numpadHasDecimal = false;
 let modalDate = new Date();
 
-// Onboarding multi-step
+// ─── NUOVO: Stato Onboarding Multi-Step ──────────────────────────────────────
 let onboardingStep = 1;
 let onbAccountEmoji = '🏦';
 
-// Privacy Mode
+// ─── NUOVO: Privacy Mode ──────────────────────────────────────────────────────
 let privacyMode = localStorage.getItem('pt_privacy') === 'true';
 let privacyRevealed = false;
 
-// Ricerca Movimenti
+// ─── NUOVO: Ricerca Movimenti ─────────────────────────────────────────────────
 let searchQuery = '';
 
-// HAPTIC FEEDBACK
+// ─── HAPTIC FEEDBACK ──────────────────────────────────────────────────────────
 function triggerHaptic(duration = 10) {
   if ('vibrate' in navigator) {
     navigator.vibrate(duration);
@@ -2096,6 +2096,10 @@ function renderRow(item, type, k) {
   </div>`;
 }
 
+function renderRowInsetGrouped(item, type, k) {
+  return renderRow(item, type, k);
+}
+
 function renderTransferRow(t, k) {
   const id = t.id;
   const fromAcc = getAccountById(t.fromAccountId);
@@ -2105,6 +2109,31 @@ function renderTransferRow(t, k) {
   return `<div class="tx-swipe-wrap" id="wrap_${id}">
     <div class="tx-delete-bg" id="delbg_${id}">Elimina</div>
     <div class="tx-row-inner" onclick="tapToEditTransfer(event,'${k}',${id})" ontouchstart="swipeStart(event,${id})" ontouchmove="swipeMove(event,${id})" ontouchend="swipeEnd(event,${id},'tr','${k}')" id="inner_${id}">
+      <div class="tx-emoji" style="background:linear-gradient(135deg,rgba(10,132,255,.25) 0%,rgba(10,132,255,.10) 100%);">🔄</div>
+      <div class="tx-info">
+        <span class="tx-cat">${label}</span>
+        <span class="tx-sub" style="color:rgba(10,132,255,.9);">Trasferimento</span>
+      </div>
+      <div class="tx-right">
+        <span class="tx-amt privacy-amount" data-original="€${fmtAmt(t.imp)}" style="color:var(--blue);">€${fmtAmt(t.imp)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTransferRowInsetGrouped(t, k) {
+  return renderTransferRow(t, k);
+}
+
+function renderTransferRow(t, k) {
+  const id = t.id;
+  const fromAcc = getAccountById(t.fromAccountId);
+  const toAcc = getAccountById(t.toAccountId);
+  const label = `${fromAcc.emoji} ${fromAcc.name} → ${toAcc.emoji} ${toAcc.name}`;
+  
+  return `<div class="tx-swipe-wrap" id="wrap_${id}">
+    <div class="tx-delete-bg" id="delbg_${id}">Elimina</div>
+    <div class="tx-row-inner" onclick="tapToEditTransfer(event,'${k}',${id})" ontouchstart="swipeStart(event,${id})" ontouchmove="swipeMove(event,${id})" ontouchend="swipeEnd(event,${id},'tr','${k}')" id="inner_${id}>
       <div class="tx-emoji" style="background:linear-gradient(135deg,rgba(10,132,255,.25) 0%,rgba(10,132,255,.10) 100%);">🔄</div>
       <div class="tx-info">
         <span class="tx-cat">${label}</span>
@@ -2276,13 +2305,13 @@ function filterMovements(query) {
   
   if (incList) {
     incList.innerHTML = filteredInc.length
-      ? filteredInc.map(i => renderRow({ ...i, id: i.id }, 'inc', mKey)).join('')
+      ? filteredInc.map(i => renderRowInsetGrouped({ ...i, id: i.id }, 'inc', mKey)).join('')
       : '<div class="empty-state-box"><div class="empty-title">Nessuna entrata trovata</div></div>';
   }
   
   if (expList) {
     expList.innerHTML = filteredExp.length
-      ? filteredExp.map(e => renderRow({ ...e, id: e.id }, 'usc', mKey)).join('')
+      ? filteredExp.map(e => renderRowInsetGrouped({ ...e, id: e.id }, 'usc', mKey)).join('')
       : '<div class="empty-state-box"><div class="empty-title">Nessuna uscita trovata</div></div>';
   }
   
@@ -2292,19 +2321,7 @@ function filterMovements(query) {
   renderPie(filteredExp);
 }
 
-// ─── HELPER PER INSET GROUPED LIST ───────────────────────────────────────────
-function renderMovementsGrouped(items, type, monthKey) {
-  if (!items.length) return emptyStateMovement(type);
-  const groups = groupByDate(items.map(i => ({ ...i, _type: type })));
-  return groups.map(g => `
-    <div class="date-separator">${g.label}</div>
-    <div class="inset-grouped-list">
-      ${g.items.map(i => renderRow(i, type, monthKey)).join('')}
-    </div>
-  `).join('');
-}
-
-// ─── RENDER PRINCIPALE ───────────────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
   let dateStr = '', totInc = 0, totUsc = 0, net = 0, pagaH = 0;
   let allIncome = [], allExpenses = [], currentK = '';
@@ -2515,28 +2532,38 @@ function render() {
   
   renderAccountBar();
   
-  // Recent list (contenitore .recent-card)
-  const recent = [...allExpenses.map(e => ({ ...e, _type: 'usc' })), ...allIncome.map(i => ({ ...i, _type: 'inc' }))]
-    .sort((a, b) => (b.ts || b.id) - (a.ts || a.id)).slice(0, 6);
+  // Recent list - Inset Grouped
+  const recent = [...allExpenses.map(e => ({ ...e, _type: 'usc' })), ...allIncome.map(i => ({ ...i, _type: 'inc' }))].sort((a, b) => (b.ts || b.id) - (a.ts || a.id)).slice(0, 6);
   const rtEl = document.getElementById('recentTitle');
   if (rtEl) rtEl.textContent = viewMode === 'day' ? 'Movimenti del giorno' : 'Recenti';
   const rl = document.getElementById('recentList');
   if (rl) {
-    if (recent.length) {
-      rl.innerHTML = `<div class="recent-card">${recent.map(e => renderRow(e, e._type, e.monthKey)).join('')}</div>`;
-    } else {
+    if (!recent.length) {
       rl.innerHTML = emptyStateNoMoves('Ancora nessun movimento.');
+    } else {
+      const grouped = groupByDate(recent.map(i => ({ ...i, _type: i._type })));
+      rl.innerHTML = grouped.map(g => {
+        const rows = g.items.map(i => renderRowInsetGrouped(i, i._type, i.monthKey || mKey || curMonthKey())).join('');
+        return `<div class="section-header-date">${g.label}</div><div class="recent-group">${rows}</div>`;
+      }).join('');
     }
   }
   
-  // Movimenti (pagina) – versione raggruppata
+  // Movimenti
   if (document.getElementById('page-movimenti').classList.contains('active')) {
     const mKey = currentK || curMonthKey();
     
     if (!searchQuery) {
-      document.getElementById('incomeList').innerHTML = renderMovementsGrouped(allIncome, 'inc', mKey);
-      document.getElementById('expenseList').innerHTML = renderMovementsGrouped(allExpenses, 'usc', mKey);
+      const makeGrouped = (items, type) => {
+        if (!items.length) return emptyStateMovement(type);
+        return groupByDate(items.map(i => ({ ...i, _type: type }))).map(g => {
+          const rows = g.items.map(i => renderRowInsetGrouped(i, type, mKey)).join('');
+          return `<div class="section-header-date">${g.label}</div><div class="recent-group">${rows}</div>`;
+        }).join('');
+      };
       
+      document.getElementById('incomeList').innerHTML = makeGrouped(allIncome, 'inc');
+      document.getElementById('expenseList').innerHTML = makeGrouped(allExpenses, 'usc');
       const mil = document.getElementById('movIncLabel');
       const mol = document.getElementById('movOutLabel');
       if (mil) mil.textContent = privacyMode ? '€***' : `€${fmt(totInc)}`;
@@ -2548,16 +2575,12 @@ function render() {
         : allTransfers.filter(t => t.fromAccountId === filterAccountId || t.toAccountId === filterAccountId);
       const trEl = document.getElementById('transferList');
       if (trEl) {
-        if (!transfers.length) {
-          trEl.innerHTML = emptyStateTransfer();
-        } else {
-          const transferGroups = groupByDate(transfers);
-          trEl.innerHTML = transferGroups.map(g => `
-            <div class="date-separator">${g.label}</div>
-            <div class="inset-grouped-list">
-              ${g.items.map(t => renderTransferRow(t, mKey)).join('')}
-            </div>
-          `).join('');
+        if (!transfers.length) trEl.innerHTML = emptyStateTransfer();
+        else {
+          trEl.innerHTML = groupByDate(transfers).map(g => {
+            const rows = g.items.map(t => renderTransferRowInsetGrouped(t, mKey)).join('');
+            return `<div class="section-header-date">${g.label}</div><div class="recent-group">${rows}</div>`;
+          }).join('');
         }
       }
       const mtr = document.getElementById('movTrLabel');
