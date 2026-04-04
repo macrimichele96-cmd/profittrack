@@ -16,19 +16,19 @@
   --indigo: #5E5CE6;
 
   /* Background Hierarchy */
-  --bg:           #000000;        /* systemBackground */
-  --bg2:          #1C1C1E;        /* secondarySystemBackground */
-  --bg3:          #2C2C2E;        /* tertiarySystemBackground */
-  --bg-grouped:   #000000;        /* systemGroupedBackground */
-  --bg-grouped2:  #1C1C1E;        /* secondarySystemGroupedBackground */
-  --bg-grouped3:  #2C2C2E;        /* tertiarySystemGroupedBackground */
+  --bg:           #000000;
+  --bg2:          #1C1C1E;
+  --bg3:          #2C2C2E;
+  --bg-grouped:   #000000;
+  --bg-grouped2:  #1C1C1E;
+  --bg-grouped3:  #2C2C2E;
 
   /* Label Colors */
   --text:  #FFFFFF;
-  --text2: rgba(235,235,245,.60);  /* secondaryLabel */
+  --text2: rgba(235,235,245,.60);
   --sub:   rgba(235,235,245,.60);
-  --sub2:  rgba(235,235,245,.30);  /* tertiaryLabel */
-  --sub3:  rgba(235,235,245,.18);  /* quaternaryLabel */
+  --sub2:  rgba(235,235,245,.30);
+  --sub3:  rgba(235,235,245,.18);
 
   /* System Fill Colors */
   --fill1: rgba(120,120,128,.36);
@@ -40,7 +40,7 @@
   --separator:        rgba(84,84,88,.65);
   --separator-opaque: #38383A;
 
-  /* Legacy compat aliases (used by JS-rendered markup) */
+  /* Legacy compat aliases */
   --card-bg:  #1C1C1E;
   --card-bg2: #2C2C2E;
   --border:   rgba(255,255,255,.10);
@@ -49,7 +49,7 @@
   --glass2:   rgba(44,44,46,.68);
 
   /* Navigation chrome */
-  --nav-bg: rgba(28,28,30,.72);  /* matches iOS UIBarStyle with vibrancy */
+  --nav-bg: rgba(28,28,30,.72);
 
   /* Layout */
   --top-nav-h: 56px;
@@ -57,8 +57,8 @@
   --kb-offset: 0px;
 
   /* Sheet geometry */
-  --sheet-radius: 10px;           /* iOS system sheet top corners */
-  --card-radius:  12px;           /* iOS card / grouped section */
+  --sheet-radius: 10px;
+  --card-radius:  12px;
   --pill-radius:  999px;
 }
 
@@ -179,28 +179,67 @@ input, button, select, textarea { font-family: inherit; }
 /* Onboarding fields — Inset Grouped style */
 .onboarding-fields { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
 
-.field-group { margin-bottom: 0; }
-.field-group label {
-  display: block;
-  font-size: 13px; font-weight: 600; color: var(--sub);
-  text-transform: uppercase; letter-spacing: .6px;
-  margin: 18px 4px 8px;
+/* ── 4. INSET GROUPED LIST (iOS 17 style) ── */
+.inset-grouped-list {
+  margin: 0 16px 16px;
+  background: var(--card-bg2);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 0.5px solid var(--border);
 }
 
-/* ── 4. INSET GROUPED LIST (iOS Settings–style forms) ── */
-/*
-   Structure:
-   .ig-group-wrap
-     .ig-group-header   ← optional uppercase caption
-     .ig-section        ← the rounded rect
-       .ig-cell
-       .ig-cell
-       ...
-     .ig-group-footer   ← optional footnote
-*/
+.date-separator {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--sub);
+  letter-spacing: 0.3px;
+  margin: 12px 0 6px 32px;
+}
 
+/* Riga di transazione – senza bordo inferiore globale */
+.tx-swipe-wrap {
+  position: relative;
+  border-bottom: 0.5px solid var(--border2);
+}
+.tx-swipe-wrap:last-child {
+  border-bottom: none;
+}
+
+/* Separatore interno che inizia dopo l'icona (54px dal bordo sinistro) */
+.tx-swipe-wrap::before {
+  content: '';
+  position: absolute;
+  left: 54px;
+  right: 0;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--border2);
+  pointer-events: none;
+}
+.tx-swipe-wrap:last-child::before {
+  display: none;
+}
+
+.recent-list {
+  max-width: 500px;
+  margin: 0 auto 16px;
+  padding: 0 16px;
+}
+.recent-card {
+  background: var(--card-bg2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.recent-card .tx-swipe-wrap {
+  border-bottom: none;
+}
+.recent-card .tx-swipe-wrap::before {
+  left: 54px;
+}
+
+/* ── 5. INSET GROUPED (Settings, ecc.) ── */
 .ig-group-wrap { margin: 0 0 8px; }
-
 .ig-group-header {
   font-size: 13px; font-weight: 400;
   color: var(--sub); text-transform: uppercase; letter-spacing: .4px;
@@ -211,20 +250,15 @@ input, button, select, textarea { font-family: inherit; }
   font-size: 13px; color: var(--sub);
   padding: 7px 32px 0; line-height: 1.4;
 }
-
 .ig-section {
   background: var(--bg-grouped2);
   border-radius: var(--card-radius);
   margin: 0 16px;
   overflow: hidden;
-  /* iOS inset grouped has a subtle border in light mode */
 }
 @media (prefers-color-scheme: light) {
-  .ig-section {
-    box-shadow: 0 0 0 .5px var(--separator) inset;
-  }
+  .ig-section { box-shadow: 0 0 0 .5px var(--separator) inset; }
 }
-
 .ig-cell {
   display: flex; align-items: center;
   padding: 0 16px;
@@ -235,7 +269,6 @@ input, button, select, textarea { font-family: inherit; }
   background: transparent;
   transition: background .12s;
 }
-/* Inset separator — appears between cells only */
 .ig-cell + .ig-cell::before {
   content: '';
   position: absolute; top: 0; left: 16px; right: 0;
@@ -244,7 +277,6 @@ input, button, select, textarea { font-family: inherit; }
 }
 .ig-cell.ig-interactive { cursor: pointer; }
 .ig-cell.ig-interactive:active { background: var(--fill3); }
-
 .ig-cell-icon {
   width: 29px; height: 29px; border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
@@ -254,20 +286,14 @@ input, button, select, textarea { font-family: inherit; }
   flex: 1; font-size: 17px; color: var(--text); line-height: 1.4;
   padding: 11px 0;
 }
-.ig-cell-label-sm {
-  font-size: 15px; color: var(--text);
-}
 .ig-cell-value {
   font-size: 17px; color: var(--sub); margin-left: 8px; flex-shrink: 0;
 }
 .ig-cell-chevron {
   color: var(--sub2); font-size: 15px; font-weight: 600;
   margin-left: 6px; flex-shrink: 0;
-  /* SF Symbol chevron shape */
 }
 .ig-cell-chevron::after { content: '›'; }
-
-/* Input inside IG cell — full-width, borderless */
 .ig-cell-input {
   flex: 1; background: none; border: none; outline: none;
   font-size: 17px; color: var(--text); font-family: inherit;
@@ -280,27 +306,10 @@ input, button, select, textarea { font-family: inherit; }
   color: var(--sub);
 }
 .ig-cell-input-right:focus { color: var(--text); }
-
-/* Currency prefix inside IG cell */
 .ig-cell-currency {
   font-size: 17px; color: var(--sub); flex-shrink: 0;
   margin-right: 4px; font-weight: 400;
 }
-
-/* Large amount display (onboarding / sheets) */
-.ig-cell-amount {
-  display: flex; align-items: center; gap: 4px;
-}
-
-/* Day picker inside IG cell */
-.ig-cell-days {
-  flex: 1; display: flex; gap: 5px; flex-wrap: wrap; padding: 10px 0;
-}
-
-/* Toggle inside IG cell */
-.ig-cell .toggle-switch { flex-shrink: 0; margin-left: 8px; }
-
-/* Action row in IG section (button-style cell) */
 .ig-cell-action {
   justify-content: center;
   font-size: 17px; font-weight: 400;
@@ -308,11 +317,9 @@ input, button, select, textarea { font-family: inherit; }
   cursor: pointer;
 }
 .ig-cell-action:active { background: var(--fill3); }
-
-/* Destructive action */
 .ig-cell-action.ig-danger { color: var(--red); }
 
-/* ── 5. DAY PICKER ── */
+/* Day picker */
 .day-picker { display: flex; gap: 5px; flex-wrap: wrap; }
 .day-btn {
   flex: 1; min-width: 38px; min-height: 32px;
@@ -404,7 +411,7 @@ input, button, select, textarea { font-family: inherit; }
   }
 }
 
-/* ── 7. TAB BAR — exact iOS glassmorphism ── */
+/* ── 7. TAB BAR ── */
 .tab-bar {
   position: fixed; bottom: 0; left: 0; width: 100%;
   background: var(--nav-bg);
@@ -431,7 +438,7 @@ input, button, select, textarea { font-family: inherit; }
 .tab-item.active { color: var(--blue); }
 .tab-icon-wrap {
   display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 32px;  /* 44px touch width, 32px visual */
+  width: 44px; height: 32px;
   border-radius: 10px;
   transition: background .18s;
 }
@@ -440,7 +447,7 @@ input, button, select, textarea { font-family: inherit; }
   .tab-item.active .tab-icon-wrap { background: rgba(0,122,255,.12); }
 }
 .tab-icon-wrap svg {
-  width: 24px; height: 24px;   /* iOS: 24×24 SF Symbol frame */
+  width: 24px; height: 24px;
   stroke: currentColor; fill: none;
   stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   transition: transform .15s ease;
@@ -449,12 +456,8 @@ input, button, select, textarea { font-family: inherit; }
   fill: currentColor; stroke-width: 0;
   transform: scale(1.06);
 }
-/* Keep stroke icons visible when filling would look bad */
-.tab-item.active .tab-keep-stroke svg {
-  fill: none; stroke-width: 1.6;
-}
 .tab-item > span:not(.tab-badge) {
-  font-size: 10px; font-weight: 500;   /* iOS: SF Pro, 10pt Medium */
+  font-size: 10px; font-weight: 500;
   letter-spacing: .1px;
 }
 .tab-badge {
@@ -646,34 +649,18 @@ input, button, select, textarea { font-family: inherit; }
 }
 .see-all-btn:active { opacity: .6; }
 
-/* ── 14. RECENT LIST (Inset Grouped) ── */
+/* ── 14. RECENT LIST (usa .recent-list e .recent-card) ── */
 .recent-list { max-width: 500px; margin: auto; padding: 0 16px; }
-
-.recent-group {
-  background: var(--glass2);
+.recent-card {
+  background: var(--glass);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border: .5px solid var(--border);
-  border-radius: 10px;
+  border-radius: 16px; padding: 2px 14px;
   overflow: hidden;
-  margin-bottom: 8px;
 }
 
-/* ── 15. DATE SEPARATOR (iOS Section Header) ── */
-.section-header-date {
-  font-size: 13px; font-weight: 500;
-  color: var(--sub);
-  text-transform: uppercase; letter-spacing: .4px;
-  padding: 16px 0 8px;
-  margin-left: 32px;
-}
-
-/* ── 16. TRANSACTION ROWS ── */
-.tx-swipe-wrap {
-  overflow: hidden; position: relative;
-  border-bottom: 0.5px solid var(--border2);
-  margin-left: 54px;
-}
-.tx-swipe-wrap:last-child { border-bottom: none; }
+/* ── 15. TRANSACTION ROWS (già aggiornate con separatori interni) ── */
+.tx-swipe-wrap { overflow: hidden; position: relative; }
 .tx-delete-bg {
   position: absolute; right: 0; top: 0; bottom: 0;
   background: var(--red); display: flex; align-items: center;
@@ -721,14 +708,14 @@ input, button, select, textarea { font-family: inherit; }
   vertical-align: middle;
 }
 
-/* ── 17. EMPTY STATE ── */
+/* ── 16. EMPTY STATE ── */
 .empty-state-box { display: flex; flex-direction: column; align-items: center; padding: 32px 0; gap: 10px; }
 .empty-icon  { font-size: 38px; opacity: .2; }
 .empty-title { font-size: 17px; font-weight: 600; margin-top: 2px; text-align: center; }
 .empty-msg   { font-size: 15px; color: var(--sub); text-align: center; line-height: 1.5; font-weight: 400; }
 .empty-add-btn { width: 200px !important; margin-top: 14px; }
 
-/* ── 18. GLASS CARD (Movimenti / Analisi) ── */
+/* ── 17. GLASS CARD (Movimenti / Analisi) ── */
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(20px) saturate(160%);
@@ -752,7 +739,6 @@ input, button, select, textarea { font-family: inherit; }
 .red-badge   { color: var(--red); }
 .card-desc { font-size: 14px; color: var(--sub); line-height: 1.4; margin-bottom: 14px; font-weight: 400; }
 
-/* Transfer quick card */
 .transfer-quick-card { margin: 8px 16px 14px; padding: 12px 14px; display: flex; align-items: center; }
 .transfer-quick-card .btn-secondary {
   width: 100%;
@@ -762,11 +748,10 @@ input, button, select, textarea { font-family: inherit; }
 }
 .transfer-quick-card .btn-secondary:active { background: rgba(191,90,242,.22); }
 
-/* ── 19. SEARCH BAR ── */
+/* ── 18. SEARCH BAR ── */
 .search-bar-wrap {
   display: flex; align-items: center; gap: 8px;
   margin: 0 16px 12px; max-width: 500px;
-  /* iOS search bar: white or secondaryGroupedBackground */
 }
 #movementSearch {
   flex: 1; padding: 10px 16px;
@@ -787,7 +772,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .clear-search-btn:active { background: var(--fill2); }
 
-/* ── 20. FAB ── */
+/* ── 19. FAB ── */
 .fab {
   position: fixed; bottom: calc(var(--tab-h) + 18px); right: 20px;
   width: 56px; height: 56px; border-radius: 28px;
@@ -804,18 +789,18 @@ input, button, select, textarea { font-family: inherit; }
   .fab { background: var(--blue); box-shadow: 0 4px 18px rgba(0,122,255,.38); }
 }
 
-/* ── 21. MODAL BACKDROP ── */
+/* ── 20. MODAL BACKDROP ── */
 .modal-backdrop {
   position: fixed; inset: 0;
   background: rgba(0,0,0,.55);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  z-index: 1090; opacity: 0; pointer-events: none;
+  z-index: 1050; opacity: 0; pointer-events: none;
   transition: opacity .28s cubic-bezier(.32,.72,0,1);
 }
 .modal-backdrop.active { opacity: 1; pointer-events: all; }
 
-/* ── 22. BOTTOM SHEET ── */
+/* ── 21. BOTTOM SHEET (FIXED: max-height, padding-bottom, z-index) ── */
 .sheet-backdrop {
   position: fixed; inset: 0; z-index: 1050;
   background: rgba(0,0,0,.48);
@@ -826,29 +811,54 @@ input, button, select, textarea { font-family: inherit; }
 }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
 
+.bottom-sheet,
+.modal-sheet {
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  z-index: 1060;
+}
+
 .bottom-sheet {
-  position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1100;
+  position: fixed; bottom: 0; left: 0; width: 100%;
   background: var(--bg2);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top-left-radius: var(--sheet-radius);
   border-top-right-radius: var(--sheet-radius);
-  padding: 0 0 calc(32px + env(safe-area-inset-bottom));
   transform: translateY(100%);
   transition: transform .32s cubic-bezier(.32,.72,0,1);
   box-shadow: 0 -1px 0 var(--separator), 0 -20px 60px rgba(0,0,0,.40);
-  max-height: 85vh; overflow-y: auto;
 }
 .bottom-sheet.active { transform: translateY(0); }
 @media (prefers-color-scheme: light) {
   .bottom-sheet { background: var(--bg-grouped); }
 }
 
-.bottom-sheet .btn-primary {
-  margin-bottom: calc(8px + env(safe-area-inset-bottom));
+.modal-sheet {
+  position: fixed; bottom: var(--kb-offset, 0px); left: 0; width: 100%;
+  background: var(--bg2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top-left-radius: var(--sheet-radius);
+  border-top-right-radius: var(--sheet-radius);
+  transform: translateY(100%);
+  transition: transform .34s cubic-bezier(.32,.72,0,1);
+  box-shadow: 0 -1px 0 var(--separator) inset, 0 -20px 60px rgba(0,0,0,.50);
+}
+.modal-sheet.active { transform: translateY(0); }
+@media (prefers-color-scheme: light) {
+  .modal-sheet { background: var(--bg-grouped); }
 }
 
-/* Grabber pill — iOS spec: 36×5px, 8px from top edge */
+/* Margine extra per il bottone di conferma nei modali */
+.modal-confirm-btn {
+  margin-bottom: 8px;
+}
+#transferModalSheet .modal-confirm-btn {
+  margin-bottom: 8px;
+}
+
 .modal-handle {
   width: 36px; height: 5px; border-radius: 2.5px;
   background: var(--fill2);
@@ -860,33 +870,11 @@ input, button, select, textarea { font-family: inherit; }
   text-align: center; letter-spacing: -.2px;
 }
 
-/* ── 23. ENTRY MODAL SHEET ── */
-.modal-sheet {
-  position: fixed; bottom: var(--kb-offset, 0px); left: 0; width: 100%;
-  z-index: 1100;
-  background: var(--bg2);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top-left-radius: var(--sheet-radius);
-  border-top-right-radius: var(--sheet-radius);
-  padding: 0 0 calc(32px + env(safe-area-inset-bottom));
-  transform: translateY(100%);
-  transition: transform .34s cubic-bezier(.32,.72,0,1);
-  box-shadow: 0 -1px 0 var(--separator) inset, 0 -20px 60px rgba(0,0,0,.50);
-  max-height: 85vh; overflow-y: auto;
-}
-.modal-sheet.active { transform: translateY(0); }
-@media (prefers-color-scheme: light) {
-  .modal-sheet { background: var(--bg-grouped); }
-}
-
 .modal-header {
   position: relative; display: flex; justify-content: center; align-items: center;
   padding: 8px 20px 10px; flex-direction: column;
 }
-/* Grabber inside modal header */
 .modal-header .modal-handle { margin: 0 auto 10px; }
-
 .modal-x {
   position: absolute; right: 16px; top: 14px;
   width: 30px; height: 30px; border-radius: 15px;
@@ -899,7 +887,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .modal-x:active { background: var(--fill2); }
 
-/* Type toggle — iOS segmented control style */
+/* Type toggle */
 .type-toggle {
   display: flex; background: var(--fill3);
   border-radius: 10px; padding: 2px;
@@ -923,7 +911,6 @@ input, button, select, textarea { font-family: inherit; }
   .type-btn.active { background: #FFFFFF; }
 }
 
-/* Amount row */
 .modal-amount-row {
   display: flex; align-items: center; gap: 6px;
   padding: 4px 20px 6px; min-height: 58px;
@@ -935,7 +922,6 @@ input, button, select, textarea { font-family: inherit; }
   color: var(--text); line-height: 1; padding: 0 0 4px; min-width: 0;
 }
 
-/* Category scroller */
 .cat-hscroll {
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none; padding: 4px 16px 10px;
@@ -967,7 +953,6 @@ input, button, select, textarea { font-family: inherit; }
 }
 .cat-card.active .cat-card-label { color: var(--cat-color); }
 
-/* Meta row (date / account buttons) */
 .modal-meta-row { display: flex; gap: 8px; padding: 0 16px 10px; }
 .meta-btn {
   flex: 1; display: flex; align-items: center; gap: 6px;
@@ -983,11 +968,10 @@ input, button, select, textarea { font-family: inherit; }
 .meta-btn svg { flex-shrink: 0; stroke: var(--sub); }
 .meta-btn span { overflow: hidden; text-overflow: ellipsis; }
 
-.modal-confirm-btn { margin: 0 16px calc(8px + env(safe-area-inset-bottom)) 16px; padding: 15px; font-size: 17px; }
+.modal-confirm-btn { margin: 0 16px; padding: 15px; font-size: 17px; }
 .btn-green { background: var(--green) !important; }
 .btn-red   { background: var(--red) !important; }
 
-/* Time deterrent */
 .time-deterrent {
   font-size: 13px; font-weight: 600; text-align: center;
   padding: 8px 12px; border-radius: 10px; margin: 0 16px 10px;
@@ -996,7 +980,7 @@ input, button, select, textarea { font-family: inherit; }
 .td-orange { color: var(--orange); background: rgba(255,159,10,.12); }
 .td-red    { color: var(--red);    background: rgba(255,69,58,.12); }
 
-/* ── 24. BUTTONS ── */
+/* ── 22. BUTTONS ── */
 .btn-primary {
   display: block; width: 100%;
   background: var(--blue);
@@ -1024,114 +1008,10 @@ input, button, select, textarea { font-family: inherit; }
 .btn-orange-tint { background: rgba(255,159,10,.15); color: var(--orange); }
 .btn-green-tint  { background: rgba(50,215,75,.12);  color: var(--green); }
 
-/* ── 25. SETTINGS — Inset Grouped Sections ── */
+/* ── 23. SETTINGS (già coperto da .ig-*) ── */
+/* ... omissis ... */
 
-/* Section wrapper with proper 16px side gutters */
-.settings-section-group { margin-bottom: 28px; }
-.settings-section-header {
-  font-size: 13px; font-weight: 400; color: var(--sub);
-  text-transform: uppercase; letter-spacing: .4px;
-  padding: 0 32px 8px; margin-top: 0;
-}
-
-/* Settings uses ig-section (same 10px IG sections) */
-/* Reuse .ig-section + .ig-cell inside settings page */
-.page-scroll .ig-section { margin: 0 16px; }
-.page-scroll .ig-group-wrap { margin-bottom: 28px; }
-
-/* Toggle row in settings */
-.settings-toggle-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0 16px; min-height: 44px; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background .12s;
-}
-.settings-toggle-row:active { background: var(--fill3); }
-.settings-toggle-row span { font-size: 17px; color: var(--text); }
-.toggle-switch {
-  width: 51px; height: 31px;
-  background: var(--fill2); border-radius: 16px;
-  position: relative; transition: background .22s; cursor: pointer;
-  flex-shrink: 0;
-}
-.toggle-switch::after {
-  content: ''; position: absolute;
-  width: 27px; height: 27px; background: #FFFFFF;
-  border-radius: 50%; top: 2px; left: 2px;
-  transition: transform .22s;
-  box-shadow: 0 2px 6px rgba(0,0,0,.30);
-}
-.toggle-switch.active { background: var(--green); }
-.toggle-switch.active::after { transform: translateX(20px); }
-
-/* Settings row buttons (data section) */
-.settings-row-btn {
-  display: flex; justify-content: space-between; align-items: center;
-  width: 100%; background: none; border: none;
-  padding: 0 16px; min-height: 44px;
-  font-size: 17px; color: var(--text); font-family: inherit;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  position: relative; transition: background .12s;
-}
-.settings-row-btn + .settings-row-btn::before {
-  content: ''; position: absolute;
-  top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
-}
-.settings-row-btn:active { background: var(--fill3); }
-.row-chevron { color: var(--sub2); font-size: 15px; font-weight: 600; }
-.danger-btn  { color: var(--red) !important; }
-
-/* Legacy field wrappers — kept for JS-rendered content */
-.settings-field { margin-bottom: 14px; padding: 0 2px; }
-.settings-field label {
-  display: block; font-size: 13px; color: var(--sub); font-weight: 500;
-  margin-bottom: 7px;
-}
-/* Amount wrap now inside ig-cell — standalone use only in analysis */
-.amount-input-wrap {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--fill3); border: .5px solid var(--separator);
-  border-radius: 10px; padding: 11px 14px; min-height: 44px;
-}
-.currency-sym { font-size: 17px; color: var(--sub); font-weight: 400; flex-shrink: 0; }
-.amount-input-wrap input {
-  flex: 1; background: none; border: none; outline: none;
-  font-size: 17px; font-weight: 600; color: var(--text); font-family: inherit;
-  -webkit-appearance: none; padding: 0; margin: 0;
-}
-.amount-input-wrap input::placeholder { color: var(--sub2); font-weight: 400; }
-
-/* Overtime row */
-.overtime-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0 16px; min-height: 44px; cursor: pointer;
-  font-size: 17px; color: var(--sub);
-  -webkit-tap-highlight-color: transparent;
-  transition: background .12s; position: relative;
-}
-.overtime-row::before {
-  content: ''; position: absolute;
-  top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
-}
-.overtime-row:active { background: var(--fill3); }
-
-/* Calc preview */
-.calc-preview {
-  display: none; text-align: center; font-size: 13px; color: var(--sub);
-  padding: 10px; background: rgba(10,132,255,.08); border-radius: 10px;
-  margin: 8px 16px; line-height: 1.5;
-}
-.salary-info-row {
-  font-size: 13px; color: var(--sub); line-height: 1.5;
-  padding: 10px 16px; background: rgba(255,159,10,.07);
-  border-bottom: .5px solid rgba(255,159,10,.2);
-  display: none;
-}
-.salary-info-row strong { color: var(--orange); }
-
-/* ── 26. ACCOUNTS LIST (settings) ── */
+/* ── 24. ACCOUNTS LIST ── */
 .acc-row {
   display: flex; align-items: center; gap: 12px;
   padding: 0 16px; min-height: 44px;
@@ -1163,7 +1043,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .ae-btn:active { transform: scale(.9); }
 
-/* ── 27. RECURRING ── */
+/* ── 25. RECURRING ── */
 .apply-banner {
   display: flex; justify-content: space-between; align-items: center;
   background: rgba(10,132,255,.10); border-bottom: .5px solid rgba(10,132,255,.20);
@@ -1224,7 +1104,6 @@ input, button, select, textarea { font-family: inherit; }
 .rec-amt   { font-size: 15px; font-weight: 700; color: var(--red); }
 .rec-total { text-align: right; font-size: 12px; color: var(--sub); padding: 8px 16px 4px; font-weight: 600; }
 
-/* Recurring category grid */
 .rec-cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 8px; }
 .rec-cat-option {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -1237,7 +1116,7 @@ input, button, select, textarea { font-family: inherit; }
 .rec-cat-option span { font-size: 12px; font-weight: 600; color: var(--sub); }
 .rec-cat-option:active { background: rgba(10,132,255,.12); transform: scale(.95); }
 
-/* ── 28. ANALYSIS PAGE ── */
+/* ── 26. ANALYSIS ── */
 .avg-box {
   font-size: 13px; color: var(--sub); line-height: 1.6;
   padding: 12px 14px; background: rgba(10,132,255,.07); border-radius: 10px;
@@ -1255,7 +1134,7 @@ input, button, select, textarea { font-family: inherit; }
 .green-result  { background: rgba(50,215,75,.10);  color: var(--green); }
 .section-divider { height: .5px; background: var(--separator); margin: 20px 0; }
 
-/* ── 29. PIE / DONUT ── */
+/* ── 27. PIE / DONUT ── */
 .pie-row    { display: flex; align-items: center; gap: 16px; }
 .pie-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 .pie-leg-row { display: flex; align-items: center; gap: 8px; }
@@ -1270,12 +1149,12 @@ input, button, select, textarea { font-family: inherit; }
 .donut-cat { flex: 1; font-size: 13px; color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .donut-pct { font-size: 13px; font-weight: 700; color: var(--text2); }
 
-/* ── 30. HISTORY CHART ── */
+/* ── 28. HISTORY CHART ── */
 .chart-legend { display: flex; justify-content: center; gap: 18px; margin-top: 12px; }
 .legend-item  { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--sub); }
 .legend-dot   { width: 8px; height: 8px; border-radius: 2px; }
 
-/* ── 31. CALENDAR ── */
+/* ── 29. CALENDAR ── */
 .cal-backdrop {
   position: fixed; inset: 0; z-index: 1099;
   display: none; background: transparent;
@@ -1351,41 +1230,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .cal-picker-btn:active { background: rgba(10,132,255,.22); transform: scale(.92); }
 
-/* ── 32. ACCOUNT PICKER ── */
-.account-picker-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 0 16px; min-height: 52px; position: relative; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; transition: background .12s;
-}
-.account-picker-row + .account-picker-row::before {
-  content: ''; position: absolute;
-  top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
-}
-.account-picker-row:active { background: var(--fill3); }
-
-/* Transfer modal internals */
-.transfer-account-selector {
-  margin: 8px 16px 4px;
-  background: var(--bg-grouped2); border-radius: 10px; overflow: hidden;
-  border: .5px solid var(--separator);
-}
-.transfer-account-row {
-  display: flex; align-items: center; padding: 0 16px; min-height: 44px;
-  gap: 12px; cursor: pointer; position: relative;
-  transition: background .15s; -webkit-tap-highlight-color: transparent;
-}
-.transfer-account-row + .transfer-account-row::before {
-  content: ''; position: absolute;
-  top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
-}
-.transfer-account-row:active { background: var(--fill3); }
-.transfer-account-label { font-size: 15px; font-weight: 600; color: var(--blue); width: 40px; }
-.transfer-account-value { flex: 1; font-size: 17px; font-weight: 500; color: var(--text); }
-.chevron { color: var(--sub2); font-size: 15px; font-weight: 600; }
-.chevron::after { content: '›'; }
-
+/* ── 30. TRANSFER ACCOUNT PICKER ── */
 .transfer-acc-card {
   display: flex; align-items: center; gap: 14px; padding: 12px 16px;
   cursor: pointer; transition: background .15s;
@@ -1405,7 +1250,7 @@ input, button, select, textarea { font-family: inherit; }
 .checkmark { color: var(--blue); font-size: 20px; font-weight: 700; }
 .transfer-acc-list { max-height: 60vh; overflow-y: auto; }
 
-/* ── 33. DATE PICKER INPUT ── */
+/* ── 31. DATE PICKER INPUT ── */
 .date-native-input {
   width: 100%; padding: 13px 16px; margin: 0 16px;
   width: calc(100% - 32px);
@@ -1420,17 +1265,14 @@ input, button, select, textarea { font-family: inherit; }
   .date-native-input::-webkit-calendar-picker-indicator { filter: opacity(.4); }
 }
 
-/* ── 34. ONBOARDING BUTTON SPACING ── */
-.onboarding-card .btn-primary { margin-top: 32px; border-radius: 14px; }
-
-/* ── 35. ANIMATIONS ── */
+/* ── 32. ANIMATIONS ── */
 @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
 @keyframes fadeUp  { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
 @keyframes pageIn  { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
 .shake { animation: shake .4s ease; }
 
-/* ── 36. TAP HIGHLIGHT GLOBAL RESET ── */
+/* ── 33. TAP HIGHLIGHT GLOBAL RESET ── */
 button, a, [onclick],
 .tab-item, .cat-card, .meta-btn,
 .acc-chip, .ae-btn, .rec-cat-option,
@@ -1438,32 +1280,3 @@ button, a, [onclick],
 .settings-toggle-row, .ig-cell {
   -webkit-tap-highlight-color: transparent;
 }
-
-/* ── 37. MISC / COMPAT ── */
-.onb-acc-picker { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 0 8px; }
-.onb-acc-picker::-webkit-scrollbar { display: none; }
-.onb-acc-btn {
-  flex: 0 0 auto; background: var(--fill3); border: .5px solid var(--border);
-  border-radius: var(--pill-radius); padding: 10px 14px; color: var(--sub);
-  font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit;
-  -webkit-tap-highlight-color: transparent; min-height: 36px;
-  transition: background .15s, border-color .15s, color .15s, transform .1s;
-}
-.onb-acc-btn.active { background: rgba(10,132,255,.14); border-color: var(--blue); color: var(--blue); }
-.onb-acc-btn:active { transform: scale(.95); }
-.cat-pill {
-  flex-shrink: 0; background: var(--fill3); border: .5px solid var(--separator);
-  border-radius: var(--pill-radius); padding: 6px 14px;
-  color: var(--sub); font-size: 13px; font-weight: 600;
-  cursor: pointer; white-space: nowrap; font-family: inherit;
-  min-height: 32px; display: flex; align-items: center;
-  -webkit-tap-highlight-color: transparent;
-}
-.np-btn {
-  background: var(--fill3); border: none; color: var(--blue);
-  width: 44px; height: 44px; border-radius: 10px;
-  cursor: pointer; font-size: 17px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent; transition: background .15s;
-}
-.np-btn:active { background: var(--fill2); }
