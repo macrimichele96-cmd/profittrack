@@ -413,7 +413,6 @@ function initPrivacyToggle() {
 }
 
 // ─── ONBOARDING MULTI-STEP ───────────────────────────────────────────────────
-let _dayPickerInited = false;
 function renderOnboardingStep() {
   document.querySelectorAll('.onboarding-step').forEach((el, i) => {
     el.style.display = (i + 1) === onboardingStep ? 'block' : 'none';
@@ -427,12 +426,8 @@ function renderOnboardingStep() {
     line.classList.toggle('completed', i + 1 < onboardingStep);
   });
   document.getElementById('onboarding').style.display = 'flex';
-
-  // Inizializza il day picker solo la prima volta che si mostra lo step 2
-  if (onboardingStep === 2 && !_dayPickerInited) {
-    _dayPickerInited = true;
-    initOnboardingDayPicker();
-  }
+  
+  initOnboardingDayPicker();
 }
 
 function nextOnboardingStep() {

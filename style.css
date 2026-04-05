@@ -1,9 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════
-   ProfitTrack · iOS 18 HIG — Complete Design System
+   ProfitTrack · iOS 17 HIG — Complete Design System
+   Palette, spacing, and component specs aligned to Apple Human
+   Interface Guidelines for iOS 17 / UIKit system appearance.
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── 1. SYSTEM COLOR TOKENS ── */
 :root {
+  /* Dynamic System Colors — Dark (default) */
   --blue:   #0A84FF;
   --green:  #32D74B;
   --red:    #FF453A;
@@ -12,27 +15,32 @@
   --teal:   #5AC8FA;
   --indigo: #5E5CE6;
 
-  --bg:           #000000;
-  --bg2:          #1C1C1E;
-  --bg3:          #2C2C2E;
-  --bg-grouped:   #000000;
-  --bg-grouped2:  #1C1C1E;
-  --bg-grouped3:  #2C2C2E;
+  /* Background Hierarchy */
+  --bg:           #000000;        /* systemBackground */
+  --bg2:          #1C1C1E;        /* secondarySystemBackground */
+  --bg3:          #2C2C2E;        /* tertiarySystemBackground */
+  --bg-grouped:   #000000;        /* systemGroupedBackground */
+  --bg-grouped2:  #1C1C1E;        /* secondarySystemGroupedBackground */
+  --bg-grouped3:  #2C2C2E;        /* tertiarySystemGroupedBackground */
 
+  /* Label Colors */
   --text:  #FFFFFF;
-  --text2: rgba(235,235,245,.60);
+  --text2: rgba(235,235,245,.60);  /* secondaryLabel */
   --sub:   rgba(235,235,245,.60);
-  --sub2:  rgba(235,235,245,.30);
-  --sub3:  rgba(235,235,245,.18);
+  --sub2:  rgba(235,235,245,.30);  /* tertiaryLabel */
+  --sub3:  rgba(235,235,245,.18);  /* quaternaryLabel */
 
+  /* System Fill Colors */
   --fill1: rgba(120,120,128,.36);
   --fill2: rgba(120,120,128,.32);
   --fill3: rgba(118,118,128,.24);
   --fill4: rgba(116,116,128,.18);
 
+  /* Separator */
   --separator:        rgba(84,84,88,.65);
   --separator-opaque: #38383A;
 
+  /* Legacy compat aliases (used by JS-rendered markup) */
   --card-bg:  #1C1C1E;
   --card-bg2: #2C2C2E;
   --border:   rgba(255,255,255,.10);
@@ -40,14 +48,17 @@
   --glass:    rgba(28,28,30,.80);
   --glass2:   rgba(44,44,46,.68);
 
-  --nav-bg: rgba(28,28,30,.72);
+  /* Navigation chrome */
+  --nav-bg: rgba(28,28,30,.72);  /* matches iOS UIBarStyle with vibrancy */
 
+  /* Layout */
   --top-nav-h: 56px;
   --tab-h:     calc(68px + env(safe-area-inset-bottom));
   --kb-offset: 0px;
 
-  --sheet-radius: 20px;           /* iOS 18: corner radius aumentato */
-  --card-radius:  12px;
+  /* Sheet geometry */
+  --sheet-radius: 10px;           /* iOS system sheet top corners */
+  --card-radius:  12px;           /* iOS card / grouped section */
   --pill-radius:  999px;
 }
 
@@ -107,6 +118,7 @@ html, body {
   overscroll-behavior-y: none;
   overscroll-behavior-x: hidden;
 }
+/* Prevent iOS auto-zoom: all inputs must be >= 16px */
 input, select, textarea {
   font-size: 16px !important;
 }
@@ -174,9 +186,29 @@ input, button, select, textarea { font-family: inherit; }
 .feature-text strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
 .feature-text p      { font-size: 13px; color: var(--sub); line-height: 1.4; }
 
+/* Onboarding fields — Inset Grouped style */
 .onboarding-fields { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
 
-/* ── 4. INSET GROUPED LIST ── */
+.field-group { margin-bottom: 0; }
+.field-group label {
+  display: block;
+  font-size: 13px; font-weight: 600; color: var(--sub);
+  text-transform: uppercase; letter-spacing: .6px;
+  margin: 18px 4px 8px;
+}
+
+/* ── 4. INSET GROUPED LIST (iOS Settings–style forms) ── */
+/*
+   Structure:
+   .ig-group-wrap
+     .ig-group-header   ← optional uppercase caption
+     .ig-section        ← the rounded rect
+       .ig-cell
+       .ig-cell
+       ...
+     .ig-group-footer   ← optional footnote
+*/
+
 .ig-group-wrap { margin: 0 0 8px; }
 
 .ig-group-header {
@@ -212,6 +244,7 @@ input, button, select, textarea { font-family: inherit; }
   background: transparent;
   transition: background .12s;
 }
+/* Inset separator — appears between cells only */
 .ig-cell + .ig-cell::before {
   content: '';
   position: absolute; top: 0; left: 16px; right: 0;
@@ -238,9 +271,11 @@ input, button, select, textarea { font-family: inherit; }
 .ig-cell-chevron {
   color: var(--sub2); font-size: 15px; font-weight: 600;
   margin-left: 6px; flex-shrink: 0;
+  /* SF Symbol chevron shape */
 }
 .ig-cell-chevron::after { content: '›'; }
 
+/* Input inside IG cell — full-width, borderless */
 .ig-cell-input {
   flex: 1; background: none; border: none; outline: none;
   font-size: 17px; color: var(--text); font-family: inherit;
@@ -254,21 +289,26 @@ input, button, select, textarea { font-family: inherit; }
 }
 .ig-cell-input-right:focus { color: var(--text); }
 
+/* Currency prefix inside IG cell */
 .ig-cell-currency {
   font-size: 17px; color: var(--sub); flex-shrink: 0;
   margin-right: 4px; font-weight: 400;
 }
 
+/* Large amount display (onboarding / sheets) */
 .ig-cell-amount {
   display: flex; align-items: center; gap: 4px;
 }
 
+/* Day picker inside IG cell */
 .ig-cell-days {
   flex: 1; display: flex; gap: 5px; flex-wrap: wrap; padding: 10px 0;
 }
 
+/* Toggle inside IG cell */
 .ig-cell .toggle-switch { flex-shrink: 0; margin-left: 8px; }
 
+/* Action row in IG section (button-style cell) */
 .ig-cell-action {
   justify-content: center;
   font-size: 17px; font-weight: 400;
@@ -277,6 +317,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .ig-cell-action:active { background: var(--fill3); }
 
+/* Destructive action */
 .ig-cell-action.ig-danger { color: var(--red); }
 
 /* ── 5. DAY PICKER ── */
@@ -371,7 +412,7 @@ input, button, select, textarea { font-family: inherit; }
   }
 }
 
-/* ── 7. TAB BAR — iOS 18 pill indicator ── */
+/* ── 7. TAB BAR — exact iOS glassmorphism ── */
 .tab-bar {
   position: fixed; bottom: 0; left: 0; width: 100%;
   background: var(--nav-bg);
@@ -398,19 +439,16 @@ input, button, select, textarea { font-family: inherit; }
 .tab-item.active { color: var(--blue); }
 .tab-icon-wrap {
   display: flex; align-items: center; justify-content: center;
-  width: 52px; height: 30px;
-  border-radius: 15px;
-  transition: background .22s cubic-bezier(.32,1,.23,1), transform .15s;
+  width: 44px; height: 32px;  /* 44px touch width, 32px visual */
+  border-radius: 10px;
+  transition: background .18s;
 }
-.tab-item.active .tab-icon-wrap {
-  background: rgba(10,132,255,.15);
-  transform: scale(1.04);
-}
+.tab-item.active .tab-icon-wrap { background: rgba(10,132,255,.14); }
 @media (prefers-color-scheme: light) {
   .tab-item.active .tab-icon-wrap { background: rgba(0,122,255,.12); }
 }
 .tab-icon-wrap svg {
-  width: 24px; height: 24px;
+  width: 24px; height: 24px;   /* iOS: 24×24 SF Symbol frame */
   stroke: currentColor; fill: none;
   stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   transition: transform .15s ease;
@@ -419,13 +457,13 @@ input, button, select, textarea { font-family: inherit; }
   fill: currentColor; stroke-width: 0;
   transform: scale(1.06);
 }
+/* Keep stroke icons visible when filling would look bad */
 .tab-item.active .tab-keep-stroke svg {
   fill: none; stroke-width: 1.6;
 }
 .tab-item > span:not(.tab-badge) {
-  font-size: 10px; font-weight: 600;
-  letter-spacing: -.1px;
-  transition: color .18s;
+  font-size: 10px; font-weight: 500;   /* iOS: SF Pro, 10pt Medium */
+  letter-spacing: .1px;
 }
 .tab-badge {
   position: absolute; top: 2px; right: calc(50% - 22px);
@@ -450,7 +488,7 @@ input, button, select, textarea { font-family: inherit; }
   touch-action: pan-y;
 }
 
-/* ── 9. ACCOUNT BAR ── */
+/* ── 9. ACCOUNT BAR — glass-aligned with hero ── */
 .account-bar {
   max-width: 500px; margin: 8px auto 0;
   display: flex; align-items: center; gap: 8px;
@@ -543,10 +581,10 @@ input, button, select, textarea { font-family: inherit; }
 .account-balance-display .balance-acc-name { opacity: .85; font-size: 13px; }
 .account-balance-display .balance-amount { font-weight: 700; font-size: 15px; }
 .hero-amount {
-  font-size: 54px; font-weight: 800; letter-spacing: -2.5px; line-height: 1;
+  font-size: 52px; font-weight: 700; letter-spacing: -2px; line-height: 1;
   margin-bottom: 4px; transition: color .3s; cursor: pointer;
 }
-@media (min-height: 750px) { .hero-amount { font-size: 60px; } }
+@media (min-height: 750px) { .hero-amount { font-size: 58px; } }
 .hero-sub  { font-size: 14px; color: var(--sub); margin-bottom: 6px; }
 .hero-trend { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
 .hero-bar-wrap { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
@@ -565,9 +603,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .stat-chip { display: flex; align-items: center; gap: 10px; }
 .stat-chip-icon { font-size: 18px; font-weight: 700; }
-.stat-chip-val {
-  font-size: 21px; font-weight: 800; letter-spacing: -.6px; line-height: 1;
-}
+.stat-chip-val  { font-size: 17px; font-weight: 700; cursor: pointer; }
 .stat-chip-lab  { font-size: 11px; color: var(--sub); margin-top: 2px; }
 .stat-divider   { width: .5px; height: 28px; background: var(--separator); margin: 0 4px; }
 
@@ -625,9 +661,10 @@ input, button, select, textarea { font-family: inherit; }
 }
 .see-all-btn:active { opacity: .6; }
 
-/* ── 14. RECENT LIST ── */
+/* ── 14. RECENT LIST (Hero-card style) ── */
 .recent-list { max-width: 500px; margin: auto; padding: 0 16px; }
 
+/* Group container styled like .hero-card */
 .recent-group {
   background: linear-gradient(145deg, rgba(32,32,36,.90) 0%, rgba(20,20,22,.82) 100%);
   backdrop-filter: blur(28px) saturate(180%);
@@ -649,7 +686,7 @@ input, button, select, textarea { font-family: inherit; }
   }
 }
 
-/* ── 15. DATE SEPARATOR ── */
+/* ── 15. DATE SEPARATOR (iOS Section Header — hero-aligned) ── */
 .section-header-date {
   font-size: 13px; font-weight: 600;
   color: var(--sub);
@@ -661,6 +698,7 @@ input, button, select, textarea { font-family: inherit; }
 /* ── 16. TRANSACTION ROWS ── */
 .tx-swipe-wrap {
   overflow: hidden; position: relative;
+  /* No border-bottom — separator handled by .tx-row-inner::after */
   margin-left: 16px;
   margin-right: 16px;
 }
@@ -680,6 +718,7 @@ input, button, select, textarea { font-family: inherit; }
   cursor: pointer;
   position: relative;
 }
+/* Subtle separator between rows — starts right of the icon (54px) */
 .tx-row-inner::after {
   content: '';
   position: absolute; bottom: 0; left: 54px; right: 0;
@@ -726,7 +765,7 @@ input, button, select, textarea { font-family: inherit; }
 .empty-msg   { font-size: 15px; color: var(--sub); text-align: center; line-height: 1.5; font-weight: 400; }
 .empty-add-btn { width: 200px !important; margin-top: 14px; }
 
-/* ── 18. GLASS CARD ── */
+/* ── 18. GLASS CARD (Movimenti / Analisi) — hero-card aligned ── */
 .glass-card {
   background: linear-gradient(145deg, rgba(32,32,36,.90) 0%, rgba(20,20,22,.82) 100%);
   backdrop-filter: blur(28px) saturate(180%);
@@ -754,6 +793,7 @@ input, button, select, textarea { font-family: inherit; }
 .red-badge   { color: var(--red); }
 .card-desc { font-size: 14px; color: var(--sub); line-height: 1.4; margin-bottom: 14px; font-weight: 400; }
 
+/* Transfer quick card */
 .transfer-quick-card { margin: 8px 16px 14px; padding: 12px 14px; display: flex; align-items: center; }
 .transfer-quick-card .btn-secondary {
   width: 100%;
@@ -767,6 +807,7 @@ input, button, select, textarea { font-family: inherit; }
 .search-bar-wrap {
   display: flex; align-items: center; gap: 8px;
   margin: 0 16px 12px; max-width: 500px;
+  /* iOS search bar: white or secondaryGroupedBackground */
 }
 #movementSearch {
   flex: 1; padding: 10px 16px;
@@ -853,6 +894,7 @@ input, button, select, textarea { font-family: inherit; }
   box-sizing: border-box;
 }
 
+/* Internal scroll container for bottom sheets */
 .bottom-sheet-content {
   flex: 1;
   overflow-y: auto;
@@ -861,11 +903,11 @@ input, button, select, textarea { font-family: inherit; }
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
 
-/* Grabber pill — iOS 18 style */
+/* Grabber pill — iOS spec: 36×5px, 8px from top edge */
 .modal-handle {
-  width: 36px; height: 4px; border-radius: 2px;
+  width: 36px; height: 5px; border-radius: 2.5px;
   background: var(--fill2);
-  margin: 10px auto 0;
+  margin: 8px auto 0;
   flex-shrink: 0;
 }
 .bottom-sheet-title {
@@ -900,7 +942,6 @@ input, button, select, textarea { font-family: inherit; }
 .modal-sheet-content {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 8px;
@@ -910,6 +951,7 @@ input, button, select, textarea { font-family: inherit; }
   position: relative; display: flex; justify-content: center; align-items: center;
   padding: 16px 20px 10px; flex-direction: column;
 }
+/* Grabber inside modal header */
 .modal-header .modal-handle { margin: 0 auto 10px; }
 
 .modal-x {
@@ -924,36 +966,28 @@ input, button, select, textarea { font-family: inherit; }
 }
 .modal-x:active { background: var(--fill2); }
 
-/* Type toggle — iOS 18 style */
+/* Type toggle — iOS segmented control style */
 .type-toggle {
   display: flex; background: var(--fill3);
   border-radius: 10px; padding: 2px;
   margin: 0 16px 12px;
-  position: relative; z-index: 1;
 }
 .type-btn {
-  flex: 1; padding: 8px 4px;
+  flex: 1; padding: 8px;
   border: none; border-radius: 9px;
   font-size: 15px; font-weight: 600;
   background: transparent; color: var(--sub);
   cursor: pointer; font-family: inherit;
-  transition: background .18s, color .18s, box-shadow .18s;
+  transition: background .18s, color .18s;
   -webkit-tap-highlight-color: transparent;
   min-height: 34px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative; z-index: 1;
 }
 .type-btn.active {
   background: var(--bg2); color: var(--text);
-  box-shadow: 0 1px 4px rgba(0,0,0,.28), 0 0.5px 0 rgba(255,255,255,.06) inset;
+  box-shadow: 0 1px 3px rgba(0,0,0,.22);
 }
 @media (prefers-color-scheme: light) {
-  .type-btn.active {
-    background: #FFFFFF;
-    box-shadow: 0 1px 4px rgba(0,0,0,.12);
-  }
+  .type-btn.active { background: #FFFFFF; }
 }
 
 /* Amount row */
@@ -1018,11 +1052,9 @@ input, button, select, textarea { font-family: inherit; }
 
 .modal-confirm-btn {
   width: calc(100% - 32px);
-  margin: 8px 16px calc(max(24px, env(safe-area-inset-bottom) + 16px)) 16px;
-  padding: 16px; font-size: 17px; font-weight: 700; flex-shrink: 0;
+  margin: 0 16px calc(24px + env(safe-area-inset-bottom)) 16px;
+  padding: 15px; font-size: 17px; flex-shrink: 0;
   box-sizing: border-box;
-  border-radius: 16px;
-  letter-spacing: -.2px;
 }
 .btn-green { background: var(--green) !important; }
 .btn-red   { background: var(--red) !important; }
@@ -1040,15 +1072,14 @@ input, button, select, textarea { font-family: inherit; }
 .btn-primary {
   display: block; width: 100%;
   background: var(--blue);
-  color: #fff; border: none; border-radius: 16px;
-  padding: 16px; font-size: 17px; font-weight: 700;
+  color: #fff; border: none; border-radius: 14px;
+  padding: 16px; font-size: 17px; font-weight: 600;
   cursor: pointer; font-family: inherit;
-  transition: opacity .18s, transform .2s cubic-bezier(.32,1,.23,1);
+  transition: opacity .15s, transform .1s;
   -webkit-tap-highlight-color: transparent;
   min-height: 50px;
-  letter-spacing: -.2px;
 }
-.btn-primary:active { opacity: .80; transform: scale(.96); }
+.btn-primary:active { opacity: .82; transform: scale(.98); }
 .btn-primary span { opacity: .8; margin-left: 4px; }
 @media (prefers-color-scheme: light) {
   .btn-primary { box-shadow: 0 2px 10px rgba(0,122,255,.26); }
@@ -1066,6 +1097,8 @@ input, button, select, textarea { font-family: inherit; }
 .btn-green-tint  { background: rgba(50,215,75,.12);  color: var(--green); }
 
 /* ── 25. SETTINGS — Inset Grouped Sections ── */
+
+/* Section wrapper with proper 16px side gutters */
 .settings-section-group { margin-bottom: 28px; }
 .settings-section-header {
   font-size: 13px; font-weight: 400; color: var(--sub);
@@ -1073,9 +1106,12 @@ input, button, select, textarea { font-family: inherit; }
   padding: 0 32px 8px; margin-top: 0;
 }
 
+/* Settings uses ig-section (same 10px IG sections) */
+/* Reuse .ig-section + .ig-cell inside settings page */
 .page-scroll .ig-section { margin: 0 16px; }
 .page-scroll .ig-group-wrap { margin-bottom: 28px; }
 
+/* Toggle row in settings */
 .settings-toggle-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0 16px; min-height: 44px; cursor: pointer;
@@ -1100,6 +1136,7 @@ input, button, select, textarea { font-family: inherit; }
 .toggle-switch.active { background: var(--green); }
 .toggle-switch.active::after { transform: translateX(20px); }
 
+/* Settings row buttons (data section) */
 .settings-row-btn {
   display: flex; justify-content: space-between; align-items: center;
   width: 100%; background: none; border: none;
@@ -1118,11 +1155,13 @@ input, button, select, textarea { font-family: inherit; }
 .row-chevron { color: var(--sub2); font-size: 15px; font-weight: 600; }
 .danger-btn  { color: var(--red) !important; }
 
+/* Legacy field wrappers — kept for JS-rendered content */
 .settings-field { margin-bottom: 14px; padding: 0 2px; }
 .settings-field label {
   display: block; font-size: 13px; color: var(--sub); font-weight: 500;
   margin-bottom: 7px;
 }
+/* Amount wrap now inside ig-cell — standalone use only in analysis */
 .amount-input-wrap {
   display: flex; align-items: center; gap: 8px;
   background: var(--fill3); border: .5px solid var(--separator);
@@ -1136,6 +1175,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .amount-input-wrap input::placeholder { color: var(--sub2); font-weight: 400; }
 
+/* Overtime row */
 .overtime-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0 16px; min-height: 44px; cursor: pointer;
@@ -1150,6 +1190,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .overtime-row:active { background: var(--fill3); }
 
+/* Calc preview */
 .calc-preview {
   display: none; text-align: center; font-size: 13px; color: var(--sub);
   padding: 10px; background: rgba(10,132,255,.08); border-radius: 10px;
@@ -1178,6 +1219,7 @@ input, button, select, textarea { font-family: inherit; }
 .acc-emoji { font-size: 24px; }
 .acc-name  { flex: 1; font-size: 17px; font-weight: 500; color: var(--text); }
 
+/* Emoji picker */
 .account-emoji-pick { display: flex; gap: 10px; flex-wrap: wrap; padding: 12px 16px 16px; }
 .ae-btn {
   width: 50px; height: 50px; border-radius: 14px;
@@ -1255,6 +1297,7 @@ input, button, select, textarea { font-family: inherit; }
 .rec-amt   { font-size: 15px; font-weight: 700; color: var(--red); }
 .rec-total { text-align: right; font-size: 12px; color: var(--sub); padding: 8px 16px 4px; font-weight: 600; }
 
+/* Recurring category grid */
 .rec-cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 8px; }
 .rec-cat-option {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -1394,6 +1437,7 @@ input, button, select, textarea { font-family: inherit; }
 }
 .account-picker-row:active { background: var(--fill3); }
 
+/* Transfer modal internals */
 .transfer-account-selector {
   margin: 8px 16px 4px;
   background: var(--bg-grouped2); border-radius: 10px; overflow: hidden;
@@ -1497,6 +1541,7 @@ button, a, [onclick],
 }
 .np-btn:active { background: var(--fill2); }
 
+/* ── 38. SEARCH INPUT iOS FIX ── */
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
   display: none;
