@@ -478,7 +478,7 @@ input, button, select, textarea { font-family: inherit; }
   padding: 8px 0 0;
 }
 
-/* ── 9. ACCOUNT BAR ── */
+/* ── 9. ACCOUNT BAR — glass-aligned with hero ── */
 .account-bar {
   max-width: 500px; margin: 8px auto 0;
   display: flex; align-items: center; gap: 8px;
@@ -492,14 +492,17 @@ input, button, select, textarea { font-family: inherit; }
 .account-scroll::-webkit-scrollbar { display: none; }
 .acc-chip {
   flex-shrink: 0;
-  background: var(--fill3); border: .5px solid var(--separator);
+  background: var(--fill3);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: .5px solid var(--border);
   color: var(--sub); font-size: 14px; font-weight: 600;
   padding: 7px 15px; border-radius: var(--pill-radius);
   cursor: pointer; white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
   min-height: 34px; display: flex; align-items: center;
-  transition: background .15s, color .15s, border-color .15s;
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
   font-family: inherit;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 .acc-chip.active {
   background: rgba(10,132,255,.16);
@@ -515,7 +518,8 @@ input, button, select, textarea { font-family: inherit; }
   flex-shrink: 0; font-size: 22px; line-height: 1;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   -webkit-tap-highlight-color: transparent;
-  transition: background .15s, transform .1s;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(10,132,255,.20);
 }
 .account-add-btn:active { background: rgba(10,132,255,.26); transform: scale(.92); }
 .reset-filter-btn {
@@ -523,7 +527,8 @@ input, button, select, textarea { font-family: inherit; }
   width: 34px; height: 34px; border-radius: 50%;
   font-size: 16px; cursor: pointer; margin-left: 4px;
   display: inline-flex; align-items: center; justify-content: center;
-  transition: background .15s, transform .1s;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(10,132,255,.20);
 }
 .reset-filter-btn:active { background: rgba(10,132,255,.26); transform: scale(.92); }
 
@@ -646,34 +651,46 @@ input, button, select, textarea { font-family: inherit; }
 }
 .see-all-btn:active { opacity: .6; }
 
-/* ── 14. RECENT LIST (Inset Grouped) ── */
+/* ── 14. RECENT LIST (Hero-card style) ── */
 .recent-list { max-width: 500px; margin: auto; padding: 0 16px; }
 
+/* Group container styled like .hero-card */
 .recent-group {
-  background: var(--glass2);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: .5px solid var(--border);
-  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(32,32,36,.90) 0%, rgba(20,20,22,.82) 100%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: .5px solid rgba(255,255,255,.14);
+  border-radius: 20px;
+  padding: 12px 0;
   overflow: hidden;
   margin-bottom: 8px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.32), 0 1px 0 rgba(255,255,255,.06) inset;
+  position: relative;
+}
+@media (prefers-color-scheme: light) {
+  .recent-group {
+    background: linear-gradient(145deg, rgba(255,255,255,.97) 0%, rgba(240,240,248,.90) 100%);
+    border-color: rgba(0,0,0,.08);
+    box-shadow: 0 6px 24px rgba(0,0,0,.07), 0 1px 0 rgba(255,255,255,.9) inset;
+  }
 }
 
-/* ── 15. DATE SEPARATOR (iOS Section Header) ── */
+/* ── 15. DATE SEPARATOR (iOS Section Header — hero-aligned) ── */
 .section-header-date {
-  font-size: 13px; font-weight: 500;
+  font-size: 13px; font-weight: 600;
   color: var(--sub);
-  text-transform: uppercase; letter-spacing: .4px;
+  text-transform: uppercase; letter-spacing: .8px;
   padding: 16px 0 8px;
-  margin-left: 32px;
+  margin-left: 16px;
 }
 
 /* ── 16. TRANSACTION ROWS ── */
 .tx-swipe-wrap {
   overflow: hidden; position: relative;
-  border-bottom: 0.5px solid var(--border2);
-  margin-left: 54px;
+  /* No border-bottom — separator handled by .tx-row-inner::after */
+  margin-left: 16px;
+  margin-right: 16px;
 }
-.tx-swipe-wrap:last-child { border-bottom: none; }
 .tx-delete-bg {
   position: absolute; right: 0; top: 0; bottom: 0;
   background: var(--red); display: flex; align-items: center;
@@ -682,13 +699,22 @@ input, button, select, textarea { font-family: inherit; }
 }
 .tx-row-inner {
   display: flex; align-items: center; gap: 12px;
-  padding: 11px 0;
+  padding: 14px 0;
   min-height: 44px;
   background: transparent; transition: transform .2s ease, background .12s;
   animation: fadeUp .25s ease both;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
+  position: relative;
 }
+/* Subtle separator between rows — starts right of the icon (54px) */
+.tx-row-inner::after {
+  content: '';
+  position: absolute; bottom: 0; left: 54px; right: 0;
+  height: .5px;
+  background: var(--border2);
+}
+.tx-swipe-wrap:last-child .tx-row-inner::after { display: none; }
 .tx-row-inner:active { background: var(--fill4); }
 .tx-emoji {
   width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
@@ -728,18 +754,22 @@ input, button, select, textarea { font-family: inherit; }
 .empty-msg   { font-size: 15px; color: var(--sub); text-align: center; line-height: 1.5; font-weight: 400; }
 .empty-add-btn { width: 200px !important; margin-top: 14px; }
 
-/* ── 18. GLASS CARD (Movimenti / Analisi) ── */
+/* ── 18. GLASS CARD (Movimenti / Analisi) — hero-card aligned ── */
 .glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: .5px solid var(--border);
-  border-radius: 16px; padding: 18px; margin: 0 16px 14px;
+  background: linear-gradient(145deg, rgba(32,32,36,.90) 0%, rgba(20,20,22,.82) 100%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: .5px solid rgba(255,255,255,.14);
+  border-radius: 20px; padding: 18px; margin: 0 16px 14px;
   overflow: visible;
+  box-shadow: 0 12px 40px rgba(0,0,0,.32), 0 1px 0 rgba(255,255,255,.06) inset;
+  position: relative;
 }
 @media (prefers-color-scheme: light) {
   .glass-card {
-    box-shadow: 0 2px 14px rgba(0,0,0,.06), 0 1px 0 rgba(255,255,255,.9) inset;
+    background: linear-gradient(145deg, rgba(255,255,255,.97) 0%, rgba(240,240,248,.90) 100%);
+    border-color: rgba(0,0,0,.08);
+    box-shadow: 0 6px 24px rgba(0,0,0,.07), 0 1px 0 rgba(255,255,255,.9) inset;
   }
 }
 .card-title {
@@ -869,7 +899,7 @@ input, button, select, textarea { font-family: inherit; }
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top-left-radius: var(--sheet-radius);
   border-top-right-radius: var(--sheet-radius);
-  padding: 0 0 calc(32px + env(safe-area-inset-bottom));
+  padding: 0 0 calc(48px + env(safe-area-inset-bottom));
   transform: translateY(100%);
   transition: transform .34s cubic-bezier(.32,.72,0,1);
   box-shadow: 0 -1px 0 var(--separator) inset, 0 -20px 60px rgba(0,0,0,.50);
