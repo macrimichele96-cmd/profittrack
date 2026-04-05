@@ -324,6 +324,11 @@ if ('serviceWorker' in navigator) {
       });
     });
   }).catch(()=>{});
+
+  // Auto-reload when a new SW takes control (new version deployed)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
 }
 async function applyUpdate() {
   if (!('serviceWorker' in navigator)) return;
@@ -2218,7 +2223,13 @@ window.addEventListener('offline', renderNetworkIndicator);
 function togglePrivacyMode() {
   triggerHaptic();
   privacyMode = !privacyMode;
-  localStorage.setItem('pt_privacy', privacyMode);
+  try {
+    localStorage.setItem('pt_privacy', privacyMode);
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      showDebugToast('Memoria locale piena. Esporta il backup per sicurezza.');
+    }
+  }
   
   const toggle = document.getElementById('privacyToggle');
   if (toggle) toggle.classList.toggle('active', privacyMode);

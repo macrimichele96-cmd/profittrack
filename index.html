@@ -550,38 +550,40 @@
     <button class="modal-x" onclick="closeModal()" aria-label="Chiudi">✕</button>
   </div>
 
-  <div class="type-toggle">
-    <button class="type-btn active" id="typeBtnUsc" onclick="setModalType('usc')">Uscita</button>
-    <button class="type-btn" id="typeBtnInc" onclick="setModalType('inc')">Entrata</button>
-  </div>
+  <div class="modal-sheet-content">
+    <div class="type-toggle">
+      <button class="type-btn active" id="typeBtnUsc" onclick="setModalType('usc')">Uscita</button>
+      <button class="type-btn" id="typeBtnInc" onclick="setModalType('inc')">Entrata</button>
+    </div>
 
-  <div class="modal-amount-row">
-    <span class="modal-currency">€</span>
-    <input id="amountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onEntryAmountInputChange()">
-  </div>
-  <div id="timeDeterrent" class="time-deterrent" style="display:none;"></div>
+    <div class="modal-amount-row">
+      <span class="modal-currency">€</span>
+      <input id="amountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onEntryAmountInputChange()">
+    </div>
+    <div id="timeDeterrent" class="time-deterrent" style="display:none;"></div>
 
-  <div class="cat-hscroll" id="catHScroll">
-    <div class="cat-hlist" id="catGrid"></div>
-  </div>
+    <div class="cat-hscroll" id="catHScroll">
+      <div class="cat-hlist" id="catGrid"></div>
+    </div>
 
-  <div class="modal-meta-row">
-    <button class="meta-btn" id="dateSelectorBtn" onclick="openDatePicker()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span id="dateSelectorLabel">Oggi</span>
-    </button>
-    <button class="meta-btn" id="accountSelectorBtn" onclick="openAccountPicker('modal')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/>
-        <line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-      <span id="accountSelectorLabel">Principale</span>
-    </button>
+    <div class="modal-meta-row">
+      <button class="meta-btn" id="dateSelectorBtn" onclick="openDatePicker()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span id="dateSelectorLabel">Oggi</span>
+      </button>
+      <button class="meta-btn" id="accountSelectorBtn" onclick="openAccountPicker('modal')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        <span id="accountSelectorLabel">Principale</span>
+      </button>
+    </div>
   </div>
 
   <button class="btn-primary modal-confirm-btn" id="modalConfirmBtn" onclick="confirmEntry()">Fatto</button>
@@ -695,35 +697,37 @@
     <button class="modal-x" onclick="closeTransferModal()" aria-label="Chiudi">✕</button>
   </div>
 
-  <div class="modal-amount-row">
-    <span class="modal-currency">€</span>
-    <input id="transferAmountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onTransferAmountInputChange()">
-  </div>
+  <div class="modal-sheet-content">
+    <div class="modal-amount-row">
+      <span class="modal-currency">€</span>
+      <input id="transferAmountInput" class="amount-native-input" type="text" inputmode="decimal" placeholder="0" oninput="onTransferAmountInputChange()">
+    </div>
 
-  <!-- Transfer account selector — Inset Grouped -->
-  <div class="ig-group-wrap" style="margin-bottom:8px;">
-    <div class="ig-section">
-      <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
-        <div class="transfer-account-label">Da</div>
-        <div class="transfer-account-value" id="transferFromSelectorLabel">🏦 Principale</div>
-        <div class="chevron"></div>
-      </div>
-      <div class="transfer-account-row" onclick="openTransferAccountPicker('to')">
-        <div class="transfer-account-label">A</div>
-        <div class="transfer-account-value" id="transferToSelectorLabel">💳 Secondario</div>
-        <div class="chevron"></div>
+    <!-- Transfer account selector — Inset Grouped -->
+    <div class="ig-group-wrap" style="margin-bottom:8px;">
+      <div class="ig-section">
+        <div class="transfer-account-row" onclick="openTransferAccountPicker('from')">
+          <div class="transfer-account-label">Da</div>
+          <div class="transfer-account-value" id="transferFromSelectorLabel">🏦 Principale</div>
+          <div class="chevron"></div>
+        </div>
+        <div class="transfer-account-row" onclick="openTransferAccountPicker('to')">
+          <div class="transfer-account-label">A</div>
+          <div class="transfer-account-value" id="transferToSelectorLabel">💳 Secondario</div>
+          <div class="chevron"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal-meta-row" style="padding-top:0;">
-    <button class="meta-btn" id="transferDateSelectorBtn" onclick="openTransferDatePicker()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-        <rect x="3" y="4" width="20" height="16" rx="2"/>
-        <line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-      <span id="transferDateSelectorLabel">Oggi</span>
-    </button>
+    <div class="modal-meta-row" style="padding-top:0;">
+      <button class="meta-btn" id="transferDateSelectorBtn" onclick="openTransferDatePicker()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="3" y="4" width="20" height="16" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        <span id="transferDateSelectorLabel">Oggi</span>
+      </button>
+    </div>
   </div>
 
   <button class="btn-primary modal-confirm-btn" id="transferConfirmBtn" onclick="confirmTransfer()"
