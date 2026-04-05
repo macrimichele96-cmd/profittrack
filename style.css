@@ -1538,3 +1538,6 @@ button, a, [onclick],
   -webkit-tap-highlight-color: transparent; transition: background .15s;
 }
 .np-btn:active { background: var(--fill2); }
+@supports (height: 100dvh) {
+  html, body { min-height: 100dvh; }
+}
