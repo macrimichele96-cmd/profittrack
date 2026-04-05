@@ -131,10 +131,12 @@ input, button, select, textarea { font-family: inherit; }
   position: fixed; inset: 0; z-index: 9999;
   background: var(--bg-grouped);
   display: flex; flex-direction: column; align-items: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding:
     calc(env(safe-area-inset-top) + 24px)
     24px
-    calc(env(safe-area-inset-bottom) + 24px);
+    calc(env(safe-area-inset-bottom) + 32px);
   animation: fadeIn .35s ease;
 }
 
@@ -158,9 +160,9 @@ input, button, select, textarea { font-family: inherit; }
 .onboarding-card { width: 100%; max-width: 360px; text-align: center; position: relative; }
 .onboarding-step { animation: fadeIn .3s ease; position: relative; }
 .ob-back-btn {
-  position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
-  left: 16px;
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 0;
   background: none; border: none;
   color: var(--blue); font-size: 17px;
   cursor: pointer; padding: 10px 14px;
@@ -1538,6 +1540,13 @@ button, a, [onclick],
   -webkit-tap-highlight-color: transparent; transition: background .15s;
 }
 .np-btn:active { background: var(--fill2); }
+
+/* ── 38. SEARCH INPUT iOS FIX ── */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  display: none;
+}
+
 @supports (height: 100dvh) {
   html, body { min-height: 100dvh; }
 }

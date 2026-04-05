@@ -1,4 +1,4 @@
-const CACHE_NAME = 'profittrack-v2';
+const CACHE_NAME = 'profittrack-v4';
 const INDEX_URL = './index.html';
 const OFFLINE_URL = './offline.html';
 const ASSETS = [
