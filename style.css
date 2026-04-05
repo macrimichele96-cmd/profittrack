@@ -155,16 +155,19 @@ input, button, select, textarea { font-family: inherit; }
 }
 .progress-line.completed { background: var(--green); }
 
-.onboarding-card { width: 100%; max-width: 360px; text-align: center; }
-.onboarding-step { animation: fadeIn .3s ease; }
+.onboarding-card { width: 100%; max-width: 360px; text-align: center; position: relative; }
+.onboarding-step { animation: fadeIn .3s ease; position: relative; }
 .ob-back-btn {
-  position: absolute; top: 0; left: 0;
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: 16px;
   background: none; border: none;
   color: var(--blue); font-size: 17px;
   cursor: pointer; padding: 10px 14px;
   min-width: 44px; min-height: 44px;
   display: flex; align-items: center;
   -webkit-tap-highlight-color: transparent;
+  z-index: 10;
 }
 .ob-back-btn:active { opacity: .5; }
 .onboarding-icon   { font-size: 60px; margin-bottom: 18px; }
@@ -219,10 +222,9 @@ input, button, select, textarea { font-family: inherit; }
 
 .ig-section {
   background: var(--bg-grouped2);
-  border-radius: var(--card-radius);
+  border-radius: 14px;
   margin: 0 16px;
   overflow: hidden;
-  /* iOS inset grouped has a subtle border in light mode */
 }
 @media (prefers-color-scheme: light) {
   .ig-section {
@@ -232,7 +234,7 @@ input, button, select, textarea { font-family: inherit; }
 
 .ig-cell {
   display: flex; align-items: center;
-  padding: 0 16px;
+  padding: 12px 16px;
   min-height: 44px;
   position: relative;
   cursor: default;
@@ -245,7 +247,7 @@ input, button, select, textarea { font-family: inherit; }
   content: '';
   position: absolute; top: 0; left: 16px; right: 0;
   height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .ig-cell.ig-interactive { cursor: pointer; }
 .ig-cell.ig-interactive:active { background: var(--fill3); }
@@ -257,7 +259,6 @@ input, button, select, textarea { font-family: inherit; }
 }
 .ig-cell-label {
   flex: 1; font-size: 17px; color: var(--text); line-height: 1.4;
-  padding: 11px 0;
 }
 .ig-cell-label-sm {
   font-size: 15px; color: var(--text);
@@ -276,7 +277,7 @@ input, button, select, textarea { font-family: inherit; }
 .ig-cell-input {
   flex: 1; background: none; border: none; outline: none;
   font-size: 17px; color: var(--text); font-family: inherit;
-  padding: 11px 0; min-width: 0;
+  padding: 0; min-width: 0;
   -webkit-appearance: none;
 }
 .ig-cell-input::placeholder { color: var(--sub2); }
@@ -886,7 +887,9 @@ input, button, select, textarea { font-family: inherit; }
 }
 
 .bottom-sheet .btn-primary {
+  width: calc(100% - 32px);
   margin: 0 16px calc(24px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 /* Internal scroll container for bottom sheets */
@@ -944,13 +947,13 @@ input, button, select, textarea { font-family: inherit; }
 
 .modal-header {
   position: relative; display: flex; justify-content: center; align-items: center;
-  padding: 8px 20px 10px; flex-direction: column;
+  padding: 16px 20px 10px; flex-direction: column;
 }
 /* Grabber inside modal header */
 .modal-header .modal-handle { margin: 0 auto 10px; }
 
 .modal-x {
-  position: absolute; right: 16px; top: 14px;
+  position: absolute; right: 16px; top: 16px;
   width: 30px; height: 30px; border-radius: 15px;
   background: var(--fill3); border: none;
   color: var(--sub); font-size: 13px; font-weight: 700;
@@ -1045,7 +1048,12 @@ input, button, select, textarea { font-family: inherit; }
 .meta-btn svg { flex-shrink: 0; stroke: var(--sub); }
 .meta-btn span { overflow: hidden; text-overflow: ellipsis; }
 
-.modal-confirm-btn { margin: 0 16px calc(24px + env(safe-area-inset-bottom)) 16px; padding: 15px; font-size: 17px; flex-shrink: 0; }
+.modal-confirm-btn {
+  width: calc(100% - 32px);
+  margin: 0 16px calc(24px + env(safe-area-inset-bottom)) 16px;
+  padding: 15px; font-size: 17px; flex-shrink: 0;
+  box-sizing: border-box;
+}
 .btn-green { background: var(--green) !important; }
 .btn-red   { background: var(--red) !important; }
 
@@ -1138,9 +1146,10 @@ input, button, select, textarea { font-family: inherit; }
 .settings-row-btn + .settings-row-btn::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .settings-row-btn:active { background: var(--fill3); }
+.settings-row-btn:last-child { border-bottom: none; }
 .row-chevron { color: var(--sub2); font-size: 15px; font-weight: 600; }
 .danger-btn  { color: var(--red) !important; }
 
@@ -1175,7 +1184,7 @@ input, button, select, textarea { font-family: inherit; }
 .overtime-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .overtime-row:active { background: var(--fill3); }
 
@@ -1203,7 +1212,7 @@ input, button, select, textarea { font-family: inherit; }
 .acc-row + .acc-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .acc-emoji { font-size: 24px; }
 .acc-name  { flex: 1; font-size: 17px; font-weight: 500; color: var(--text); }
@@ -1244,7 +1253,7 @@ input, button, select, textarea { font-family: inherit; }
 .add-recurring-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .add-recurring-row input {
   background: none; border: none; outline: none;
@@ -1279,7 +1288,7 @@ input, button, select, textarea { font-family: inherit; }
 .rec-row + .rec-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .rec-emoji { font-size: 20px; }
 .rec-name  { flex: 1; font-size: 17px; color: var(--text); }
@@ -1422,7 +1431,7 @@ input, button, select, textarea { font-family: inherit; }
 .account-picker-row + .account-picker-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .account-picker-row:active { background: var(--fill3); }
 
@@ -1440,7 +1449,7 @@ input, button, select, textarea { font-family: inherit; }
 .transfer-account-row + .transfer-account-row::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .transfer-account-row:active { background: var(--fill3); }
 .transfer-account-label { font-size: 15px; font-weight: 600; color: var(--blue); width: 40px; }
@@ -1456,7 +1465,7 @@ input, button, select, textarea { font-family: inherit; }
 .transfer-acc-card + .transfer-acc-card::before {
   content: ''; position: absolute;
   top: 0; left: 16px; right: 0; height: .5px;
-  background: var(--separator);
+  background: var(--border);
 }
 .transfer-acc-card:active  { background: var(--fill3); }
 .transfer-acc-card.active  { background: rgba(10,132,255,.10); }
