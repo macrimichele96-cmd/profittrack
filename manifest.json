@@ -4,14 +4,19 @@
   "description": "Tieni traccia di entrate e uscite. Scopri quanto vale il tuo tempo.",
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "id": "/",
+  "scope": "./",
   "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",
   "lang": "it",
   "categories": ["finance", "productivity"],
   "icons": [
-    { "src": "image.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "image.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "image.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "image.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "image.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "image.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
     {

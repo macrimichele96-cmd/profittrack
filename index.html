@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ProfitTrack">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-<title>ProfitTrack</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="image.png">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ProfitTrack">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <title>ProfitTrack</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="image.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Splash screen placeholder while JS loads */
+    #splash {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .4s ease;
+    }
+    #splash img { width: 120px; height: 120px; border-radius: 27px; }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+  </style>
 </head>
 <body>
+  <div id="splash"><img src="image.png" alt="ProfitTrack"></div>
 
 <!-- ══ ONBOARDING (Multi-Step) ══ -->
 <div id="onboarding" class="onboarding-overlay" style="display:none;">

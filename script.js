@@ -327,8 +327,21 @@ if ('serviceWorker' in navigator) {
 
   // Auto-reload when a new SW takes control (new version deployed)
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload();
+    if (document.getElementById('modalSheet')?.classList.contains('open') ||
+        document.getElementById('transferModalSheet')?.classList.contains('open')) {
+      document.getElementById('updateBanner').style.display = 'flex';
+    } else {
+      window.location.reload();
+    }
   });
+
+  // Keyboard avoiding on iOS
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const offset = window.innerHeight - window.visualViewport.height;
+      document.documentElement.style.setProperty('--kb-offset', offset + 'px');
+    });
+  }
 }
 async function applyUpdate() {
   if (!('serviceWorker' in navigator)) return;
@@ -383,6 +396,12 @@ window.onload = async () => {
   } else {
     bootApp();
   }
+  
+  // Hide splash screen after content is ready
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    if (s) { s.classList.add('hidden'); setTimeout(() => s.remove(), 400); }
+  }, 600);
 };
 
 function initPrivacyToggle() {
