@@ -1,6 +1,8 @@
 'use strict';
 
 // ─── CATEGORIE ───────────────────────────────────────────────────────────────
+
+let _dayPickerInited = false;
 const CATS_USC = [
   { id:'cibo',        label:'Cibo',        emoji:'🛒', color:'#FF9F0A' },
   { id:'affitto',     label:'Affitto',     emoji:'🏡', color:'#0A84FF' },
@@ -413,22 +415,27 @@ function initPrivacyToggle() {
 }
 
 // ─── ONBOARDING MULTI-STEP ───────────────────────────────────────────────────
+let _dayPickerInited = false;
 function renderOnboardingStep() {
-  document.querySelectorAll('.onboarding-step').forEach((el, i) => {
-    el.style.display = (i + 1) === onboardingStep ? 'block' : 'none';
-  });
-  document.querySelectorAll('.progress-dot').forEach(dot => {
-    const step = parseInt(dot.dataset.step);
-    dot.classList.toggle('active', step <= onboardingStep);
-    dot.classList.toggle('completed', step < onboardingStep);
-  });
-  document.querySelectorAll('.progress-line').forEach((line, i) => {
-    line.classList.toggle('completed', i + 1 < onboardingStep);
-  });
-  document.getElementById('onboarding').style.display = 'flex';
-  
-  initOnboardingDayPicker();
-}
+   document.querySelectorAll('.onboarding-step').forEach((el, i) => {
+     el.style.display = (i + 1) === onboardingStep ? 'block' : 'none';
+   });
+   document.querySelectorAll('.progress-dot').forEach(dot => {
+     const step = parseInt(dot.dataset.step);
+     dot.classList.toggle('active', step <= onboardingStep);
+     dot.classList.toggle('completed', step < onboardingStep);
+   });
+   document.querySelectorAll('.progress-line').forEach((line, i) => {
+     line.classList.toggle('completed', i + 1 < onboardingStep);
+   });
+   document.getElementById('onboarding').style.display = 'flex';
+   
+   // Inizializza il day picker solo la prima volta che si mostra lo step 2
+   if (onboardingStep === 2 && !_dayPickerInited) {
+     _dayPickerInited = true;
+     initOnboardingDayPicker();
+   }
+ }
 
 function nextOnboardingStep() {
   triggerHaptic();
