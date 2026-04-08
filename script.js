@@ -393,11 +393,15 @@ window.onload = async () => {
 
   initPrivacyToggle();
   
-  if (!gSettings.stip || gSettings.stip===0) {
-    onboardingStep = 1;
-    renderOnboardingStep();
-  } else {
-    bootApp();
+    try {
+    if (!gSettings.stip || gSettings.stip===0) {
+      onboardingStep = 1;
+      renderOnboardingStep();
+    } else {
+      bootApp();
+    }
+  } catch(e) {
+    console.error('Boot error:', e);
   }
   
   // Hide splash screen after content is ready
