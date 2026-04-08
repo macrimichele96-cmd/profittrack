@@ -419,7 +419,6 @@ function initPrivacyToggle() {
 }
 
 // ─── ONBOARDING MULTI-STEP ───────────────────────────────────────────────────
-let _dayPickerInited = false;
 function renderOnboardingStep() {
    document.querySelectorAll('.onboarding-step').forEach((el, i) => {
      el.style.display = (i + 1) === onboardingStep ? 'block' : 'none';
