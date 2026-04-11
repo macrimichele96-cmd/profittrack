@@ -323,16 +323,16 @@ input, button, select, textarea { font-family: inherit; }
 .ig-cell-action.ig-danger { color: var(--red); }
 
 /* ── 5. DAY PICKER (iOS 18 pill style) ── */
-.day-picker {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.day-btn {
-  flex: 1;
-  min-width: 40px;
-  min-height: 36px;
-  padding: 6px 4px;
+  .day-picker {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .day-btn {
+    flex: none;
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 2px;
   background: var(--fill4);
   border: none;
   border-radius: 12px;
@@ -350,10 +350,17 @@ input, button, select, textarea { font-family: inherit; }
   background: var(--fill3);
 }
 .day-btn.active {
-  background: var(--blue);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(10,132,255,0.4);
-}
+    background: rgba(255,69,58,.16);
+    border: .5px solid var(--red);
+    color: var(--red);
+    box-shadow: none;
+  }
+  @media (prefers-color-scheme: light) {
+    .day-btn.active {
+      background: rgba(255,59,48,.12);
+      border-color: var(--red);
+    }
+  }
 
 /* ── 6. TOP NAVIGATION BAR ── */
 .top-nav {
@@ -782,7 +789,15 @@ input, button, select, textarea { font-family: inherit; }
 .empty-icon  { font-size: 38px; opacity: .2; }
 .empty-title { font-size: 17px; font-weight: 600; margin-top: 2px; text-align: center; }
 .empty-msg   { font-size: 15px; color: var(--sub); text-align: center; line-height: 1.5; font-weight: 400; }
-.empty-add-btn { width: 200px !important; margin-top: 14px; }
+.empty-add-btn {
+    width: auto !important;
+    min-width: 160px;
+    max-width: 220px;
+    margin-top: 14px;
+    padding: 12px 20px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
 
 /* ── 18. GLASS CARD (Movimenti / Analisi) — hero-card aligned ── */
 .glass-card {
@@ -921,25 +936,30 @@ input, button, select, textarea { font-family: inherit; }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
 
 .bottom-sheet {
-  position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1100;
-  background: var(--bg2);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top-left-radius: var(--sheet-radius);
-  border-top-right-radius: var(--sheet-radius);
-  padding: 0;
-  transform: translateY(100%);
-  transition: transform .32s cubic-bezier(.32,.72,0,1);
-  box-shadow: 0 -1px 0 var(--separator), 0 -20px 60px rgba(0,0,0,.40);
-  max-height: 90dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.bottom-sheet.active { transform: translateY(0); }
-@media (prefers-color-scheme: light) {
-  .bottom-sheet { background: var(--bg-grouped); }
-}
+    position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1100;
+    background: rgba(28,28,30,.96);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-top-left-radius: var(--sheet-radius);
+    border-top-right-radius: var(--sheet-radius);
+    border-top: .5px solid rgba(255,255,255,.12);
+    padding: 0;
+    transform: translateY(100%);
+    transition: transform .36s cubic-bezier(.32,.72,0,1);
+    box-shadow: 0 -2px 40px rgba(0,0,0,.55), 0 -1px 0 rgba(255,255,255,.07) inset;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .bottom-sheet.active { transform: translateY(0); }
+  @media (prefers-color-scheme: light) {
+    .bottom-sheet {
+      background: rgba(242,242,247,.97);
+      border-top-color: rgba(0,0,0,.10);
+      box-shadow: 0 -2px 40px rgba(0,0,0,.14);
+    }
+  }
 
 .bottom-sheet .btn-primary {
   width: calc(100% - 32px);
@@ -969,27 +989,32 @@ input, button, select, textarea { font-family: inherit; }
 }
 
 /* ── 23. ENTRY MODAL SHEET ── */
-.modal-sheet {
-  position: fixed; bottom: var(--kb-offset, 0px); left: 0; width: 100%;
-  z-index: 1100;
-  background: var(--bg2);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top-left-radius: var(--sheet-radius);
-  border-top-right-radius: var(--sheet-radius);
-  padding: 0;
-  transform: translateY(100%);
-  transition: transform .34s cubic-bezier(.32,.72,0,1);
-  box-shadow: 0 -1px 0 var(--separator) inset, 0 -20px 60px rgba(0,0,0,.50);
-  max-height: 90dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.modal-sheet.active { transform: translateY(0); }
-@media (prefers-color-scheme: light) {
-  .modal-sheet { background: var(--bg-grouped); }
-}
+  .modal-sheet {
+    position: fixed; bottom: var(--kb-offset, 0px); left: 0; width: 100%;
+    z-index: 1100;
+    background: rgba(28,28,30,.96);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-top-left-radius: var(--sheet-radius);
+    border-top-right-radius: var(--sheet-radius);
+    border-top: .5px solid rgba(255,255,255,.12);
+    padding: 0;
+    transform: translateY(100%);
+    transition: transform .38s cubic-bezier(.32,.72,0,1);
+    box-shadow: 0 -2px 40px rgba(0,0,0,.60), 0 -1px 0 rgba(255,255,255,.08) inset;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-sheet.active { transform: translateY(0); }
+  @media (prefers-color-scheme: light) {
+    .modal-sheet {
+      background: rgba(242,242,247,.96);
+      border-top-color: rgba(0,0,0,.10);
+      box-shadow: 0 -2px 40px rgba(0,0,0,.14);
+    }
+  }
 
 /* Internal scroll container for modal sheets — flex child that scrolls */
 .modal-sheet-content {
@@ -1020,39 +1045,42 @@ input, button, select, textarea { font-family: inherit; }
 }
 .modal-x:active { background: var(--fill2); }
 
-/* Type toggle — iOS segmented control style (iOS 18) */
-.type-toggle {
-  display: flex; background: var(--fill3);
-  border-radius: 10px; padding: 2px;
-  margin: 0 16px 12px;
-  position: relative;
-  z-index: 1;
-}
-.type-btn {
-  flex: 1; padding: 8px 4px;
-  border: none; border-radius: 9px;
-  font-size: 15px; font-weight: 600;
-  background: transparent; color: var(--sub);
-  cursor: pointer; font-family: inherit;
-  transition: background .18s, color .18s, box-shadow .18s;
-  -webkit-tap-highlight-color: transparent;
-  min-height: 34px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  z-index: 1;
-}
-.type-btn.active {
-  background: var(--bg2); color: var(--text);
-  box-shadow: 0 1px 4px rgba(0,0,0,.28), 0 0.5px 0 rgba(255,255,255,.06) inset;
-}
-@media (prefers-color-scheme: light) {
-  .type-btn.active {
-    background: #FFFFFF;
-    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+/* Type toggle — iOS 18 segmented control */
+  .type-toggle {
+    display: flex; background: var(--fill3);
+    border-radius: 12px; padding: 3px;
+    margin: 4px 16px 14px;
+    position: relative; z-index: 1;
   }
-}
+  .type-btn {
+    flex: 1; padding: 9px 4px;
+    border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 700;
+    background: transparent; color: var(--sub);
+    cursor: pointer; font-family: inherit;
+    transition: background .2s cubic-bezier(.32,1,.23,1),
+                color .15s, box-shadow .2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 36px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -.2px;
+  }
+  #typeBtnUsc.active {
+    background: rgba(255,69,58,.18);
+    color: var(--red);
+    box-shadow: 0 1px 4px rgba(255,69,58,.22), 0 .5px 0 rgba(255,255,255,.06) inset;
+  }
+  #typeBtnInc.active {
+    background: rgba(50,215,75,.15);
+    color: var(--green);
+    box-shadow: 0 1px 4px rgba(50,215,75,.20), 0 .5px 0 rgba(255,255,255,.06) inset;
+  }
+  @media (prefers-color-scheme: light) {
+    #typeBtnUsc.active { background: rgba(255,59,48,.12); }
+    #typeBtnInc.active { background: rgba(52,199,89,.12); }
+  }
 
 /* Amount row */
 .modal-amount-row {
@@ -1061,9 +1089,9 @@ input, button, select, textarea { font-family: inherit; }
 }
 .modal-currency { font-size: 34px; font-weight: 300; color: var(--sub); line-height: 1; flex-shrink: 0; }
 .amount-native-input {
-  flex: 1; width: 100%; border: none; outline: none; background: transparent;
-  font-family: inherit; font-size: 52px; font-weight: 700; letter-spacing: -2px;
-  color: var(--text); line-height: 1; padding: 0 0 4px; min-width: 0;
+    flex: 1; width: 100%; border: none; outline: none; background: transparent;
+    font-family: inherit; font-size: 56px; font-weight: 800; letter-spacing: -2.5px;
+    color: var(--text); line-height: 1; padding: 0 0 4px; min-width: 0;
 }
 
 /* Category scroller */
@@ -1125,8 +1153,14 @@ input, button, select, textarea { font-family: inherit; }
   border-radius: 16px;
   letter-spacing: -.2px;
 }
-.btn-green { background: var(--green) !important; }
-.btn-red   { background: var(--red) !important; }
+.btn-green {
+    background: var(--green) !important;
+    box-shadow: 0 4px 16px rgba(50,215,75,.35) !important;
+  }
+  .btn-red {
+    background: var(--red) !important;
+    box-shadow: 0 4px 16px rgba(255,69,58,.35) !important;
+  }
 
 /* Time deterrent */
 .time-deterrent {

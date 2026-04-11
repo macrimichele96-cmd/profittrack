@@ -353,12 +353,14 @@
 
       <!-- Privacy — Inset Grouped -->
       <div class="ig-group-wrap">
+        <div class="ig-group-header">Privacy</div>
         <div class="ig-section">
           <div class="settings-toggle-row ig-cell ig-interactive" onclick="togglePrivacyMode()">
             <span class="ig-cell-label">Nascondi Saldi</span>
             <div id="privacyToggle" class="toggle-switch"></div>
           </div>
         </div>
+        <div class="ig-group-footer">Oscura gli importi per usare l'app in pubblico.</div>
       </div>
 
       <!-- Conti — Inset Grouped -->
@@ -442,9 +444,12 @@
         <!-- Calc preview (outside section, below it) -->
         <div id="calcPreview" class="calc-preview"></div>
 
-        <!-- Save button -->
-        <div style="padding:12px 16px 0;">
-          <button class="btn-primary" onclick="saveSettings()">Salva</button>
+        <!-- Save button — visually connected to the section -->
+        <div style="padding:10px 16px 4px;">
+          <button class="btn-primary" onclick="saveSettings()"
+                  style="border-radius:14px;font-size:17px;font-weight:700;">
+            Salva Parametri
+          </button>
         </div>
       </div>
 
